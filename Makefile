@@ -21,6 +21,8 @@ LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
 LDLIBS = -lcurl -ldl
 
 OBJS = \
+	easy.o \
+	easy_handle.o \
 	module.o
 TARGET = curl.so
 

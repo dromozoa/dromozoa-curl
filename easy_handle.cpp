@@ -15,25 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_COMMON_HPP
-#define DROMOZOA_COMMON_HPP
-
-#include <curl/curl.h>
-
-#include <dromozoa/bind.hpp>
+#include "common.hpp"
 
 namespace dromozoa {
-  class easy_handle {
-  public:
-    explicit easy_handle(CURL* handle);
-    ~easy_handle();
-    void cleanup();
-    CURL* get() const;
-  private:
-    CURL* handle_;
-  };
+  easy_handle::easy_handle(CURL* handle) : handle_(handle) {}
 
-  easy_handle* check_easy_handle(lua_State* L, int arg);
+  easy_handle::~easy_handle() {
+    if (handle_) {
+      cleanup();
+    }
+  }
+
+  void easy_handle::cleanup() {
+    CURL* handle = handle_;
+    handle_ = 0;
+    curl_easy_cleanup(handle);
+  }
+
+  CURL* easy_handle::get() const {
+    return handle_;
+  }
 }
-
-#endif
