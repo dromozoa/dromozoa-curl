@@ -27,6 +27,15 @@ namespace dromozoa {
       check_easy_handle(L, 1)->~easy_handle();
     }
 
+    void impl_call(lua_State* L) {
+      if (CURL* handle = curl_easy_init()) {
+        luaX_new<easy_handle>(L, handle);
+        luaX_set_metatable(L, "dromozoa.curl.easy");
+      } else {
+        luaX_push(L, luaX_nil);
+      }
+    }
+
     void impl_cleanup(lua_State* L) {
       check_easy_handle(L, 1)->cleanup();
       luaX_push_success(L);
@@ -51,6 +60,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__gc", impl_gc);
       lua_pop(L, 1);
 
+      luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "cleanup", impl_cleanup);
       luaX_set_field(L, -1, "reset", impl_reset);
     }
