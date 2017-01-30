@@ -15,8 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local pairs = require "dromozoa.commons.pairs"
 local curl = require "dromozoa.curl"
 
 local easy = assert(curl.easy())
 assert(easy:reset())
 assert(easy:cleanup())
+
+for k, v in pairs(curl) do
+  print(k, v)
+end

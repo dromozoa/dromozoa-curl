@@ -23,6 +23,7 @@ LDLIBS = -lcurl -ldl
 OBJS = \
 	easy.o \
 	easy_handle.o \
+	main.o \
 	module.o
 TARGET = curl.so
 
