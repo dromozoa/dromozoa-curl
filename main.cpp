@@ -142,6 +142,35 @@ namespace dromozoa {
     luaX_set_field<int>(L, -1, "CURLOPT_STREAM_WEIGHT", CURLOPT_STREAM_WEIGHT);
 #endif
 
+    // SMTP OPTIONS
+    luaX_set_field<int>(L, -1, "CURLOPT_MAIL_FROM", CURLOPT_MAIL_FROM);
+    luaX_set_field<int>(L, -1, "CURLOPT_MAIL_RCPT", CURLOPT_MAIL_RCPT);
+    luaX_set_field<int>(L, -1, "CURLOPT_MAIL_AUTH", CURLOPT_MAIL_AUTH);
+
+    // TFTP OPTIONS
+    luaX_set_field<int>(L, -1, "CURLOPT_TFTP_BLKSIZE", CURLOPT_TFTP_BLKSIZE);
+#if CURL_AT_LEAST_VERSION(7,48,0)
+    luaX_set_field<int>(L, -1, "CURLOPT_TFTP_NO_OPTIONS", CURLOPT_TFTP_NO_OPTIONS);
+#endif
+
+    // FTP OPTIONS
+    luaX_set_field<int>(L, -1, "CURLOPT_FTPPORT", CURLOPT_FTPPORT);
+    luaX_set_field<int>(L, -1, "CURLOPT_QUOTE", CURLOPT_QUOTE);
+    luaX_set_field<int>(L, -1, "CURLOPT_POSTQUOTE", CURLOPT_POSTQUOTE);
+    luaX_set_field<int>(L, -1, "CURLOPT_PREQUOTE", CURLOPT_PREQUOTE);
+    luaX_set_field<int>(L, -1, "CURLOPT_APPEND", CURLOPT_APPEND);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_USE_EPRT", CURLOPT_FTP_USE_EPRT);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_USE_EPSV", CURLOPT_FTP_USE_EPSV);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_USE_PRET", CURLOPT_FTP_USE_PRET);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_CREATE_MISSING_DIRS", CURLOPT_FTP_CREATE_MISSING_DIRS);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_RESPONSE_TIMEOUT", CURLOPT_FTP_RESPONSE_TIMEOUT);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_ALTERNATIVE_TO_USER", CURLOPT_FTP_ALTERNATIVE_TO_USER);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_SKIP_PASV_IP", CURLOPT_FTP_SKIP_PASV_IP);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTPSSLAUTH", CURLOPT_FTPSSLAUTH);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_SSL_CCC", CURLOPT_FTP_SSL_CCC);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_ACCOUNT", CURLOPT_FTP_ACCOUNT);
+    luaX_set_field<int>(L, -1, "CURLOPT_FTP_FILEMETHOD", CURLOPT_FTP_FILEMETHOD);
+
     // luaX_set_field<int>(L, -1, "", );
   }
 }
