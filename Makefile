@@ -24,7 +24,8 @@ OBJS = \
 	easy.o \
 	easy_handle.o \
 	main.o \
-	module.o
+	module.o \
+	symbols.o
 TARGET = curl.so
 
 all: $(TARGET)
