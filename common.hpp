@@ -34,6 +34,8 @@ namespace dromozoa {
   };
 
   easy_handle* check_easy_handle(lua_State* L, int arg);
+
+  void push_error(lua_State* L, CURLcode code);
 }
 
 #endif

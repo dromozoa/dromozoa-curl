@@ -18,10 +18,15 @@
 local pairs = require "dromozoa.commons.pairs"
 local curl = require "dromozoa.curl"
 
+assert(curl.global_init())
+assert(curl.global_init())
+
 local easy = assert(curl.easy())
 assert(easy:reset())
 assert(easy:cleanup())
 
 for k, v in pairs(curl) do
-  print(k, v)
+  -- print(k, v)
 end
+
+assert(curl.global_cleanup())

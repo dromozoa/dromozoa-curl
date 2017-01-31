@@ -18,25 +18,9 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  namespace {
-    void impl_global_init(lua_State* L) {
-      long flags = luaX_opt_integer(L, 1, CURL_GLOBAL_ALL);
-      CURLcode result = curl_global_init(flags);
-      if (result == 0) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    void impl_global_cleanup(lua_State* L) {
-      curl_global_cleanup();
-      luaX_push_success(L);
-    }
-  }
-
-  void initialize_main(lua_State* L) {
-    luaX_set_field(L, -1, "global_init", impl_global_init);
-    luaX_set_field(L, -1, "global_cleanup", impl_global_cleanup);
+  void push_error(lua_State* L, CURLcode code) {
+    luaX_push(L, luaX_nil);
+    luaX_push(L, curl_easy_strerror(code));
+    luaX_push<lua_Integer>(L, code);
   }
 }
