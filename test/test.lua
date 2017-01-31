@@ -23,6 +23,15 @@ assert(curl.global_init())
 
 local easy = assert(curl.easy())
 assert(easy:reset())
+
+assert(easy:setopt(curl.CURLOPT_URL, "http://dromozoa.s3.amazonaws.com/pub/index.html"))
+assert(easy:perform())
+print(easy:getinfo(curl.CURLINFO_RESPONSE_CODE))
+
+print(curl.CURL_HTTP_VERSION_1_0)
+print(curl.CURL_HTTP_VERSION_1_1)
+print(curl.CURL_HTTP_VERSION_2_0)
+
 assert(easy:cleanup())
 
 for k, v in pairs(curl) do

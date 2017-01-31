@@ -45,6 +45,55 @@ namespace dromozoa {
       curl_easy_reset(check_easy(L, 1));
       luaX_push_success(L);
     }
+
+
+
+
+
+
+    void impl_setopt(lua_State* L) {
+      CURLoption option = luaX_check_enum<CURLoption>(L, 2);
+      CURLcode result = CURLE_OK;
+      switch (option) {
+        case CURLOPT_URL:
+          const char* value = luaL_checkstring(L, 3);
+          result = curl_easy_setopt(check_easy(L, 1), option, value);
+          break;
+      }
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void impl_perform(lua_State* L) {
+      CURLcode result = curl_easy_perform(check_easy(L, 1));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void impl_getinfo(lua_State* L) {
+      CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
+      CURLcode result = CURLE_OK;
+      switch (info) {
+        case CURLINFO_RESPONSE_CODE:
+          long value = 0;
+          result = curl_easy_getinfo(check_easy(L, 1), info, &value);
+          if (result == CURLE_OK) {
+            luaX_push(L, value);
+            return;
+          }
+      }
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
   }
 
   easy_handle* check_easy_handle(lua_State* L, int arg) {
@@ -63,6 +112,9 @@ namespace dromozoa {
       luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "cleanup", impl_cleanup);
       luaX_set_field(L, -1, "reset", impl_reset);
+      luaX_set_field(L, -1, "setopt", impl_setopt);
+      luaX_set_field(L, -1, "perform", impl_perform);
+      luaX_set_field(L, -1, "getinfo", impl_getinfo);
     }
     luaX_set_field(L, -2, "easy");
   }

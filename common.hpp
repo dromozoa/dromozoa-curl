@@ -36,6 +36,7 @@ namespace dromozoa {
   easy_handle* check_easy_handle(lua_State* L, int arg);
 
   void push_error(lua_State* L, CURLcode code);
+  void push_error_not_implemented(lua_State* L);
 }
 
 #endif
