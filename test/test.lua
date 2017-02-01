@@ -16,6 +16,7 @@
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 local curl = require "dromozoa.curl"
 
 assert(curl.global_init())
@@ -34,8 +35,15 @@ print(curl.CURL_HTTP_VERSION_2_0)
 
 assert(easy:cleanup())
 
+local data = sequence()
 for k, v in pairs(curl) do
-  -- print(k, v)
+  if k:match("^CURLOPT") then
+    data:push({ name = k, value = v })
+  end
+end
+data:sort(function (a, b) return a.value < b.value end)
+for item in data:each() do
+  -- print(item.name, item.value)
 end
 
 assert(curl.global_cleanup())

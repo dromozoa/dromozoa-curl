@@ -46,24 +46,24 @@ namespace dromozoa {
       luaX_push_success(L);
     }
 
-
-
-
-
-
-    void impl_setopt(lua_State* L) {
-      CURLoption option = luaX_check_enum<CURLoption>(L, 2);
-      CURLcode result = CURLE_OK;
-      switch (option) {
-        case CURLOPT_URL:
-          const char* value = luaL_checkstring(L, 3);
-          result = curl_easy_setopt(check_easy(L, 1), option, value);
-          break;
-      }
+    void impl_setopt_string(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
       if (result == CURLE_OK) {
         luaX_push_success(L);
       } else {
         push_error(L, result);
+      }
+    }
+
+    void impl_setopt(lua_State* L) {
+      CURLoption option = luaX_check_enum<CURLoption>(L, 2);
+      switch (option) {
+        case CURLOPT_URL:
+        case CURLOPT_USERAGENT:
+          impl_setopt_string(L, option);
+          return;
+        default:
+          break;
       }
     }
 
@@ -76,22 +76,24 @@ namespace dromozoa {
       }
     }
 
-    void impl_getinfo(lua_State* L) {
-      CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
-      CURLcode result = CURLE_OK;
-      switch (info) {
-        case CURLINFO_RESPONSE_CODE:
-          long value = 0;
-          result = curl_easy_getinfo(check_easy(L, 1), info, &value);
-          if (result == CURLE_OK) {
-            luaX_push(L, value);
-            return;
-          }
-      }
+    void impl_getinfo_long(lua_State* L, CURLINFO info) {
+      long value = 0;
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &value);
       if (result == CURLE_OK) {
-        luaX_push_success(L);
+        luaX_push(L, value);
       } else {
         push_error(L, result);
+      }
+    }
+
+    void impl_getinfo(lua_State* L) {
+      CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
+      switch (info) {
+        case CURLINFO_RESPONSE_CODE:
+          impl_getinfo_long(L, info);
+          return;
+        default:
+          break;
       }
     }
   }
