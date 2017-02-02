@@ -161,7 +161,7 @@ namespace dromozoa {
           getinfo_slist(L, info);
           return;
         default:
-          break;
+          push_error(L, CURLE_UNKNOWN_OPTION);
       }
     }
   }
