@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local curl = require "dromozoa.curl"
@@ -25,13 +26,46 @@ assert(curl.global_init())
 local easy = assert(curl.easy())
 assert(easy:reset())
 
-assert(easy:setopt(curl.CURLOPT_URL, "http://dromozoa.s3.amazonaws.com/pub/index.html"))
+assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
+assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
+assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
 assert(easy:perform())
+print(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL))
 print(easy:getinfo(curl.CURLINFO_RESPONSE_CODE))
+print(easy:getinfo(curl.CURLINFO_FILETIME))
+print(easy:getinfo(curl.CURLINFO_TOTAL_TIME))
+print(easy:getinfo(curl.CURLINFO_NAMELOOKUP_TIME))
+print(easy:getinfo(curl.CURLINFO_CONNECT_TIME))
+print(easy:getinfo(curl.CURLINFO_APPCONNECT_TIME))
+print(easy:getinfo(curl.CURLINFO_PRETRANSFER_TIME))
+print(easy:getinfo(curl.CURLINFO_STARTTRANSFER_TIME))
+print(easy:getinfo(curl.CURLINFO_REDIRECT_TIME))
+print(easy:getinfo(curl.CURLINFO_REDIRECT_COUNT))
+print(easy:getinfo(curl.CURLINFO_REDIRECT_URL))
+print(easy:getinfo(curl.CURLINFO_SIZE_UPLOAD))
+print(easy:getinfo(curl.CURLINFO_SIZE_DOWNLOAD))
+print(easy:getinfo(curl.CURLINFO_SPEED_DOWNLOAD))
+print(easy:getinfo(curl.CURLINFO_SPEED_UPLOAD))
+print(easy:getinfo(curl.CURLINFO_HEADER_SIZE))
+print(easy:getinfo(curl.CURLINFO_REQUEST_SIZE))
+print(easy:getinfo(curl.CURLINFO_SSL_VERIFYRESULT))
+print(json.encode(easy:getinfo(curl.CURLINFO_SSL_ENGINES)))
+print(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD))
+print(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_UPLOAD))
+print(easy:getinfo(curl.CURLINFO_CONTENT_TYPE))
+print(easy:getinfo(curl.CURLINFO_HTTPAUTH_AVAIL))
+print(easy:getinfo(curl.CURLINFO_PROXYAUTH_AVAIL))
+print(easy:getinfo(curl.CURLINFO_OS_ERRNO))
+print(easy:getinfo(curl.CURLINFO_NUM_CONNECTS))
+print(easy:getinfo(curl.CURLINFO_PRIMARY_IP))
+print(easy:getinfo(curl.CURLINFO_PRIMARY_PORT))
+print(easy:getinfo(curl.CURLINFO_LOCAL_IP))
+print(easy:getinfo(curl.CURLINFO_LOCAL_PORT))
+print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
 
-print(curl.CURL_HTTP_VERSION_1_0)
-print(curl.CURL_HTTP_VERSION_1_1)
-print(curl.CURL_HTTP_VERSION_2_0)
+-- print(curl.CURL_HTTP_VERSION_1_0)
+-- print(curl.CURL_HTTP_VERSION_1_1)
+-- print(curl.CURL_HTTP_VERSION_2_0)
 
 assert(easy:cleanup())
 

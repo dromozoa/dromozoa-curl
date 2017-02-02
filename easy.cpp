@@ -46,7 +46,17 @@ namespace dromozoa {
       luaX_push_success(L);
     }
 
-    void impl_setopt_string(lua_State* L, CURLoption option) {
+    template <class T>
+    void setopt_integer(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void setopt_string(lua_State* L, CURLoption option) {
       CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
       if (result == CURLE_OK) {
         luaX_push_success(L);
@@ -58,9 +68,13 @@ namespace dromozoa {
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (option) {
+        case CURLOPT_FILETIME:
+        case CURLOPT_SSL_VERIFYPEER:
+          setopt_integer<long>(L, option);
+          return;
         case CURLOPT_URL:
         case CURLOPT_USERAGENT:
-          impl_setopt_string(L, option);
+          setopt_string(L, option);
           return;
         default:
           break;
@@ -76,11 +90,28 @@ namespace dromozoa {
       }
     }
 
-    void impl_getinfo_long(lua_State* L, CURLINFO info) {
-      long value = 0;
+    template <class T>
+    void getinfo(lua_State* L, CURLINFO info) {
+      T value = 0;
       CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &value);
       if (result == CURLE_OK) {
         luaX_push(L, value);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void getinfo_slist(lua_State* L, CURLINFO info) {
+      struct curl_slist* slist = 0;
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &slist);
+      if (result == CURLE_OK) {
+        struct curl_slist* head = slist;
+        lua_newtable(L);
+        for (int i = 1; head; ++i) {
+          luaX_set_field(L, -1, i, head->data);
+          head = head->next;
+        }
+        curl_slist_free_all(slist);
       } else {
         push_error(L, result);
       }
@@ -90,7 +121,44 @@ namespace dromozoa {
       CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
       switch (info) {
         case CURLINFO_RESPONSE_CODE:
-          impl_getinfo_long(L, info);
+        case CURLINFO_FILETIME:
+        case CURLINFO_REDIRECT_COUNT:
+        case CURLINFO_HEADER_SIZE:
+        case CURLINFO_REQUEST_SIZE:
+        case CURLINFO_SSL_VERIFYRESULT:
+        case CURLINFO_HTTPAUTH_AVAIL:
+        case CURLINFO_PROXYAUTH_AVAIL:
+        case CURLINFO_OS_ERRNO:
+        case CURLINFO_NUM_CONNECTS:
+        case CURLINFO_PRIMARY_PORT:
+        case CURLINFO_LOCAL_PORT:
+          getinfo<long>(L, info);
+          return;
+        case CURLINFO_TOTAL_TIME:
+        case CURLINFO_NAMELOOKUP_TIME:
+        case CURLINFO_CONNECT_TIME:
+        case CURLINFO_APPCONNECT_TIME:
+        case CURLINFO_PRETRANSFER_TIME:
+        case CURLINFO_STARTTRANSFER_TIME:
+        case CURLINFO_REDIRECT_TIME:
+        case CURLINFO_SIZE_UPLOAD:
+        case CURLINFO_SIZE_DOWNLOAD:
+        case CURLINFO_SPEED_DOWNLOAD:
+        case CURLINFO_SPEED_UPLOAD:
+        case CURLINFO_CONTENT_LENGTH_DOWNLOAD:
+        case CURLINFO_CONTENT_LENGTH_UPLOAD:
+          getinfo<double>(L, info);
+          return;
+        case CURLINFO_EFFECTIVE_URL:
+        case CURLINFO_REDIRECT_URL:
+        case CURLINFO_CONTENT_TYPE:
+        case CURLINFO_PRIMARY_IP:
+        case CURLINFO_LOCAL_IP:
+          getinfo<const char*>(L, info);
+          return;
+        case CURLINFO_SSL_ENGINES:
+        case CURLINFO_COOKIELIST:
+          getinfo_slist(L, info);
           return;
         default:
           break;
