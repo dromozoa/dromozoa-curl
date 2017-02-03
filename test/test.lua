@@ -29,7 +29,15 @@ assert(easy:reset())
 assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
+
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+  print(("%q"):format(data))
+  -- print(data)
+end))
+
 assert(easy:perform())
+
+--[[
 print(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL))
 print(easy:getinfo(curl.CURLINFO_RESPONSE_CODE))
 print(easy:getinfo(curl.CURLINFO_FILETIME))
@@ -62,6 +70,7 @@ print(easy:getinfo(curl.CURLINFO_PRIMARY_PORT))
 print(easy:getinfo(curl.CURLINFO_LOCAL_IP))
 print(easy:getinfo(curl.CURLINFO_LOCAL_PORT))
 print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
+]]
 
 -- print(curl.CURL_HTTP_VERSION_1_0)
 -- print(curl.CURL_HTTP_VERSION_1_1)

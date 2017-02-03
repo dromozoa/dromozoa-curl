@@ -23,14 +23,68 @@
 #include <dromozoa/bind.hpp>
 
 namespace dromozoa {
+  namespace bind {
+    class luaX_reference {
+    public:
+      luaX_reference() : L_(), ref_(LUA_NOREF) {}
+
+      explicit luaX_reference(lua_State* L, int ref = LUA_NOREF) : L_(L), ref_(ref) {}
+
+      ~luaX_reference() {
+        reset();
+      }
+
+      void reset(int ref = LUA_NOREF) {
+        if (L_) {
+          luaL_unref(L_, LUA_REGISTRYINDEX, ref_);
+          ref_ = ref;
+        }
+      }
+
+      lua_State* lua_state() const {
+        return L_;
+      }
+
+      int get() const {
+        return ref_;
+      }
+
+      int get_field() const {
+        return luaX_get_field(L_, LUA_REGISTRYINDEX, ref_);
+      }
+
+      void swap(luaX_reference& that) {
+        lua_State* L = L_;
+        L_ = that.L_;
+        that.L_ = L;
+
+        int ref = ref_;
+        ref_ = that.ref_;
+        that.ref_ = ref;
+      }
+
+    public:
+      lua_State* L_;
+      int ref_;
+      luaX_reference(const luaX_reference&);
+      luaX_reference& operator=(const luaX_reference&);
+    };
+  }
+
+  using bind::luaX_reference;
+
   class easy_handle {
   public:
     explicit easy_handle(CURL* handle);
     ~easy_handle();
     void cleanup();
     CURL* get() const;
+    luaX_reference& write_function();
   private:
     CURL* handle_;
+    luaX_reference write_function_;
+    easy_handle(const easy_handle&);
+    easy_handle& operator=(const easy_handle&);
   };
 
   easy_handle* check_easy_handle(lua_State* L, int arg);

@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
+
 #include "common.hpp"
 
 namespace dromozoa {
@@ -65,6 +67,57 @@ namespace dromozoa {
       }
     }
 
+    size_t write_function_impl(char* ptr, size_t size, size_t count, void* userdata) {
+      luaX_reference* write_function = static_cast<luaX_reference*>(userdata);
+      /*
+      std::cerr
+        << static_cast<void*>(ptr) << " "
+        << size << " "
+        << count << " "
+        << write_function << " "
+        << write_function->lua_state() << " "
+        << write_function->get() << std::endl;
+      return size * count;
+      */
+      lua_State* L = write_function->lua_state();
+      int top = lua_gettop(L);
+      write_function->get_field();
+      lua_pushlstring(L, ptr, size * count);
+      size_t result;
+      int r = lua_pcall(L, 1, 1, 0);
+      if (r != 0) {
+        std::cerr << "pcall error " << r << std::endl;
+        result = 0;
+      } else {
+        if (lua_isnumber(L, -1)) {
+          result = lua_tointeger(L, -1);
+        } else {
+          result = size * count;
+        }
+      }
+      lua_settop(L, top);
+      return result;
+    }
+
+    void setopt_write_function(lua_State* L, CURLoption) {
+      easy_handle* self = check_easy_handle(L, 1);
+      lua_pushvalue(L, 3);
+      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+      luaX_reference& write_function = self->write_function();
+      luaX_reference(L, ref).swap(write_function);
+      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_WRITEDATA, &write_function);
+      if (result == CURLE_OK) {
+        CURLcode result = curl_easy_setopt(self->get(), CURLOPT_WRITEFUNCTION, &write_function_impl);
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (option) {
@@ -76,8 +129,11 @@ namespace dromozoa {
         case CURLOPT_USERAGENT:
           setopt_string(L, option);
           return;
+        case CURLOPT_WRITEFUNCTION:
+          setopt_write_function(L, option);
+          return;
         default:
-          break;
+          push_error(L, CURLE_UNKNOWN_OPTION);
       }
     }
 

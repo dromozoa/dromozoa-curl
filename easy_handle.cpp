@@ -35,4 +35,8 @@ namespace dromozoa {
   CURL* easy_handle::get() const {
     return handle_;
   }
+
+  luaX_reference& easy_handle::write_function() {
+    return write_function_;
+  }
 }
