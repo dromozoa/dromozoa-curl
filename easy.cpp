@@ -67,18 +67,30 @@ namespace dromozoa {
       }
     }
 
+    size_t header_callback(char* ptr, size_t size, size_t count, void* userdata) {
+      luaX_reference* header_function = static_cast<luaX_reference*>(userdata);
+      lua_State* L = header_function->lua_state();
+      int top = lua_gettop(L);
+      header_function->get_field();
+      lua_pushlstring(L, ptr, size * count);
+      size_t result;
+      int r = lua_pcall(L, 1, 1, 0);
+      if (r != 0) {
+        std::cerr << "pcall error " << r << std::endl;
+        result = 0;
+      } else {
+        if (lua_isnumber(L, -1)) {
+          result = lua_tointeger(L, -1);
+        } else {
+          result = size * count;
+        }
+      }
+      lua_settop(L, top);
+      return result;
+    }
+
     size_t write_function_impl(char* ptr, size_t size, size_t count, void* userdata) {
       luaX_reference* write_function = static_cast<luaX_reference*>(userdata);
-      /*
-      std::cerr
-        << static_cast<void*>(ptr) << " "
-        << size << " "
-        << count << " "
-        << write_function << " "
-        << write_function->lua_state() << " "
-        << write_function->get() << std::endl;
-      return size * count;
-      */
       lua_State* L = write_function->lua_state();
       int top = lua_gettop(L);
       write_function->get_field();
@@ -97,6 +109,25 @@ namespace dromozoa {
       }
       lua_settop(L, top);
       return result;
+    }
+
+    void setopt_header_function(lua_State* L, CURLoption) {
+      easy_handle* self = check_easy_handle(L, 1);
+      lua_pushvalue(L, 3);
+      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+      luaX_reference& header_function = self->header_function();
+      luaX_reference(L, ref).swap(header_function);
+      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_HEADERDATA, &header_function);
+      if (result == CURLE_OK) {
+        CURLcode result = curl_easy_setopt(self->get(), CURLOPT_HEADERFUNCTION, &header_callback);
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
+      } else {
+        push_error(L, result);
+      }
     }
 
     void setopt_write_function(lua_State* L, CURLoption) {
@@ -128,6 +159,9 @@ namespace dromozoa {
         case CURLOPT_URL:
         case CURLOPT_USERAGENT:
           setopt_string(L, option);
+          return;
+        case CURLOPT_HEADERFUNCTION:
+          setopt_header_function(L, option);
           return;
         case CURLOPT_WRITEFUNCTION:
           setopt_write_function(L, option);

@@ -36,6 +36,10 @@ namespace dromozoa {
     return handle_;
   }
 
+  luaX_reference& easy_handle::header_function() {
+    return header_function_;
+  }
+
   luaX_reference& easy_handle::write_function() {
     return write_function_;
   }
