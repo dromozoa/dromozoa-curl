@@ -71,8 +71,8 @@ namespace dromozoa {
       new_easy_ref(L, easy);
       luaX_push(L, s);
       luaX_push(L, what);
-      lua_settop(L, top);
       lua_pcall(L, 3, 1, 0);
+      lua_settop(L, top);
       return 0;
     }
 
@@ -92,6 +92,14 @@ namespace dromozoa {
     }
 
     int timer_callback(CURLM* multi, long timeout_ms, void* userdata) {
+      luaX_reference* function = static_cast<luaX_reference*>(userdata);
+      lua_State* L = function->lua_state();
+      int top = lua_gettop(L);
+      function->get_field();
+      new_multi_ref(L, multi);
+      luaX_push(L, timeout_ms);
+      lua_pcall(L, 2, 1, 0);
+      lua_settop(L, top);
       return 0;
     }
 
@@ -102,7 +110,7 @@ namespace dromozoa {
       luaX_reference& function = self->socket_function();
       luaX_reference(L, ref).swap(function);
       curl_multi_setopt(self->get(), CURLMOPT_TIMERDATA, &function);
-      CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_TIMERFUNCTION, &socket_callback);
+      CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_TIMERFUNCTION, &timer_callback);
       if (result == CURLM_OK) {
         luaX_push_success(L);
       } else {
@@ -112,12 +120,22 @@ namespace dromozoa {
   }
 
   multi_handle* check_multi_handle(lua_State* L, int arg) {
-    return luaX_check_udata<multi_handle>(L, arg, "dromozoa.curl.multi");
+    return luaX_check_udata<multi_handle>(L, arg, "dromozoa.curl.multi_ref", "dromozoa.curl.multi");
+  }
+
+  void new_multi_ref(lua_State* L, CURLM* handle) {
+    luaX_new<multi_handle>(L, handle);
+    luaX_set_metatable(L, "dromozoa.curl.multi_ref");
   }
 
   void initialize_multi(lua_State* L) {
     lua_newtable(L);
     {
+      luaL_newmetatable(L, "dromozoa.curl.multi_ref");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, -2, "__index");
+      lua_pop(L, 1);
+
       luaL_newmetatable(L, "dromozoa.curl.multi");
       lua_pushvalue(L, -2);
       luaX_set_field(L, -2, "__index");

@@ -110,6 +110,7 @@ namespace dromozoa {
   };
 
   multi_handle* check_multi_handle(lua_State* L, int arg);
+  void new_multi_ref(lua_State* L, CURLM* handle);
 
   void push_error(lua_State* L, CURLcode code);
   void push_error(lua_State* L, CURLMcode code);
