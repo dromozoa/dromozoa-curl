@@ -249,16 +249,26 @@ namespace dromozoa {
   }
 
   easy_handle* check_easy_handle(lua_State* L, int arg) {
-    return luaX_check_udata<easy_handle>(L, arg, "dromozoa.curl.easy");
+    return luaX_check_udata<easy_handle>(L, arg, "dromozoa.curl.easy_ref", "dromozoa.curl.easy");
   }
 
   CURL* check_easy(lua_State* L, int arg) {
     return check_easy_handle(L, arg)->get();
   }
 
+  void new_easy_ref(lua_State* L, CURL* handle) {
+    luaX_new<easy_handle>(L, handle);
+    luaX_set_metatable(L, "dromozoa.curl.easy_ref");
+  }
+
   void initialize_easy(lua_State* L) {
     lua_newtable(L);
     {
+      luaL_newmetatable(L, "dromozoa.curl.easy_ref");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, -2, "__index");
+      lua_pop(L, 1);
+
       luaL_newmetatable(L, "dromozoa.curl.easy");
       lua_pushvalue(L, -2);
       luaX_set_field(L, -2, "__index");

@@ -35,4 +35,12 @@ namespace dromozoa {
   CURLM* multi_handle::get() const {
     return handle_;
   }
+
+  luaX_reference& multi_handle::socket_function() {
+    return socket_function_;
+  }
+
+  luaX_reference& multi_handle::timer_function() {
+    return timer_function_;
+  }
 }

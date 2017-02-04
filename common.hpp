@@ -91,6 +91,7 @@ namespace dromozoa {
 
   easy_handle* check_easy_handle(lua_State* L, int arg);
   CURL* check_easy(lua_State* L, int arg);
+  void new_easy_ref(lua_State* L, CURL* handle);
 
   class multi_handle {
   public:
@@ -98,8 +99,12 @@ namespace dromozoa {
     ~multi_handle();
     CURLMcode cleanup();
     CURLM* get() const;
+    luaX_reference& socket_function();
+    luaX_reference& timer_function();
   private:
     CURLM* handle_;
+    luaX_reference socket_function_;
+    luaX_reference timer_function_;
     multi_handle(const multi_handle&);
     multi_handle& operator=(const multi_handle&);
   };

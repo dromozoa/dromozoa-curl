@@ -62,6 +62,53 @@ namespace dromozoa {
         push_error(L, result);
       }
     }
+
+    int socket_callback(CURL* easy, curl_socket_t s, int what, void* userdata, void* socketdata) {
+      luaX_reference* function = static_cast<luaX_reference*>(userdata);
+      lua_State* L = function->lua_state();
+      int top = lua_gettop(L);
+      function->get_field();
+      new_easy_ref(L, easy);
+      luaX_push(L, s);
+      luaX_push(L, what);
+      lua_settop(L, top);
+      lua_pcall(L, 3, 1, 0);
+      return 0;
+    }
+
+    void impl_setopt_socket_function(lua_State* L) {
+      multi_handle* self = check_multi_handle(L, 1);
+      lua_pushvalue(L, 2);
+      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+      luaX_reference& function = self->socket_function();
+      luaX_reference(L, ref).swap(function);
+      curl_multi_setopt(self->get(), CURLMOPT_SOCKETDATA, &function);
+      CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_SOCKETFUNCTION, &socket_callback);
+      if (result == CURLM_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    int timer_callback(CURLM* multi, long timeout_ms, void* userdata) {
+      return 0;
+    }
+
+    void impl_setopt_timer_function(lua_State* L) {
+      multi_handle* self = check_multi_handle(L, 1);
+      lua_pushvalue(L, 2);
+      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+      luaX_reference& function = self->socket_function();
+      luaX_reference(L, ref).swap(function);
+      curl_multi_setopt(self->get(), CURLMOPT_TIMERDATA, &function);
+      CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_TIMERFUNCTION, &socket_callback);
+      if (result == CURLM_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
   }
 
   multi_handle* check_multi_handle(lua_State* L, int arg) {
@@ -81,6 +128,8 @@ namespace dromozoa {
       luaX_set_field(L, -1, "cleanup", impl_cleanup);
       luaX_set_field(L, -1, "add_handle", impl_add_handle);
       luaX_set_field(L, -1, "remove_handle", impl_remove_handle);
+      luaX_set_field(L, -1, "setopt_socket_function", impl_setopt_socket_function);
+      luaX_set_field(L, -1, "setopt_timer_function", impl_setopt_timer_function);
     }
     luaX_set_field(L, -2, "multi");
   }
