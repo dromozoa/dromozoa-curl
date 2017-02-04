@@ -20,11 +20,13 @@
 namespace dromozoa {
   void initialize_easy(lua_State* L);
   void initialize_main(lua_State* L);
+  void initialize_multi(lua_State* L);
   void initialize_symbols(lua_State* L);
 
   void initialize(lua_State* L) {
     initialize_easy(L);
     initialize_main(L);
+    initialize_multi(L);
     initialize_symbols(L);
   }
 }

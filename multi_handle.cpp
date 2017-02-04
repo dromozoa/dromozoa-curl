@@ -18,15 +18,21 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  void push_error(lua_State* L, CURLcode code) {
-    luaX_push(L, luaX_nil);
-    luaX_push(L, curl_easy_strerror(code));
-    luaX_push<lua_Integer>(L, code);
+  multi_handle::multi_handle(CURLM* handle) : handle_(handle) {}
+
+  multi_handle::~multi_handle() {
+    if (handle_) {
+      cleanup();
+    }
   }
 
-  void push_error(lua_State* L, CURLMcode code) {
-    luaX_push(L, luaX_nil);
-    luaX_push(L, curl_multi_strerror(code));
-    luaX_push<lua_Integer>(L, code);
+  CURLMcode multi_handle::cleanup() {
+    CURLM* handle = handle_;
+    handle_ = 0;
+    return curl_multi_cleanup(handle);
+  }
+
+  CURLM* multi_handle::get() const {
+    return handle_;
   }
 }

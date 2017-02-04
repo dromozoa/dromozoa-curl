@@ -15,16 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <iostream>
-
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    CURL* check_easy(lua_State* L, int arg) {
-      return check_easy_handle(L, arg)->get();
-    }
-
     void impl_gc(lua_State* L) {
       check_easy_handle(L, 1)->~easy_handle();
     }
@@ -76,7 +70,6 @@ namespace dromozoa {
       size_t result;
       int r = lua_pcall(L, 1, 1, 0);
       if (r != 0) {
-        std::cerr << "pcall error " << r << std::endl;
         result = 0;
       } else {
         if (lua_isnumber(L, -1)) {
@@ -98,7 +91,6 @@ namespace dromozoa {
       size_t result;
       int r = lua_pcall(L, 1, 1, 0);
       if (r != 0) {
-        std::cerr << "pcall error " << r << std::endl;
         result = 0;
       } else {
         if (lua_isnumber(L, -1)) {
@@ -258,6 +250,10 @@ namespace dromozoa {
 
   easy_handle* check_easy_handle(lua_State* L, int arg) {
     return luaX_check_udata<easy_handle>(L, arg, "dromozoa.curl.easy");
+  }
+
+  CURL* check_easy(lua_State* L, int arg) {
+    return check_easy_handle(L, arg)->get();
   }
 
   void initialize_easy(lua_State* L) {

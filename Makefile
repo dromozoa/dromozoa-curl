@@ -26,6 +26,8 @@ OBJS = \
 	error.o \
 	main.o \
 	module.o \
+	multi.o \
+	multi_handle.o \
 	symbols.o
 TARGET = curl.so
 

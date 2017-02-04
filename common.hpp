@@ -90,9 +90,24 @@ namespace dromozoa {
   };
 
   easy_handle* check_easy_handle(lua_State* L, int arg);
+  CURL* check_easy(lua_State* L, int arg);
+
+  class multi_handle {
+  public:
+    explicit multi_handle(CURLM* handle);
+    ~multi_handle();
+    CURLMcode cleanup();
+    CURLM* get() const;
+  private:
+    CURLM* handle_;
+    multi_handle(const multi_handle&);
+    multi_handle& operator=(const multi_handle&);
+  };
+
+  multi_handle* check_multi_handle(lua_State* L, int arg);
 
   void push_error(lua_State* L, CURLcode code);
-  void push_error_not_implemented(lua_State* L);
+  void push_error(lua_State* L, CURLMcode code);
 }
 
 #endif
