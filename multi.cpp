@@ -31,6 +31,8 @@ namespace dromozoa {
       if (CURLM* handle = curl_multi_init()) {
         luaX_new<multi_handle>(L, handle);
         luaX_set_metatable(L, "dromozoa.curl.multi");
+      } else {
+        push_error(L, CURLE_FAILED_INIT);
       }
     }
 

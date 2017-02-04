@@ -28,7 +28,7 @@ namespace dromozoa {
         luaX_new<easy_handle>(L, handle);
         luaX_set_metatable(L, "dromozoa.curl.easy");
       } else {
-        luaX_push(L, luaX_nil);
+        push_error(L, CURLE_FAILED_INIT);
       }
     }
 
