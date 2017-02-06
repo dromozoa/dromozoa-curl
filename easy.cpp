@@ -63,7 +63,7 @@ namespace dromozoa {
 
     size_t header_callback(char* ptr, size_t size, size_t count, void* userdata) {
       luaX_reference* header_function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = header_function->lua_state();
+      lua_State* L = header_function->state();
       int top = lua_gettop(L);
       header_function->get_field();
       lua_pushlstring(L, ptr, size * count);
@@ -84,7 +84,7 @@ namespace dromozoa {
 
     size_t write_function_impl(char* ptr, size_t size, size_t count, void* userdata) {
       luaX_reference* write_function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = write_function->lua_state();
+      lua_State* L = write_function->state();
       int top = lua_gettop(L);
       write_function->get_field();
       lua_pushlstring(L, ptr, size * count);
@@ -105,10 +105,9 @@ namespace dromozoa {
 
     void setopt_header_function(lua_State* L, CURLoption) {
       easy_handle* self = check_easy_handle(L, 1);
-      lua_pushvalue(L, 3);
-      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
       luaX_reference& header_function = self->header_function();
-      luaX_reference(L, ref).swap(header_function);
+      lua_pushvalue(L, 3);
+      luaX_reference(L).swap(header_function);
       CURLcode result = curl_easy_setopt(self->get(), CURLOPT_HEADERDATA, &header_function);
       if (result == CURLE_OK) {
         CURLcode result = curl_easy_setopt(self->get(), CURLOPT_HEADERFUNCTION, &header_callback);
@@ -124,10 +123,9 @@ namespace dromozoa {
 
     void setopt_write_function(lua_State* L, CURLoption) {
       easy_handle* self = check_easy_handle(L, 1);
-      lua_pushvalue(L, 3);
-      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
       luaX_reference& write_function = self->write_function();
-      luaX_reference(L, ref).swap(write_function);
+      lua_pushvalue(L, 3);
+      luaX_reference(L).swap(write_function);
       CURLcode result = curl_easy_setopt(self->get(), CURLOPT_WRITEDATA, &write_function);
       if (result == CURLE_OK) {
         CURLcode result = curl_easy_setopt(self->get(), CURLOPT_WRITEFUNCTION, &write_function_impl);

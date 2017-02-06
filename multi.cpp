@@ -65,7 +65,7 @@ namespace dromozoa {
 
     int socket_callback(CURL* easy, curl_socket_t s, int what, void* userdata, void* socketdata) {
       luaX_reference* function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = function->lua_state();
+      lua_State* L = function->state();
       int top = lua_gettop(L);
       function->get_field();
       new_easy_ref(L, easy);
@@ -78,10 +78,9 @@ namespace dromozoa {
 
     void impl_setopt_socket_function(lua_State* L) {
       multi_handle* self = check_multi_handle(L, 1);
-      lua_pushvalue(L, 2);
-      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
       luaX_reference& function = self->socket_function();
-      luaX_reference(L, ref).swap(function);
+      lua_pushvalue(L, 2);
+      luaX_reference(L).swap(function);
       curl_multi_setopt(self->get(), CURLMOPT_SOCKETDATA, &function);
       CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_SOCKETFUNCTION, &socket_callback);
       if (result == CURLM_OK) {
@@ -93,7 +92,7 @@ namespace dromozoa {
 
     int timer_callback(CURLM* multi, long timeout_ms, void* userdata) {
       luaX_reference* function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = function->lua_state();
+      lua_State* L = function->state();
       int top = lua_gettop(L);
       function->get_field();
       new_multi_ref(L, multi);
@@ -105,10 +104,9 @@ namespace dromozoa {
 
     void impl_setopt_timer_function(lua_State* L) {
       multi_handle* self = check_multi_handle(L, 1);
-      lua_pushvalue(L, 2);
-      int ref = luaL_ref(L, LUA_REGISTRYINDEX);
       luaX_reference& function = self->socket_function();
-      luaX_reference(L, ref).swap(function);
+      lua_pushvalue(L, 2);
+      luaX_reference(L).swap(function);
       curl_multi_setopt(self->get(), CURLMOPT_TIMERDATA, &function);
       CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_TIMERFUNCTION, &timer_callback);
       if (result == CURLM_OK) {
