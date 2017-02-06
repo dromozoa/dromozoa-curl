@@ -54,6 +54,18 @@ namespace dromozoa {
       }
     }
 
+    void impl_socket_action(lua_State* L) {
+      curl_socket_t sockfd = luaX_check_integer<curl_socket_t>(L, 2);
+      int ev_bitmask = luaX_opt_integer<int>(L, 3, 0);
+      int running_handles = 0;
+      CURLMcode result = curl_multi_socket_action(check_multi(L, 1), sockfd, ev_bitmask, &running_handles);
+      if (result == CURLM_OK) {
+        luaX_push(L, running_handles);
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void impl_remove_handle(lua_State* L) {
       CURLMcode result = curl_multi_remove_handle(check_multi(L, 1), check_easy(L, 2));
       if (result == CURLM_OK) {
@@ -63,25 +75,33 @@ namespace dromozoa {
       }
     }
 
-    int socket_callback(CURL* easy, curl_socket_t s, int what, void* userdata, void* socketdata) {
-      luaX_reference* function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = function->state();
+    int socket_callback(CURL* easy, curl_socket_t s, int what, void* userdata, void*) {
+      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
+      lua_State* L = ref.state();
       int top = lua_gettop(L);
-      function->get_field();
+      ref.get_field();
       new_easy_ref(L, easy);
       luaX_push(L, s);
       luaX_push(L, what);
-      lua_pcall(L, 3, 1, 0);
+      int result = 0;
+      int r = lua_pcall(L, 3, 1, 0);
+      if (r == 0) {
+        if (luaX_is_integer(L, 1)) {
+          result = lua_tointeger(L, 1);
+        }
+      } else {
+        DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
+      }
       lua_settop(L, top);
-      return 0;
+      return result;
     }
 
     void impl_setopt_socket_function(lua_State* L) {
       multi_handle* self = check_multi_handle(L, 1);
-      luaX_reference& function = self->socket_function();
+      luaX_reference& ref = self->socket_function();
       lua_pushvalue(L, 2);
-      luaX_reference(L).swap(function);
-      curl_multi_setopt(self->get(), CURLMOPT_SOCKETDATA, &function);
+      luaX_reference(L).swap(ref);
+      curl_multi_setopt(self->get(), CURLMOPT_SOCKETDATA, &ref);
       CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_SOCKETFUNCTION, &socket_callback);
       if (result == CURLM_OK) {
         luaX_push_success(L);
@@ -91,23 +111,31 @@ namespace dromozoa {
     }
 
     int timer_callback(CURLM* multi, long timeout_ms, void* userdata) {
-      luaX_reference* function = static_cast<luaX_reference*>(userdata);
-      lua_State* L = function->state();
+      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
+      lua_State* L = ref.state();
       int top = lua_gettop(L);
-      function->get_field();
+      ref.get_field();
       new_multi_ref(L, multi);
       luaX_push(L, timeout_ms);
-      lua_pcall(L, 2, 1, 0);
+      int result = 0;
+      int r = lua_pcall(L, 2, 1, 0);
+      if (r == 0) {
+        if (luaX_is_integer(L, 1)) {
+          result = lua_tointeger(L, 1);
+        }
+      } else {
+        DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
+      }
       lua_settop(L, top);
-      return 0;
+      return result;
     }
 
     void impl_setopt_timer_function(lua_State* L) {
       multi_handle* self = check_multi_handle(L, 1);
-      luaX_reference& function = self->socket_function();
+      luaX_reference& ref = self->timer_function();
       lua_pushvalue(L, 2);
-      luaX_reference(L).swap(function);
-      curl_multi_setopt(self->get(), CURLMOPT_TIMERDATA, &function);
+      luaX_reference(L).swap(ref);
+      curl_multi_setopt(self->get(), CURLMOPT_TIMERDATA, &ref);
       CURLMcode result = curl_multi_setopt(self->get(), CURLMOPT_TIMERFUNCTION, &timer_callback);
       if (result == CURLM_OK) {
         luaX_push_success(L);
@@ -144,6 +172,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "cleanup", impl_cleanup);
       luaX_set_field(L, -1, "add_handle", impl_add_handle);
       luaX_set_field(L, -1, "remove_handle", impl_remove_handle);
+      luaX_set_field(L, -1, "socket_action", impl_socket_action);
       luaX_set_field(L, -1, "setopt_socket_function", impl_setopt_socket_function);
       luaX_set_field(L, -1, "setopt_timer_function", impl_setopt_timer_function);
     }
