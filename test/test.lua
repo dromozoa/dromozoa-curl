@@ -30,12 +30,12 @@ assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/inde
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
 
-assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
+assert(easy:setopt_header_function(function (data)
   print(("header:%q"):format(data))
-  -- print(data)
+  return #data
 end))
 
-assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+assert(easy:setopt_write_function(function (data)
   print(("write:%q"):format(data))
   -- print(data)
 end))
