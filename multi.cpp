@@ -86,8 +86,8 @@ namespace dromozoa {
       int result = 0;
       int r = lua_pcall(L, 3, 1, 0);
       if (r == 0) {
-        if (luaX_is_integer(L, 1)) {
-          result = lua_tointeger(L, 1);
+        if (luaX_is_integer(L, -1)) {
+          result = lua_tointeger(L, -1);
         }
       } else {
         DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
@@ -120,8 +120,8 @@ namespace dromozoa {
       int result = 0;
       int r = lua_pcall(L, 2, 1, 0);
       if (r == 0) {
-        if (luaX_is_integer(L, 1)) {
-          result = lua_tointeger(L, 1);
+        if (luaX_is_integer(L, -1)) {
+          result = lua_tointeger(L, -1);
         }
       } else {
         DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
