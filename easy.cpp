@@ -92,7 +92,7 @@ namespace dromozoa {
           result = size * nmemb;
         }
       } else {
-        DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
+        DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
       }
       lua_settop(L, top);
       return result;
@@ -127,7 +127,7 @@ namespace dromozoa {
           result = size * nmemb;
         }
       } else {
-        DROMOZOA_UNEXPECTED(lua_tostring(L, 1));
+        DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
       }
       lua_settop(L, top);
       return result;
