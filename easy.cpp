@@ -71,6 +71,7 @@ namespace dromozoa {
           return;
         case CURLOPT_URL:
         case CURLOPT_USERAGENT:
+        case CURLOPT_REFERER:
           setopt_string(L, option);
           return;
         default:
