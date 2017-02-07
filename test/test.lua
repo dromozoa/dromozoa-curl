@@ -26,23 +26,25 @@ assert(curl.global_init())
 local easy = assert(curl.easy())
 assert(easy:reset())
 
--- assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
-assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=redirect&redirect_count=3"))
+assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
+-- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=redirect&redirect_count=3"))
 -- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=sleep&sleep_duration=0.5&sleep_count=10"))
+assert(easy:setopt(curl.CURLOPT_VERBOSE, 0))
+assert(easy:setopt(curl.CURLOPT_NOPROGRESS, 0))
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
 assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
 assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/"))
 
 assert(easy:setopt_header_function(function (data)
-  print(("header:%q"):format(data))
+  -- print(("header:%q"):format(data))
   return #data
 end))
 
 local content = ""
 assert(easy:setopt_write_function(function (data)
   content = content .. data
-  print(("write:%q"):format(data))
+  -- print(("write:%q"):format(data))
   -- print(data)
 end))
 
@@ -87,8 +89,8 @@ print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
 -- print(curl.CURL_HTTP_VERSION_1_1)
 -- print(curl.CURL_HTTP_VERSION_2_0)
 
-local result = json.decode(content)
-print(json.encode(result, { pretty = true }))
+-- local result = json.decode(content)
+-- print(json.encode(result, { pretty = true }))
 
 assert(easy:cleanup())
 

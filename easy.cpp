@@ -64,6 +64,8 @@ namespace dromozoa {
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (option) {
+        case CURLOPT_VERBOSE:
+        case CURLOPT_NOPROGRESS:
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
         case CURLOPT_FOLLOWLOCATION:

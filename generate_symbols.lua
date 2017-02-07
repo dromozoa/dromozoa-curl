@@ -42,7 +42,7 @@ io.write(([[
 
 namespace dromozoa {
   void initialize_symbols(lua_State* L) {
-]]):format(arg[0], source_name))
+]]):format(source_name))
 
 for line in io.lines(source_file) do
   if line:match("^CURL") then
