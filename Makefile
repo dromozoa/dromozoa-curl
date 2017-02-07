@@ -22,12 +22,15 @@ LDLIBS = -lcurl -ldl
 
 OBJS = \
 	easy.o \
+	easy_getinfo.o \
 	easy_handle.o \
+	easy_setopt.o \
 	error.o \
 	main.o \
 	module.o \
 	multi.o \
 	multi_handle.o \
+	multi_setopt.o \
 	symbols.o
 TARGET = curl.so
 
