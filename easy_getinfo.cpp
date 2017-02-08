@@ -46,6 +46,25 @@ namespace dromozoa {
       }
     }
 
+    void getinfo_certinfo(lua_State* L, CURLINFO info) {
+      struct curl_certinfo* certinfo = 0;
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &info);
+      if (result == CURLE_OK) {
+        lua_newtable(L);
+        for (int i = 0; i < certinfo->num_of_certs; ++i) {
+          struct curl_slist* item = certinfo->certinfo[i];
+          lua_newtable(L);
+          for (int j = 1; item; ++j) {
+            luaX_set_field(L, -1, j, item->data);
+            item = item->next;
+          }
+          luaX_set_field(L, -2, i + 1);
+        }
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void impl_getinfo(lua_State* L) {
       CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
       switch (info) {
@@ -68,6 +87,15 @@ namespace dromozoa {
         case CURLINFO_NUM_CONNECTS:
         case CURLINFO_PRIMARY_PORT:
         case CURLINFO_LOCAL_PORT:
+        case CURLINFO_LASTSOCKET:
+        case CURLINFO_CONDITION_UNMET:
+        case CURLINFO_RTSP_CLIENT_CSEQ:
+        case CURLINFO_RTSP_SERVER_CSEQ:
+        case CURLINFO_RTSP_CSEQ_RECV:
+#if CURL_AT_LEAST_VERSION(7,52,0)
+        case CURLINFO_PROTOCOL:
+        case CURLINFO_SCHEME:
+#endif
           getinfo<long>(L, info);
           return;
         case CURLINFO_TOTAL_TIME:
@@ -85,16 +113,26 @@ namespace dromozoa {
         case CURLINFO_CONTENT_LENGTH_UPLOAD:
           getinfo<double>(L, info);
           return;
+#if CURL_AT_LEAST_VERSION(7,45,0)
+        case CURLINFO_ACTIVESOCKET:
+          getinfo<curl_socket_t>(L, info);
+          return;
+#endif
         case CURLINFO_EFFECTIVE_URL:
         case CURLINFO_REDIRECT_URL:
         case CURLINFO_CONTENT_TYPE:
         case CURLINFO_PRIMARY_IP:
         case CURLINFO_LOCAL_IP:
+        case CURLINFO_FTP_ENTRY_PATH:
+        case CURLINFO_RTSP_SESSION_ID:
           getinfo<const char*>(L, info);
           return;
         case CURLINFO_SSL_ENGINES:
         case CURLINFO_COOKIELIST:
           getinfo_slist(L, info);
+          return;
+        case CURLINFO_CERTINFO:
+          getinfo_certinfo(L, info);
           return;
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);

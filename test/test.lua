@@ -35,6 +35,7 @@ assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
 assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
 assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/"))
+-- assert(easy:setopt(curl.CURLOPT_CERTINFO, 1))
 
 assert(easy:setopt_header_function(function (data)
   -- print(("header:%q"):format(data))
@@ -84,6 +85,7 @@ print(easy:getinfo(curl.CURLINFO_LOCAL_IP))
 print(easy:getinfo(curl.CURLINFO_LOCAL_PORT))
 print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
 ]]
+print(json.encode(easy:getinfo(curl.CURLINFO_CERTINFO)))
 
 -- print(curl.CURL_HTTP_VERSION_1_0)
 -- print(curl.CURL_HTTP_VERSION_1_1)

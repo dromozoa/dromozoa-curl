@@ -46,6 +46,7 @@ namespace dromozoa {
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
         case CURLOPT_FOLLOWLOCATION:
+        case CURLOPT_CERTINFO:
           setopt_integer<long>(L, option);
           return;
         case CURLOPT_URL:
