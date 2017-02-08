@@ -19,7 +19,6 @@
 
 namespace dromozoa {
   namespace {
-
     template <class T>
     void getinfo(lua_State* L, CURLINFO info) {
       T value = 0;
@@ -32,16 +31,16 @@ namespace dromozoa {
     }
 
     void getinfo_slist(lua_State* L, CURLINFO info) {
-      struct curl_slist* slist = 0;
-      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &slist);
+      struct curl_slist* list = 0;
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &list);
       if (result == CURLE_OK) {
-        struct curl_slist* head = slist;
+        struct curl_slist* item = list;
         lua_newtable(L);
-        for (int i = 1; head; ++i) {
-          luaX_set_field(L, -1, i, head->data);
-          head = head->next;
+        for (int i = 1; item; ++i) {
+          luaX_set_field(L, -1, i, item->data);
+          item = item->next;
         }
-        curl_slist_free_all(slist);
+        curl_slist_free_all(list);
       } else {
         push_error(L, result);
       }
@@ -51,11 +50,18 @@ namespace dromozoa {
       CURLINFO info = luaX_check_enum<CURLINFO>(L, 2);
       switch (info) {
         case CURLINFO_RESPONSE_CODE:
+        case CURLINFO_HTTP_CONNECTCODE:
+#if CURL_AT_LEAST_VERSION(7,50,0)
+        case CURLINFO_HTTP_VERSION:
+#endif
         case CURLINFO_FILETIME:
         case CURLINFO_REDIRECT_COUNT:
         case CURLINFO_HEADER_SIZE:
         case CURLINFO_REQUEST_SIZE:
         case CURLINFO_SSL_VERIFYRESULT:
+#if CURL_AT_LEAST_VERSION(7,52,0)
+        case CURLINFO_PROXY_SSL_VERIFYRESULT:
+#endif
         case CURLINFO_HTTPAUTH_AVAIL:
         case CURLINFO_PROXYAUTH_AVAIL:
         case CURLINFO_OS_ERRNO:

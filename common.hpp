@@ -20,6 +20,10 @@
 
 #include <curl/curl.h>
 
+#ifndef CURL_AT_LEAST_VERSION
+#define CURL_AT_LEAST_VERSION(x,y,z) (LIBCURL_VERSION_NUM >= (x) << 16 | (y) << 8 | (z))
+#endif
+
 #include <dromozoa/bind.hpp>
 
 namespace dromozoa {
