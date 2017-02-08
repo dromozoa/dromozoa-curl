@@ -47,6 +47,7 @@ namespace dromozoa {
         case CURLOPT_SSL_VERIFYPEER:
         case CURLOPT_FOLLOWLOCATION:
         case CURLOPT_CERTINFO:
+        case CURLOPT_UPLOAD:
           setopt_integer<long>(L, option);
           return;
         case CURLOPT_URL:
@@ -60,18 +61,19 @@ namespace dromozoa {
     }
 
     size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+      size_t n = size * nmemb;
       luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
       lua_State* L = ref.state();
       int top = lua_gettop(L);
       ref.get_field();
-      lua_pushlstring(L, ptr, size * nmemb);
+      lua_pushlstring(L, ptr, n);
       size_t result = 0;
       int r = lua_pcall(L, 1, 1, 0);
       if (r == 0) {
         if (luaX_is_integer(L, -1)) {
           result = lua_tointeger(L, -1);
         } else {
-          result = size * nmemb;
+          result = n;
         }
       } else {
         DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
@@ -94,19 +96,58 @@ namespace dromozoa {
       }
     }
 
-    size_t header_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
+      size_t n = size * nmemb;
       luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
       lua_State* L = ref.state();
       int top = lua_gettop(L);
       ref.get_field();
-      lua_pushlstring(L, ptr, size * nmemb);
+      luaX_push(L, n);
+      size_t result = CURLE_ABORTED_BY_CALLBACK;
+      int r = lua_pcall(L, 1, 1, 0);
+      if (r == 0) {
+        result = 0;
+        if (const char* data = lua_tolstring(L, -1, &result)) {
+          if (result > n) {
+            result = n;
+          }
+          memcpy(buffer, data, result);
+        }
+      } else {
+        DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
+      }
+      lua_settop(L, top);
+      return result;
+    }
+
+    void impl_setopt_read_function(lua_State* L) {
+      easy_handle* self = check_easy_handle(L, 1);
+      luaX_reference& ref = self->read_function();
+      lua_pushvalue(L, 2);
+      luaX_reference(L).swap(ref);
+      curl_easy_setopt(self->get(), CURLOPT_READDATA, &ref);
+      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, &read_callback);
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    size_t header_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+      size_t n = size * nmemb;
+      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
+      lua_State* L = ref.state();
+      int top = lua_gettop(L);
+      ref.get_field();
+      lua_pushlstring(L, ptr, n);
       size_t result = 0;
       int r = lua_pcall(L, 1, 1, 0);
       if (r == 0) {
         if (luaX_is_integer(L, -1)) {
           result = lua_tointeger(L, -1);
         } else {
-          result = size * nmemb;
+          result = n;
         }
       } else {
         DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
@@ -133,6 +174,7 @@ namespace dromozoa {
   void initialize_easy_setopt(lua_State* L) {
     luaX_set_field(L, -1, "setopt", impl_setopt);
     luaX_set_field(L, -1, "setopt_write_function", impl_setopt_write_function);
+    luaX_set_field(L, -1, "setopt_read_function", impl_setopt_read_function);
     luaX_set_field(L, -1, "setopt_header_function", impl_setopt_header_function);
   }
 }

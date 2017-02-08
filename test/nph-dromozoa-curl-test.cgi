@@ -51,6 +51,7 @@ if query_string ~= nil and query_string ~= "" then
   end
 end
 result.params = params
+result.content = io.read("*a")
 
 local command = params.command
 if command == "sleep" then

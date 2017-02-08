@@ -33,12 +33,14 @@ namespace dromozoa {
     ~easy_handle();
     void cleanup();
     CURL* get() const;
-    luaX_reference& header_function();
     luaX_reference& write_function();
+    luaX_reference& read_function();
+    luaX_reference& header_function();
   private:
     CURL* handle_;
-    luaX_reference header_function_;
     luaX_reference write_function_;
+    luaX_reference read_function_;
+    luaX_reference header_function_;
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
   };
