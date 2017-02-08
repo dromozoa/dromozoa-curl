@@ -49,6 +49,13 @@ namespace dromozoa {
 #if CURL_AT_LEAST_VERSION(7,51,0)
         case CURLOPT_KEEP_SENDING_ON_ERROR:
 #endif
+        case CURLOPT_PATH_AS_IS:
+        case CURLOPT_PROTOCOLS:
+        case CURLOPT_REDIR_PROTOCOLS:
+        case CURLOPT_PROXYPORT:
+        case CURLOPT_PROXYTYPE:
+        case CURLOPT_HTTPPROXYTUNNEL:
+
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
         case CURLOPT_FOLLOWLOCATION:
@@ -56,7 +63,17 @@ namespace dromozoa {
         case CURLOPT_UPLOAD:
           setopt_integer<long>(L, option);
           return;
+
         case CURLOPT_URL:
+#if CURL_AT_LEAST_VERSION(7,45,0)
+        case CURLOPT_DEFAULT_PROTOCOL:
+#endif
+        case CURLOPT_PROXY:
+#if CURL_AT_LEAST_VERSION(7,52,0)
+        case CURLOPT_PRE_PROXY:
+#endif
+        case CURLOPT_NOPROXY:
+
         case CURLOPT_USERAGENT:
         case CURLOPT_REFERER:
           setopt_string(L, option);
