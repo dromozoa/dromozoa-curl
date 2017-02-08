@@ -42,7 +42,13 @@ namespace dromozoa {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (option) {
         case CURLOPT_VERBOSE:
+        case CURLOPT_HEADER:
         case CURLOPT_NOPROGRESS:
+        case CURLOPT_NOSIGNAL:
+        case CURLOPT_FAILONERROR:
+#if CURL_AT_LEAST_VERSION(7,51,0)
+        case CURLOPT_KEEP_SENDING_ON_ERROR:
+#endif
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
         case CURLOPT_FOLLOWLOCATION:
@@ -57,6 +63,19 @@ namespace dromozoa {
           return;
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);
+      }
+    }
+
+    template <class T>
+    void setopt_function(lua_State* L, easy_handle* self, luaX_reference& ref, CURLoption option_data, CURLoption option_function, const T& callback) {
+      lua_pushvalue(L, 2);
+      luaX_reference(L).swap(ref);
+      curl_easy_setopt(self->get(), option_data, &ref);
+      CURLcode result = curl_easy_setopt(self->get(), option_function, callback);
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
       }
     }
 
@@ -84,16 +103,7 @@ namespace dromozoa {
 
     void impl_setopt_write_function(lua_State* L) {
       easy_handle* self = check_easy_handle(L, 1);
-      luaX_reference& ref = self->write_function();
-      lua_pushvalue(L, 2);
-      luaX_reference(L).swap(ref);
-      curl_easy_setopt(self->get(), CURLOPT_WRITEDATA, &ref);
-      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_WRITEFUNCTION, &write_callback);
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
+      setopt_function(L, self, self->write_function(), CURLOPT_WRITEDATA, CURLOPT_WRITEFUNCTION, &write_callback);
     }
 
     size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
@@ -122,52 +132,12 @@ namespace dromozoa {
 
     void impl_setopt_read_function(lua_State* L) {
       easy_handle* self = check_easy_handle(L, 1);
-      luaX_reference& ref = self->read_function();
-      lua_pushvalue(L, 2);
-      luaX_reference(L).swap(ref);
-      curl_easy_setopt(self->get(), CURLOPT_READDATA, &ref);
-      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, &read_callback);
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    size_t header_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
-      size_t n = size * nmemb;
-      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
-      lua_State* L = ref.state();
-      int top = lua_gettop(L);
-      ref.get_field();
-      lua_pushlstring(L, ptr, n);
-      size_t result = 0;
-      int r = lua_pcall(L, 1, 1, 0);
-      if (r == 0) {
-        if (luaX_is_integer(L, -1)) {
-          result = lua_tointeger(L, -1);
-        } else {
-          result = n;
-        }
-      } else {
-        DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
-      }
-      lua_settop(L, top);
-      return result;
+      setopt_function(L, self, self->read_function(), CURLOPT_READDATA, CURLOPT_READFUNCTION, &read_callback);
     }
 
     void impl_setopt_header_function(lua_State* L) {
       easy_handle* self = check_easy_handle(L, 1);
-      luaX_reference& ref = self->header_function();
-      lua_pushvalue(L, 2);
-      luaX_reference(L).swap(ref);
-      curl_easy_setopt(self->get(), CURLOPT_HEADERDATA, &ref);
-      CURLcode result = curl_easy_setopt(self->get(), CURLOPT_HEADERFUNCTION, &header_callback);
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
+      setopt_function(L, self, self->header_function(), CURLOPT_HEADERDATA, CURLOPT_HEADERFUNCTION, &write_callback);
     }
   }
 
