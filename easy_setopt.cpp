@@ -38,6 +38,28 @@ namespace dromozoa {
       }
     }
 
+    void setopt_slist(lua_State* L, CURLoption option, string_list& list) {
+      if (lua_istable(L, 2)) {
+        string_list().swap(list);
+        for (int i = 1; ; ++i) {
+          luaX_get_field(L, 2, i);
+          if (const char* p = lua_tostring(L, -1)) {
+            list.append(p);
+            lua_pop(L, 1);
+          } else {
+            lua_pop(L, 1);
+            break;
+          }
+        }
+        CURLcode result = curl_easy_setopt(check_easy(L, 1), option, list.get());
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
+      }
+    }
+
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (option) {
@@ -78,6 +100,16 @@ namespace dromozoa {
         case CURLOPT_REFERER:
           setopt_string(L, option);
           return;
+
+#if CURL_AT_LEAST_VERSION(7,49,0)
+        case CURLOPT_CONNECT_TO:
+          setopt_slist(L, option, check_easy_handle(L, 1)->connect_to());
+          return;
+#endif
+        case CURLOPT_RESOLVE:
+          setopt_slist(L, option, check_easy_handle(L, 1)->resolve());
+          return;
+
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);
       }

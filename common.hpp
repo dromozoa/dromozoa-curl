@@ -27,6 +27,19 @@
 #include <dromozoa/bind.hpp>
 
 namespace dromozoa {
+  class string_list {
+  public:
+    explicit string_list(curl_slist* list = 0);
+    ~string_list();
+    curl_slist* get() const;
+    void append(const char* string);
+    void swap(string_list& that);
+  private:
+    curl_slist* list_;
+    string_list(const string_list&);
+    string_list& operator=(const string_list&);
+  };
+
   class easy_handle {
   public:
     explicit easy_handle(CURL* handle);
@@ -36,11 +49,15 @@ namespace dromozoa {
     luaX_reference& write_function();
     luaX_reference& read_function();
     luaX_reference& header_function();
+    string_list& connect_to();
+    string_list& resolve();
   private:
     CURL* handle_;
     luaX_reference write_function_;
     luaX_reference read_function_;
     luaX_reference header_function_;
+    string_list connect_to_;
+    string_list resolve_;
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
   };

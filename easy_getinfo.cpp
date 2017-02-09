@@ -31,16 +31,16 @@ namespace dromozoa {
     }
 
     void getinfo_slist(lua_State* L, CURLINFO info) {
-      struct curl_slist* list = 0;
-      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &list);
+      struct curl_slist* slist = 0;
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &slist);
       if (result == CURLE_OK) {
-        struct curl_slist* item = list;
+        string_list list(slist);
         lua_newtable(L);
+        struct curl_slist* item = list.get();
         for (int i = 1; item; ++i) {
           luaX_set_field(L, -1, i, item->data);
           item = item->next;
         }
-        curl_slist_free_all(list);
       } else {
         push_error(L, result);
       }
@@ -52,8 +52,8 @@ namespace dromozoa {
       if (result == CURLE_OK) {
         lua_newtable(L);
         for (int i = 0; i < certinfo->num_of_certs; ++i) {
-          struct curl_slist* item = certinfo->certinfo[i];
           lua_newtable(L);
+          struct curl_slist* item = certinfo->certinfo[i];
           for (int j = 1; item; ++j) {
             luaX_set_field(L, -1, j, item->data);
             item = item->next;

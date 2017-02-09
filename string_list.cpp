@@ -18,41 +18,25 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  easy_handle::easy_handle(CURL* handle) : handle_(handle) {}
+  string_list::string_list(curl_slist* list) : list_(list) {}
 
-  easy_handle::~easy_handle() {
-    if (handle_) {
-      cleanup();
+  ~string_list() {
+    if (list_) {
+      curl_slist_free_all(list_);
     }
   }
 
-  void easy_handle::cleanup() {
-    CURL* handle = handle_;
-    handle_ = 0;
-    curl_easy_cleanup(handle);
+  curl_slist* string_list::get() const {
+    return list_;
   }
 
-  CURL* easy_handle::get() const {
-    return handle_;
+  void string_list::append(const char* string) {
+    list_ = curl_slist_append(list_, string);
   }
 
-  luaX_reference& easy_handle::write_function() {
-    return write_function_;
-  }
-
-  luaX_reference& easy_handle::read_function() {
-    return read_function_;
-  }
-
-  luaX_reference& easy_handle::header_function() {
-    return header_function_;
-  }
-
-  string_list& easy_handle::connect_to() {
-    return connect_to_;
-  }
-
-  string_list& easy_handle::resolve() {
-    return resolve_;
+  void string_list::swap(string_list& that) {
+    curl_slist* list = list_;
+    list_ = that.list_;
+    that.list_ = list;
   }
 }
