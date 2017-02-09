@@ -77,6 +77,25 @@ namespace dromozoa {
         case CURLOPT_PROXYPORT:
         case CURLOPT_PROXYTYPE:
         case CURLOPT_HTTPPROXYTUNNEL:
+        case CURLOPT_SOCKS5_GSSAPI_NEC:
+        case CURLOPT_LOCALPORT:
+        case CURLOPT_LOCALPORTRANGE:
+        case CURLOPT_DNS_CACHE_TIMEOUT:
+        case CURLOPT_DNS_USE_GLOBAL_CACHE:
+        case CURLOPT_BUFFERSIZE:
+        case CURLOPT_PORT:
+#if CURL_AT_LEAST_VERSION(7,49,0)
+        case CURLOPT_TCP_FASTOPEN:
+#endif
+        case CURLOPT_TCP_NODELAY:
+        case CURLOPT_ADDRESS_SCOPE:
+        case CURLOPT_TCP_KEEPALIVE:
+        case CURLOPT_TCP_KEEPIDLE:
+        case CURLOPT_TCP_KEEPINTVL:
+        case CURLOPT_NETRC:
+        case CURLOPT_HTTPAUTH:
+        case CURLOPT_PROXYAUTH:
+        case CURLOPT_SASL_IR:
 
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
@@ -95,6 +114,29 @@ namespace dromozoa {
         case CURLOPT_PRE_PROXY:
 #endif
         case CURLOPT_NOPROXY:
+        case CURLOPT_SOCKS5_GSSAPI_SERVICE:
+        case CURLOPT_PROXY_SERVICE_NAME:
+        case CURLOPT_SERVICE_NAME:
+        case CURLOPT_INTERFACE:
+        case CURLOPT_UNIX_SOCKET_PATH:
+#if CURL_AT_LEAST_VERSION(7,53,0)
+        case CURLOPT_ABSTRACT_UNIX_SOCKET:
+#endif
+        case CURLOPT_NETRC_FILE:
+        case CURLOPT_USERPWD:
+        case CURLOPT_PROXYUSERPWD:
+        case CURLOPT_USERNAME:
+        case CURLOPT_PASSWORD:
+        case CURLOPT_LOGIN_OPTIONS:
+        case CURLOPT_PROXYUSERNAME:
+        case CURLOPT_PROXYPASSWORD:
+        case CURLOPT_TLSAUTH_USERNAME:
+        case CURLOPT_TLSAUTH_PASSWORD:
+#if CURL_AT_LEAST_VERSION(7,52,0)
+        case CURLOPT_PROXY_TLSAUTH_PASSWORD:
+#endif
+        case CURLOPT_TLSAUTH_TYPE:
+        case CURLOPT_XOAUTH2_BEARER:
 
         case CURLOPT_USERAGENT:
         case CURLOPT_REFERER:
