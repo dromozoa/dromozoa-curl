@@ -1,4 +1,4 @@
-// generated from generate_symbols.lua
+// generated from curl-7.52.1/docs/libcurl/symbols-in-versions
 
 #include "common.hpp"
 

@@ -36,11 +36,35 @@ namespace dromozoa {
     return handle_;
   }
 
+  luaX_reference& easy_handle::write_function() {
+    return write_function_;
+  }
+
+  luaX_reference& easy_handle::read_function() {
+    return read_function_;
+  }
+
   luaX_reference& easy_handle::header_function() {
     return header_function_;
   }
 
-  luaX_reference& easy_handle::write_function() {
-    return write_function_;
+  string_list& easy_handle::connect_to() {
+    return connect_to_;
+  }
+
+  string_list& easy_handle::resolve() {
+    return resolve_;
+  }
+
+  string_list& easy_handle::http_header() {
+    return http_header_;
+  }
+
+  string_list& easy_handle::proxy_header() {
+    return proxy_header_;
+  }
+
+  string_list& easy_handle::http_200_aliases() {
+    return http_200_aliases_;
   }
 }

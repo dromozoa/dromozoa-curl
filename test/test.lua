@@ -26,24 +26,35 @@ assert(curl.global_init())
 local easy = assert(curl.easy())
 assert(easy:reset())
 
-assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
+-- assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
+assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/no-such-file.html"))
+-- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=redirect&redirect_count=3"))
+-- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=sleep&sleep_duration=0.5&sleep_count=10"))
+assert(easy:setopt(curl.CURLOPT_VERBOSE, 0))
+assert(easy:setopt(curl.CURLOPT_NOPROGRESS, 0))
+assert(easy:setopt(curl.CURLOPT_FAILONERROR, 1))
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
+assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
+assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/"))
+-- assert(easy:setopt(curl.CURLOPT_CERTINFO, 1))
 
 assert(easy:setopt_header_function(function (data)
   print(("header:%q"):format(data))
   return #data
 end))
 
+local content = ""
 assert(easy:setopt_write_function(function (data)
-  print(("write:%q"):format(data))
+  content = content .. data
+  -- print(("write:%q"):format(data))
   -- print(data)
 end))
 
 assert(easy:perform())
 
---[[
 print(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL))
+--[[
 print(easy:getinfo(curl.CURLINFO_RESPONSE_CODE))
 print(easy:getinfo(curl.CURLINFO_FILETIME))
 print(easy:getinfo(curl.CURLINFO_TOTAL_TIME))
@@ -76,10 +87,14 @@ print(easy:getinfo(curl.CURLINFO_LOCAL_IP))
 print(easy:getinfo(curl.CURLINFO_LOCAL_PORT))
 print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
 ]]
+print(json.encode(easy:getinfo(curl.CURLINFO_CERTINFO)))
 
 -- print(curl.CURL_HTTP_VERSION_1_0)
 -- print(curl.CURL_HTTP_VERSION_1_1)
 -- print(curl.CURL_HTTP_VERSION_2_0)
+
+-- local result = json.decode(content)
+-- print(json.encode(result, { pretty = true }))
 
 assert(easy:cleanup())
 
