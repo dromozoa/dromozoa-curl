@@ -96,13 +96,36 @@ namespace dromozoa {
         case CURLOPT_HTTPAUTH:
         case CURLOPT_PROXYAUTH:
         case CURLOPT_SASL_IR:
+        case CURLOPT_AUTOREFERER:
+        case CURLOPT_FOLLOWLOCATION:
+        case CURLOPT_UNRESTRICTED_AUTH:
+        case CURLOPT_MAXREDIRS:
+        case CURLOPT_POSTREDIR:
+        case CURLOPT_PUT:
+        case CURLOPT_POST:
+        case CURLOPT_POSTFIELDSIZE:
+        case CURLOPT_HEADEROPT:
+        case CURLOPT_COOKIESESSION:
+        case CURLOPT_HTTPGET:
+        case CURLOPT_HTTP_VERSION:
+        case CURLOPT_IGNORE_CONTENT_LENGTH:
+        case CURLOPT_HTTP_CONTENT_DECODING:
+        case CURLOPT_HTTP_TRANSFER_DECODING:
+        case CURLOPT_EXPECT_100_TIMEOUT_MS:
+        case CURLOPT_PIPEWAIT:
+#if CURL_AT_LEAST_VERSION(7,46,0)
+        case CURLOPT_STREAM_WEIGHT:
+#endif
 
         case CURLOPT_FILETIME:
         case CURLOPT_SSL_VERIFYPEER:
-        case CURLOPT_FOLLOWLOCATION:
         case CURLOPT_CERTINFO:
         case CURLOPT_UPLOAD:
           setopt_integer<long>(L, option);
+          return;
+
+        case CURLOPT_POSTFIELDSIZE_LARGE:
+          setopt_integer<curl_off_t>(L, option);
           return;
 
         case CURLOPT_URL:
@@ -137,9 +160,16 @@ namespace dromozoa {
 #endif
         case CURLOPT_TLSAUTH_TYPE:
         case CURLOPT_XOAUTH2_BEARER:
-
-        case CURLOPT_USERAGENT:
+        case CURLOPT_ACCEPT_ENCODING:
+        case CURLOPT_TRANSFER_ENCODING:
+        // case CURLOPT_POSTFIELDS: // [TODO] does not copy...
+        case CURLOPT_COPYPOSTFIELDS:
         case CURLOPT_REFERER:
+        case CURLOPT_USERAGENT:
+        case CURLOPT_COOKIE:
+        case CURLOPT_COOKIEFILE:
+        case CURLOPT_COOKIEJAR:
+        case CURLOPT_COOKIELIST:
           setopt_string(L, option);
           return;
 
@@ -151,6 +181,28 @@ namespace dromozoa {
         case CURLOPT_RESOLVE:
           setopt_slist(L, option, check_easy_handle(L, 1)->resolve());
           return;
+        case CURLOPT_HTTPHEADER:
+          setopt_slist(L, option, check_easy_handle(L, 1)->http_header());
+          return;
+        case CURLOPT_PROXYHEADER:
+          setopt_slist(L, option, check_easy_handle(L, 1)->proxy_header());
+          return;
+        case CURLOPT_HTTP200ALIASES:
+          setopt_slist(L, option, check_easy_handle(L, 1)->http_200_aliases());
+          return;
+
+        // [TODO] impl
+        case CURLOPT_HTTPPOST:
+          push_error(L, CURLE_UNKNOWN_OPTION);
+          return;
+
+#if CURL_AT_LEAST_VERSION(7,46,0)
+        // [TODO] impl
+        case CURLOPT_STREAM_DEPENDS:
+        case CURLOPT_STREAM_DEPENDS_E:
+          push_error(L, CURLE_UNKNOWN_OPTION);
+          return;
+#endif
 
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);

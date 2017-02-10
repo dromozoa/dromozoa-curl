@@ -55,4 +55,16 @@ namespace dromozoa {
   string_list& easy_handle::resolve() {
     return resolve_;
   }
+
+  string_list& easy_handle::http_header() {
+    return http_header_;
+  }
+
+  string_list& easy_handle::proxy_header() {
+    return proxy_header_;
+  }
+
+  string_list& easy_handle::http_200_aliases() {
+    return http_200_aliases_;
+  }
 }
