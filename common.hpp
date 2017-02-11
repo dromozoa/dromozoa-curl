@@ -25,7 +25,7 @@
 #endif
 
 #if !CURL_AT_LEAST_VERSION(7,17,0)
-#error curl 7.17.0 or greater is required
+#error
 #endif
 
 #include <dromozoa/bind.hpp>

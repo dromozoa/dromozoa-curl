@@ -43,6 +43,11 @@ local version_min = curl_version_bits("7.17.0")
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
 local symbols_name = assert(symbols_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
 
+local ignore_symbols = {
+  CURL_DID_MEMORY_FUNC_TYPEDEFS = true;
+  CURL_STRICTER = true;
+}
+
 local out = assert(io.open("symbols.cpp", "w"))
 
 out:write(([[
@@ -58,10 +63,15 @@ for line in io.lines(symbols_file) do
   if line:match("^CURL") then
     local data = split(line, "%s+")
     local name, introduced, deprecated, removed = unpack(data)
-    if name ~= "CURL_DID_MEMORY_FUNC_TYPEDEFS" and name ~= "CURL_STRICTER" then
+    if not ignore_symbols[name] then
       introduced = assert(curl_version_bits(introduced))
       removed = curl_version_bits(removed)
       if removed == nil or removed > version_min then
+
+
+
+
+
         if introduced >= version_min then
           if removed ~= nil then
             out:write(([[
