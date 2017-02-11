@@ -82,10 +82,14 @@ namespace dromozoa {
             case CURLINFO_CERTINFO:
               getinfo_certinfo(L, info);
               return;
+#if CURL_AT_LEAST_VERSION(7,34,0)
             case CURLINFO_TLS_SESSION:
+#if CURL_AT_LEAST_VERSION(7,48,0)
             case CURLINFO_TLS_SSL_PTR:
+#endif
               push_error(L, CURLE_UNKNOWN_OPTION);
               return;
+#endif
             default:
               getinfo_slist(L, info);
               return;
