@@ -24,6 +24,10 @@
 #define CURL_AT_LEAST_VERSION(x,y,z) (LIBCURL_VERSION_NUM >= (x) << 16 | (y) << 8 | (z))
 #endif
 
+#if !CURL_AT_LEAST_VERSION(7,17,0)
+#error curl 7.17.0 or greater is required
+#endif
+
 #include <dromozoa/bind.hpp>
 
 namespace dromozoa {
