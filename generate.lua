@@ -31,20 +31,30 @@ local function curl_version_bits(s)
   end
 end
 
-local source_file = ...
-local version_min = curl_version_bits("7.14.0")
+local source_dir = ...
 
-local source_name = assert(source_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
-io.write(([[
+--[[
+https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+> Before version 7.17.0, strings were not copied. Instead the user was forced
+> keep them available until libcurl no longer needed them.
+]]
+local version_min = curl_version_bits("7.17.0")
+
+local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
+local symbols_name = assert(symbols_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
+
+local out = assert(io.open("symbols.cpp", "w"))
+
+out:write(([[
 // generated from %s
 
 #include "common.hpp"
 
 namespace dromozoa {
   void initialize_symbols(lua_State* L) {
-]]):format(source_name))
+]]):format(symbols_name))
 
-for line in io.lines(source_file) do
+for line in io.lines(symbols_file) do
   if line:match("^CURL") then
     local data = split(line, "%s+")
     local name, introduced, deprecated, removed = unpack(data)
@@ -53,13 +63,13 @@ for line in io.lines(source_file) do
     if removed == nil or removed > version_min then
       if introduced >= version_min then
         if removed ~= nil then
-          io.write(([[
+          out:write(([[
 #if 0x%06x <= LIBCURL_VERSION_NUM && LIBCURL_VERSION_NUM < 0x%06x
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
 ]]):format(introduced, removed, name, name))
         else
-          io.write(([[
+          out:write(([[
 #if 0x%06x <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
@@ -67,13 +77,13 @@ for line in io.lines(source_file) do
         end
       else
         if removed ~= nil then
-          io.write(([[
+          out:write(([[
 #if LIBCURL_VERSION_NUM < 0x%06x
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
 ]]):format(removed, name, name))
         else
-          io.write(([[
+          out:write(([[
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 ]]):format(name, name))
         end
@@ -82,7 +92,8 @@ for line in io.lines(source_file) do
   end
 end
 
-io.write([[
+out:write([[
   }
 }
 ]])
+out:close()
