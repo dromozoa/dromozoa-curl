@@ -33,10 +33,10 @@ local function curl_version_bits(s)
   end
 end
 
-local function check_option(source_dir, name)
+local function check_option(source_dir, name, deprecated)
   local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
   if doc == nil then
-    io.stderr:write("not found: ", name, "\n")
+    io.stderr:write("not found: ", name, " (", tostring(deprecated), ")\n")
   end
 end
 
@@ -75,10 +75,11 @@ for line in io.lines(symbols_file) do
     local data = split(line, "%s+")
     local name, introduced, deprecated, removed = unpack(data)
     introduced = assert(curl_version_bits(introduced))
+    deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
-    if not ignore_symbols[name] and (removed == nil or removed > version_min) then
-      if name:match("^CURLOPT_") or name:match("^CURLINFO_") or name:match("^CURLMOPT_") then
-        local option = check_option(source_dir, name)
+    if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
+      if name:match("^CURLOPT_") or name:match("^CURLMOPT_") then
+        local option = check_option(source_dir, name, deprecated)
       end
 
       local condition
