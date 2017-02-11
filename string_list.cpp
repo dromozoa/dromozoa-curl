@@ -20,7 +20,7 @@
 namespace dromozoa {
   string_list::string_list(curl_slist* list) : list_(list) {}
 
-  ~string_list() {
+  string_list::~string_list() {
     if (list_) {
       curl_slist_free_all(list_);
     }
