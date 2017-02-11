@@ -1231,9 +1231,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURL_CSELECT_ERR", CURL_CSELECT_ERR);
     luaX_set_field<lua_Integer>(L, -1, "CURL_CSELECT_IN", CURL_CSELECT_IN);
     luaX_set_field<lua_Integer>(L, -1, "CURL_CSELECT_OUT", CURL_CSELECT_OUT);
-#if 0x073100 <= LIBCURL_VERSION_NUM
-    luaX_set_field<lua_Integer>(L, -1, "CURL_DID_MEMORY_FUNC_TYPEDEFS", CURL_DID_MEMORY_FUNC_TYPEDEFS);
-#endif
     luaX_set_field<lua_Integer>(L, -1, "CURL_ERROR_SIZE", CURL_ERROR_SIZE);
 #if 0x071500 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURL_FNMATCHFUNC_FAIL", CURL_FNMATCHFUNC_FAIL);
@@ -1403,9 +1400,6 @@ namespace dromozoa {
 #endif
 #if 0x071505 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURL_SOCKOPT_OK", CURL_SOCKOPT_OK);
-#endif
-#if 0x073202 <= LIBCURL_VERSION_NUM
-    luaX_set_field<lua_Integer>(L, -1, "CURL_STRICTER", CURL_STRICTER);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURL_SSLVERSION_DEFAULT", CURL_SSLVERSION_DEFAULT);
     luaX_set_field<lua_Integer>(L, -1, "CURL_SSLVERSION_SSLv2", CURL_SSLVERSION_SSLv2);

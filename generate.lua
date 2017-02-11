@@ -58,34 +58,36 @@ for line in io.lines(symbols_file) do
   if line:match("^CURL") then
     local data = split(line, "%s+")
     local name, introduced, deprecated, removed = unpack(data)
-    introduced = assert(curl_version_bits(introduced))
-    removed = curl_version_bits(removed)
-    if removed == nil or removed > version_min then
-      if introduced >= version_min then
-        if removed ~= nil then
-          out:write(([[
+    if name ~= "CURL_DID_MEMORY_FUNC_TYPEDEFS" and name ~= "CURL_STRICTER" then
+      introduced = assert(curl_version_bits(introduced))
+      removed = curl_version_bits(removed)
+      if removed == nil or removed > version_min then
+        if introduced >= version_min then
+          if removed ~= nil then
+            out:write(([[
 #if 0x%06x <= LIBCURL_VERSION_NUM && LIBCURL_VERSION_NUM < 0x%06x
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
 ]]):format(introduced, removed, name, name))
-        else
-          out:write(([[
+          else
+            out:write(([[
 #if 0x%06x <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
 ]]):format(introduced, name, name))
-        end
-      else
-        if removed ~= nil then
-          out:write(([[
+          end
+        else
+          if removed ~= nil then
+            out:write(([[
 #if LIBCURL_VERSION_NUM < 0x%06x
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 #endif
 ]]):format(removed, name, name))
-        else
-          out:write(([[
+          else
+            out:write(([[
     luaX_set_field<lua_Integer>(L, -1, "%s", %s);
 ]]):format(name, name))
+          end
         end
       end
     end
