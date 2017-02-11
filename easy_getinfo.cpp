@@ -95,9 +95,11 @@ namespace dromozoa {
               return;
           }
           return;
+#if CURL_AT_LEAST_VERSION(7,45,0)
         case CURLINFO_SOCKET:
           getinfo<curl_socket_t>(L, info);
           return;
+#endif
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);
       }
