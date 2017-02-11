@@ -89,6 +89,10 @@ print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
 ]]
 print(json.encode(easy:getinfo(curl.CURLINFO_CERTINFO)))
 
+if curl.CURLINFO_ACTIVESOCKET then
+  print(json.encode(easy:getinfo(curl.CURLINFO_ACTIVESOCKET)))
+end
+
 -- print(curl.CURL_HTTP_VERSION_1_0)
 -- print(curl.CURL_HTTP_VERSION_1_1)
 -- print(curl.CURL_HTTP_VERSION_2_0)
