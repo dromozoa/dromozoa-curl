@@ -941,7 +941,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEDATA", CURLOPT_WRITEDATA);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEFUNCTION", CURLOPT_WRITEFUNCTION);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEHEADER", CURLOPT_WRITEHEADER);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEINFO", CURLOPT_WRITEINFO);
 #if 0x072000 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_XFERINFODATA", CURLOPT_XFERINFODATA);
 #endif

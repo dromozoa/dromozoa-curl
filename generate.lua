@@ -20,6 +20,22 @@ local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
 local unpack = require "dromozoa.commons.unpack"
 
+local source_dir = ...
+
+local ignore_symbols = {
+  CURL_DID_MEMORY_FUNC_TYPEDEFS = true;
+  CURL_STRICTER = true;
+  CURLOPT_WRITEINFO = true;
+}
+
+local alias_symbols = {
+  CURLOPT_ENCODING = "CURLOPT_ACCEPT_ENCODING";
+  CURLOPT_POST301 = "CURLOPT_POSTREDIR";
+  CURLOPT_RTSPHEADER = "CURLOPT_HTTPHEADER";
+  CURLOPT_SERVER_RESPONSE_TIMEOUT = "CURLOPT_FTP_RESPONSE_TIMEOUT";
+  CURLOPT_WRITEHEADER = "CURLOPT_HEADERDATA";
+}
+
 local function curl_version_bits(s)
   if s == nil or s == "-" then
     return nil
@@ -33,14 +49,14 @@ local function curl_version_bits(s)
   end
 end
 
-local function check_option(source_dir, name, deprecated)
+local function check_option(name)
   local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
   if doc == nil then
-    io.stderr:write("not found: ", name, " (", tostring(deprecated), ")\n")
+    local alias_name = alias_symbols[name]
+    doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, alias_name))
   end
+  assert(doc, "not found symbol " .. name)
 end
-
-local source_dir = ...
 
 --[[
 https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
@@ -52,14 +68,8 @@ local version_min = curl_version_bits("7.17.0")
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
 local symbols_name = assert(symbols_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
 
-local ignore_symbols = {
-  CURL_DID_MEMORY_FUNC_TYPEDEFS = true;
-  CURL_STRICTER = true;
-}
-
-local options = sequence()
-
 local out = assert(io.open("symbols.cpp", "w"))
+local options = sequence()
 
 out:write(([[
 // generated from %s
@@ -79,7 +89,10 @@ for line in io.lines(symbols_file) do
     removed = curl_version_bits(removed)
     if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
       if name:match("^CURLOPT_") or name:match("^CURLMOPT_") then
-        local option = check_option(source_dir, name, deprecated)
+        local alias_name = alias_symbols[name]
+        if alias_name == nil then
+          local option = check_option(name)
+        end
       end
 
       local condition
