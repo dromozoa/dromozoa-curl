@@ -20,12 +20,16 @@
 
 #include <curl/curl.h>
 
+#ifndef CURL_VERSION_BITS
+#define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
+#endif
+
 #ifndef CURL_AT_LEAST_VERSION
-#define CURL_AT_LEAST_VERSION(x,y,z) (LIBCURL_VERSION_NUM >= (x) << 16 | (y) << 8 | (z))
+#define CURL_AT_LEAST_VERSION(x, y, z) (LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(x, y, z))
 #endif
 
 #if !CURL_AT_LEAST_VERSION(7,17,0)
-#error curl 7.17.0 or greater is required
+#error
 #endif
 
 #include <dromozoa/bind.hpp>

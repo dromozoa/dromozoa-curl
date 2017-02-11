@@ -31,6 +31,7 @@ OBJS = \
 	multi.o \
 	multi_handle.o \
 	multi_setopt.o \
+	string_list.o \
 	symbols.o
 TARGET = curl.so
 

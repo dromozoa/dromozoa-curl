@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local read_file = require "dromozoa.commons.read_file"
+local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
 local unpack = require "dromozoa.commons.unpack"
 
@@ -31,6 +33,13 @@ local function curl_version_bits(s)
   end
 end
 
+local function check_option(source_dir, name)
+  local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
+  if doc == nil then
+    io.stderr:write("not found: ", name, "\n")
+  end
+end
+
 local source_dir = ...
 
 --[[
@@ -42,6 +51,13 @@ local version_min = curl_version_bits("7.17.0")
 
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
 local symbols_name = assert(symbols_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
+
+local ignore_symbols = {
+  CURL_DID_MEMORY_FUNC_TYPEDEFS = true;
+  CURL_STRICTER = true;
+}
+
+local options = sequence()
 
 local out = assert(io.open("symbols.cpp", "w"))
 
@@ -60,33 +76,27 @@ for line in io.lines(symbols_file) do
     local name, introduced, deprecated, removed = unpack(data)
     introduced = assert(curl_version_bits(introduced))
     removed = curl_version_bits(removed)
-    if removed == nil or removed > version_min then
+    if not ignore_symbols[name] and (removed == nil or removed > version_min) then
+      if name:match("^CURLOPT_") or name:match("^CURLINFO_") or name:match("^CURLMOPT_") then
+        local option = check_option(source_dir, name)
+      end
+
+      local condition
       if introduced >= version_min then
-        if removed ~= nil then
-          out:write(([[
-#if 0x%06x <= LIBCURL_VERSION_NUM && LIBCURL_VERSION_NUM < 0x%06x
-    luaX_set_field<lua_Integer>(L, -1, "%s", %s);
-#endif
-]]):format(introduced, removed, name, name))
-        else
-          out:write(([[
-#if 0x%06x <= LIBCURL_VERSION_NUM
-    luaX_set_field<lua_Integer>(L, -1, "%s", %s);
-#endif
-]]):format(introduced, name, name))
+        condition = ("0x%06x <= LIBCURL_VERSION_NUM"):format(introduced)
+      end
+      if removed ~= nil then
+        if condition ~= nil then
+          condition = condition .. " && "
         end
-      else
-        if removed ~= nil then
-          out:write(([[
-#if LIBCURL_VERSION_NUM < 0x%06x
-    luaX_set_field<lua_Integer>(L, -1, "%s", %s);
-#endif
-]]):format(removed, name, name))
-        else
-          out:write(([[
-    luaX_set_field<lua_Integer>(L, -1, "%s", %s);
-]]):format(name, name))
-        end
+        condition = condition .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
+      end
+      if condition ~= nil then
+        out:write("#if ", condition, "\n")
+      end
+      out:write("    luaX_set_field<lua_Integer>(L, -1, \"", name, "\", ", name, ");\n")
+      if condition ~= nil then
+        out:write("#endif\n")
       end
     end
   end
@@ -97,3 +107,7 @@ out:write([[
 }
 ]])
 out:close()
+
+for option in options:each() do
+  print(option.name)
+end
