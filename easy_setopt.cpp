@@ -20,6 +20,15 @@
 
 namespace dromozoa {
   namespace {
+    void setopt_string(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
     template <class T>
     void setopt_integer(lua_State* L, CURLoption option) {
       CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
@@ -30,18 +39,8 @@ namespace dromozoa {
       }
     }
 
-    void setopt_string(lua_State* L, CURLoption option) {
-      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
     void setopt_slist(lua_State* L, CURLoption option) {
       if (lua_istable(L, 2)) {
-        easy_handle* self = check_easy_handle(L, 1);
         string_list list;
         for (int i = 1; ; ++i) {
           luaX_get_field(L, 2, i);
@@ -53,6 +52,7 @@ namespace dromozoa {
             break;
           }
         }
+        easy_handle* self = check_easy_handle(L, 1);
         self->set_slist(option, list.get());
         CURLcode result = curl_easy_setopt(self->get(), option, list.release());
         if (result == CURLE_OK) {
