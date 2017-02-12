@@ -18,6 +18,8 @@
 #ifndef DROMOZOA_COMMON_HPP
 #define DROMOZOA_COMMON_HPP
 
+#include <map>
+
 #include <curl/curl.h>
 
 #ifndef CURL_VERSION_BITS
@@ -40,6 +42,7 @@ namespace dromozoa {
     explicit string_list(curl_slist* list = 0);
     ~string_list();
     curl_slist* get() const;
+    curl_slist* release();
     void append(const char* string);
     void swap(string_list& that);
   private:
@@ -62,6 +65,9 @@ namespace dromozoa {
     string_list& http_header();
     string_list& proxy_header();
     string_list& http_200_aliases();
+
+    void set_slist(CURLoption option, curl_slist* slist);
+
   private:
     CURL* handle_;
     luaX_reference write_function_;
@@ -72,6 +78,8 @@ namespace dromozoa {
     string_list http_header_;
     string_list proxy_header_;
     string_list http_200_aliases_;
+    std::map<CURLoption, curl_slist*> slists_;
+
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
   };

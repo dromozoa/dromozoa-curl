@@ -30,6 +30,13 @@ namespace dromozoa {
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
+
+    std::map<CURLoption, curl_slist*>::iterator i = slists_.begin();
+    std::map<CURLoption, curl_slist*>::iterator end = slists_.end();
+    for (; i != end; ++i) {
+      curl_slist_free_all(i->second);
+    }
+    slists_.clear();
   }
 
   CURL* easy_handle::get() const {
@@ -66,5 +73,15 @@ namespace dromozoa {
 
   string_list& easy_handle::http_200_aliases() {
     return http_200_aliases_;
+  }
+
+  void easy_handle::set_slist(CURLoption option, curl_slist* slist) {
+    std::map<CURLoption, curl_slist*>::iterator i = slists_.find(option);
+    if (i == slists_.end()) {
+      slists_.insert(std::make_pair(option, slist));
+    } else {
+      curl_slist_free_all(i->second);
+      i->second = slist;
+    }
   }
 }

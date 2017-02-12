@@ -39,9 +39,10 @@ namespace dromozoa {
       }
     }
 
-    void setopt_slist(lua_State* L, CURLoption option, string_list& list) {
+    void setopt_slist(lua_State* L, CURLoption option) {
       if (lua_istable(L, 2)) {
-        string_list().swap(list);
+        easy_handle* self = check_easy_handle(L, 1);
+        string_list list;
         for (int i = 1; ; ++i) {
           luaX_get_field(L, 2, i);
           if (const char* p = lua_tostring(L, -1)) {
@@ -52,7 +53,8 @@ namespace dromozoa {
             break;
           }
         }
-        CURLcode result = curl_easy_setopt(check_easy(L, 1), option, list.get());
+        self->set_slist(option, list.get());
+        CURLcode result = curl_easy_setopt(self->get(), option, list.release());
         if (result == CURLE_OK) {
           luaX_push_success(L);
         } else {
@@ -66,57 +68,26 @@ namespace dromozoa {
       switch (easy_setopt_param(option)) {
         case easy_setopt_param_char_p:
           switch (option) {
-            case CURLOPT_POSTFIELDS: // [TODO] impl copy
-              push_error(L, CURLE_UNKNOWN_OPTION);
+            case CURLOPT_POSTFIELDS:
+              setopt_string(L, CURLOPT_COPYPOSTFIELDS);
               return;
             default:
               setopt_string(L, option);
               return;
           }
           return;
-        case easy_setopt_param_curl_off_t:
-          setopt_integer<curl_off_t>(L, option);
-          return;
         case easy_setopt_param_long:
           setopt_integer<long>(L, option);
           return;
-      }
-
-      switch (option) {
-
-#if CURL_AT_LEAST_VERSION(7,49,0)
-        case CURLOPT_CONNECT_TO:
-          setopt_slist(L, option, check_easy_handle(L, 1)->connect_to());
+        case easy_setopt_param_curl_off_t:
+          setopt_integer<curl_off_t>(L, option);
           return;
-#endif
-        case CURLOPT_RESOLVE:
-          setopt_slist(L, option, check_easy_handle(L, 1)->resolve());
+        case easy_setopt_param_struct_curl_slist_p:
+          setopt_slist(L, option);
           return;
-        case CURLOPT_HTTPHEADER:
-          setopt_slist(L, option, check_easy_handle(L, 1)->http_header());
-          return;
-        case CURLOPT_PROXYHEADER:
-          setopt_slist(L, option, check_easy_handle(L, 1)->proxy_header());
-          return;
-        case CURLOPT_HTTP200ALIASES:
-          setopt_slist(L, option, check_easy_handle(L, 1)->http_200_aliases());
-          return;
-
-        // [TODO] impl
-        case CURLOPT_HTTPPOST:
-          push_error(L, CURLE_UNKNOWN_OPTION);
-          return;
-
-#if CURL_AT_LEAST_VERSION(7,46,0)
-        // [TODO] impl
-        case CURLOPT_STREAM_DEPENDS:
-        case CURLOPT_STREAM_DEPENDS_E:
-          push_error(L, CURLE_UNKNOWN_OPTION);
-          return;
-#endif
-
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);
+          return;
       }
     }
 

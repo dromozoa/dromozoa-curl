@@ -30,6 +30,12 @@ namespace dromozoa {
     return list_;
   }
 
+  curl_slist* string_list::release() {
+    curl_slist* list = list_;
+    list_ = 0;
+    return list;
+  }
+
   void string_list::append(const char* string) {
     list_ = curl_slist_append(list_, string);
   }
