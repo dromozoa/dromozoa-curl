@@ -82,37 +82,9 @@ local function check_option(name)
   then
     param_type = matcher[1]
     param_name = matcher[2]
-    print(("%s|%s|%s"):format(name, param_type, param_name or ""))
+    -- print(("%s|%s|%s"):format(name, param_type, param_name or ""))
   end
   assert(param_type)
-
---[[
-  local param = params[3]:gsub("%s+$", ""):gsub("%s+", " ")
-  local param_type
-  if param:match("^char %*%*[%w_]+$") then
-    param_type = "char **"
-  elseif param:match("^char %*[%w_]+$") then
-    param_type = "char *"
-  elseif param:match("^long [%w_]+$") then
-    param_type = "long"
-  elseif param:match("^curl_off_t [%w_]+$") then
-    param_type = "curl_off_t"
-  elseif param:match("^void %*[%w_]+$") then
-    param_type = "void *"
-  elseif param:match("^struct curl_httppost %*[%w_]+$") then
-    param_type = "struct curl_httppost *"
-  elseif param:match("^struct curl_slist %*[%w_]+$") then
-    param_type = "struct curl_slist *"
-  elseif param:match("^CURL %*[%w_]+$") then
-    param_type = "CURL *"
-  elseif param:match("^CURLSH %*[%w_]+$") then
-    param_type = "CURLSH *"
-  elseif param:match("^FILE %*[%w_]+$") then
-    param_type = "FILE *"
-  else
-    local callback_type = assert(param:match("^([%w_]+callback)"))
-  end
-]]
 end
 
 --[[
