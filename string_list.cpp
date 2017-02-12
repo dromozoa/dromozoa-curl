@@ -18,31 +18,31 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  string_list::string_list(curl_slist* list) : list_(list) {}
+  string_list::string_list(struct curl_slist* slist) : slist_(slist) {}
 
   string_list::~string_list() {
-    if (list_) {
-      curl_slist_free_all(list_);
+    if (slist_) {
+      curl_slist_free_all(slist_);
     }
   }
 
-  curl_slist* string_list::get() const {
-    return list_;
+  struct curl_slist* string_list::get() const {
+    return slist_;
   }
 
-  curl_slist* string_list::release() {
-    curl_slist* list = list_;
-    list_ = 0;
-    return list;
+  struct curl_slist* string_list::release() {
+    curl_slist* slist = slist_;
+    slist_ = 0;
+    return slist;
   }
 
   void string_list::append(const char* string) {
-    list_ = curl_slist_append(list_, string);
+    slist_ = curl_slist_append(slist_, string);
   }
 
   void string_list::swap(string_list& that) {
-    curl_slist* list = list_;
-    list_ = that.list_;
-    that.list_ = list;
+    struct curl_slist* slist = slist_;
+    slist_ = that.slist_;
+    that.slist_ = slist;
   }
 }

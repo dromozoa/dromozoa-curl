@@ -39,14 +39,14 @@
 namespace dromozoa {
   class string_list {
   public:
-    explicit string_list(curl_slist* list = 0);
+    explicit string_list(struct curl_slist* slist = 0);
     ~string_list();
-    curl_slist* get() const;
-    curl_slist* release();
+    struct curl_slist* get() const;
+    struct curl_slist* release();
     void append(const char* string);
     void swap(string_list& that);
   private:
-    curl_slist* list_;
+    struct curl_slist* slist_;
     string_list(const string_list&);
     string_list& operator=(const string_list&);
   };
