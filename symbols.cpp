@@ -1,6 +1,7 @@
-// generated from curl-7.52.1/docs/libcurl/symbols-in-versions
+// generated from curl-7.52.1
 
 #include "common.hpp"
+#include "symbols.hpp"
 
 namespace dromozoa {
   void initialize_symbols(lua_State* L) {

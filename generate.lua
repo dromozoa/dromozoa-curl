@@ -15,6 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local basename = require "dromozoa.commons.basename"
+local json = require "dromozoa.commons.json"
+local keys = require "dromozoa.commons.keys"
 local read_file = require "dromozoa.commons.read_file"
 local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
@@ -50,7 +53,9 @@ local function curl_version_bits(s)
   end
 end
 
-local function check_option(name)
+local function parse_option_man(name)
+  assert(name:match("^CURLM?OPT_"))
+
   local alias_name
 
   local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
@@ -85,6 +90,29 @@ local function check_option(name)
     -- print(("%s|%s|%s"):format(name, param_type, param_name or ""))
   end
   assert(param_type)
+
+  local param_enum
+  if name:match("CURLOPT_") then
+    param_enum = "easy_setopt_"
+  else
+    param_enum = "multi_setopt_"
+  end
+
+  if param_type:match("callback$") then
+    param_enum = param_enum .. "callback"
+  else
+    param_enum = param_enum .. param_type:gsub("%*", "p"):gsub(" ", "_")
+  end
+
+  return {
+    name = name;
+    param_type = param_type;
+    param_name = param_name;
+    param_enum = param_enum;
+  }
+end
+
+local function type_to_enum(param_type)
 end
 
 --[[
@@ -95,19 +123,23 @@ https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 local version_min = curl_version_bits("7.17.0")
 
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
-local symbols_name = assert(symbols_file:match("(curl%-%d+%.%d+%.%d+/.*)"))
+local options = sequence()
+local easy_setopts = sequence()
+local easy_setopt_enums = {}
+local multi_setopts = sequence()
+local multi_setopt_enums = {}
 
 local out = assert(io.open("symbols.cpp", "w"))
-local options = sequence()
 
 out:write(([[
 // generated from %s
 
 #include "common.hpp"
+#include "symbols.hpp"
 
 namespace dromozoa {
   void initialize_symbols(lua_State* L) {
-]]):format(symbols_name))
+]]):format(basename(source_dir)))
 
 for line in io.lines(symbols_file) do
   if line:match("^CURL") then
@@ -117,11 +149,8 @@ for line in io.lines(symbols_file) do
     deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
     if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
-      if name:match("^CURLOPT_") or name:match("^CURLMOPT_") then
-        local alias_name = alias_symbols[name]
-        if alias_name == nil then
-          local option = check_option(name)
-        end
+      if name:match("^CURLM?OPT_") then
+        options:push(parse_option_man(name))
       end
 
       local condition
@@ -152,5 +181,43 @@ out:write([[
 out:close()
 
 for option in options:each() do
-  print(option.name)
+  if option.name:match("^CURLOPT_") then
+    easy_setopt_enums[option.param_enum] = true
+  else
+    multi_setopt_enums[option.param_enum] = true
+  end
 end
+
+local out = assert(io.open("symbols.hpp", "w"))
+
+out:write(([[
+// generate from %s
+
+#ifndef DROMOZOA_SYMBOLS_HPP
+#define DROMOZOA_SYMBOLS_HPP
+
+namespace dromozoa {
+  enum easy_setopt_enum {
+]]):format(basename(source_dir)))
+
+for enum in keys(easy_setopt_enums):sort():each() do
+  out:write("    ", enum, ",\n")
+end
+
+out:write([[
+  };
+
+  enum multi_setopt_enum {
+]])
+
+for enum in keys(multi_setopt_enums):sort():each() do
+  out:write("    ", enum, ",\n")
+end
+
+out:write([[
+  };
+}
+
+#endif
+]])
+out:close()
