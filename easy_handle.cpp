@@ -55,26 +55,6 @@ namespace dromozoa {
     return header_function_;
   }
 
-  string_list& easy_handle::connect_to() {
-    return connect_to_;
-  }
-
-  string_list& easy_handle::resolve() {
-    return resolve_;
-  }
-
-  string_list& easy_handle::http_header() {
-    return http_header_;
-  }
-
-  string_list& easy_handle::proxy_header() {
-    return proxy_header_;
-  }
-
-  string_list& easy_handle::http_200_aliases() {
-    return http_200_aliases_;
-  }
-
   void easy_handle::set_slist(CURLoption option, curl_slist* slist) {
     std::map<CURLoption, curl_slist*>::iterator i = slists_.find(option);
     if (i == slists_.end()) {

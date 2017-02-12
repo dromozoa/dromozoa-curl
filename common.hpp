@@ -60,26 +60,13 @@ namespace dromozoa {
     luaX_reference& write_function();
     luaX_reference& read_function();
     luaX_reference& header_function();
-    string_list& connect_to();
-    string_list& resolve();
-    string_list& http_header();
-    string_list& proxy_header();
-    string_list& http_200_aliases();
-
     void set_slist(CURLoption option, curl_slist* slist);
-
   private:
     CURL* handle_;
     luaX_reference write_function_;
     luaX_reference read_function_;
     luaX_reference header_function_;
-    string_list connect_to_;
-    string_list resolve_;
-    string_list http_header_;
-    string_list proxy_header_;
-    string_list http_200_aliases_;
     std::map<CURLoption, curl_slist*> slists_;
-
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
   };
