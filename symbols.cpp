@@ -34,11 +34,9 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLE_AGAIN", CURLE_AGAIN);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_ALREADY_COMPLETE", CURLE_ALREADY_COMPLETE);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_BAD_CALLING_ORDER", CURLE_BAD_CALLING_ORDER);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_BAD_CONTENT_ENCODING", CURLE_BAD_CONTENT_ENCODING);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_BAD_DOWNLOAD_RESUME", CURLE_BAD_DOWNLOAD_RESUME);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_BAD_FUNCTION_ARGUMENT", CURLE_BAD_FUNCTION_ARGUMENT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_BAD_PASSWORD_ENTERED", CURLE_BAD_PASSWORD_ENTERED);
 #if 0x071500 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_CHUNK_FAILED", CURLE_CHUNK_FAILED);
 #endif
@@ -57,35 +55,24 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_ACCEPT_TIMEOUT", CURLE_FTP_ACCEPT_TIMEOUT);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_ACCESS_DENIED", CURLE_FTP_ACCESS_DENIED);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_BAD_DOWNLOAD_RESUME", CURLE_FTP_BAD_DOWNLOAD_RESUME);
 #if 0x071500 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_BAD_FILE_LIST", CURLE_FTP_BAD_FILE_LIST);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_CANT_GET_HOST", CURLE_FTP_CANT_GET_HOST);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_CANT_RECONNECT", CURLE_FTP_CANT_RECONNECT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_GET_SIZE", CURLE_FTP_COULDNT_GET_SIZE);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_RETR_FILE", CURLE_FTP_COULDNT_RETR_FILE);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_SET_ASCII", CURLE_FTP_COULDNT_SET_ASCII);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_SET_BINARY", CURLE_FTP_COULDNT_SET_BINARY);
 #if 0x071100 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_SET_TYPE", CURLE_FTP_COULDNT_SET_TYPE);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_STOR_FILE", CURLE_FTP_COULDNT_STOR_FILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_COULDNT_USE_REST", CURLE_FTP_COULDNT_USE_REST);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_PARTIAL_FILE", CURLE_FTP_PARTIAL_FILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_PORT_FAILED", CURLE_FTP_PORT_FAILED);
 #if 0x071400 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_PRET_FAILED", CURLE_FTP_PRET_FAILED);
 #endif
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_QUOTE_ERROR", CURLE_FTP_QUOTE_ERROR);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_SSL_FAILED", CURLE_FTP_SSL_FAILED);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_USER_PASSWORD_INCORRECT", CURLE_FTP_USER_PASSWORD_INCORRECT);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WEIRD_227_FORMAT", CURLE_FTP_WEIRD_227_FORMAT);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WEIRD_PASS_REPLY", CURLE_FTP_WEIRD_PASS_REPLY);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WEIRD_PASV_REPLY", CURLE_FTP_WEIRD_PASV_REPLY);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WEIRD_SERVER_REPLY", CURLE_FTP_WEIRD_SERVER_REPLY);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WEIRD_USER_REPLY", CURLE_FTP_WEIRD_USER_REPLY);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_FTP_WRITE_ERROR", CURLE_FTP_WRITE_ERROR);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_FUNCTION_NOT_FOUND", CURLE_FUNCTION_NOT_FOUND);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_GOT_NOTHING", CURLE_GOT_NOTHING);
 #if 0x072600 <= LIBCURL_VERSION_NUM
@@ -95,17 +82,13 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP2_STREAM", CURLE_HTTP2_STREAM);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP_NOT_FOUND", CURLE_HTTP_NOT_FOUND);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP_PORT_FAILED", CURLE_HTTP_PORT_FAILED);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP_POST_ERROR", CURLE_HTTP_POST_ERROR);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP_RANGE_ERROR", CURLE_HTTP_RANGE_ERROR);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_HTTP_RETURNED_ERROR", CURLE_HTTP_RETURNED_ERROR);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_INTERFACE_FAILED", CURLE_INTERFACE_FAILED);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_LDAP_CANNOT_BIND", CURLE_LDAP_CANNOT_BIND);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_LDAP_INVALID_URL", CURLE_LDAP_INVALID_URL);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_LDAP_SEARCH_FAILED", CURLE_LDAP_SEARCH_FAILED);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_LIBRARY_NOT_FOUND", CURLE_LIBRARY_NOT_FOUND);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_LOGIN_DENIED", CURLE_LOGIN_DENIED);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_MALFORMAT_USER", CURLE_MALFORMAT_USER);
 #if 0x071505 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_NOT_BUILT_IN", CURLE_NOT_BUILT_IN);
 #endif
@@ -114,7 +97,6 @@ namespace dromozoa {
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_OK", CURLE_OK);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_OPERATION_TIMEDOUT", CURLE_OPERATION_TIMEDOUT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_OPERATION_TIMEOUTED", CURLE_OPERATION_TIMEOUTED);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_OUT_OF_MEMORY", CURLE_OUT_OF_MEMORY);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_PARTIAL_FILE", CURLE_PARTIAL_FILE);
 #if 0x071101 <= LIBCURL_VERSION_NUM
@@ -146,7 +128,6 @@ namespace dromozoa {
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SEND_ERROR", CURLE_SEND_ERROR);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SEND_FAIL_REWIND", CURLE_SEND_FAIL_REWIND);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_SHARE_IN_USE", CURLE_SHARE_IN_USE);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SSH", CURLE_SSH);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SSL_CACERT", CURLE_SSL_CACERT);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SSL_CACERT_BADFILE", CURLE_SSL_CACERT_BADFILE);
@@ -171,8 +152,6 @@ namespace dromozoa {
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLE_SSL_SHUTDOWN_FAILED", CURLE_SSL_SHUTDOWN_FAILED);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_TELNET_OPTION_SYNTAX", CURLE_TELNET_OPTION_SYNTAX);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_TFTP_DISKFULL", CURLE_TFTP_DISKFULL);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_TFTP_EXISTS", CURLE_TFTP_EXISTS);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_TFTP_ILLEGAL", CURLE_TFTP_ILLEGAL);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_TFTP_NOSUCHUSER", CURLE_TFTP_NOSUCHUSER);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_TFTP_NOTFOUND", CURLE_TFTP_NOTFOUND);
@@ -186,7 +165,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLE_UNSUPPORTED_PROTOCOL", CURLE_UNSUPPORTED_PROTOCOL);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_UPLOAD_FAILED", CURLE_UPLOAD_FAILED);
     luaX_set_field<lua_Integer>(L, -1, "CURLE_URL_MALFORMAT", CURLE_URL_MALFORMAT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLE_URL_MALFORMAT_USER", CURLE_URL_MALFORMAT_USER);
 #if 0x071100 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLE_USE_SSL_FAILED", CURLE_USE_SSL_FAILED);
 #endif
@@ -275,13 +253,9 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPMETHOD_MULTICWD", CURLFTPMETHOD_MULTICWD);
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPMETHOD_NOCWD", CURLFTPMETHOD_NOCWD);
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPMETHOD_SINGLECWD", CURLFTPMETHOD_SINGLECWD);
-    luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_ALL", CURLFTPSSL_ALL);
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_CCC_ACTIVE", CURLFTPSSL_CCC_ACTIVE);
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_CCC_NONE", CURLFTPSSL_CCC_NONE);
     luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_CCC_PASSIVE", CURLFTPSSL_CCC_PASSIVE);
-    luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_CONTROL", CURLFTPSSL_CONTROL);
-    luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_NONE", CURLFTPSSL_NONE);
-    luaX_set_field<lua_Integer>(L, -1, "CURLFTPSSL_TRY", CURLFTPSSL_TRY);
 #if 0x071304 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLFTP_CREATE_DIR", CURLFTP_CREATE_DIR);
 #endif
@@ -334,7 +308,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HEADER_OUT", CURLINFO_HEADER_OUT);
     luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HEADER_SIZE", CURLINFO_HEADER_SIZE);
     luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HTTPAUTH_AVAIL", CURLINFO_HTTPAUTH_AVAIL);
-    luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HTTP_CODE", CURLINFO_HTTP_CODE);
     luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HTTP_CONNECTCODE", CURLINFO_HTTP_CONNECTCODE);
 #if 0x073200 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLINFO_HTTP_VERSION", CURLINFO_HTTP_VERSION);
@@ -533,7 +506,6 @@ namespace dromozoa {
 #if 0x071500 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_CHUNK_END_FUNCTION", CURLOPT_CHUNK_END_FUNCTION);
 #endif
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_CLOSEPOLICY", CURLOPT_CLOSEPOLICY);
 #if 0x071507 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_CLOSESOCKETDATA", CURLOPT_CLOSESOCKETDATA);
 #endif
@@ -583,7 +555,6 @@ namespace dromozoa {
 #if 0x071800 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_DNS_SERVERS", CURLOPT_DNS_SERVERS);
 #endif
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_DNS_USE_GLOBAL_CACHE", CURLOPT_DNS_USE_GLOBAL_CACHE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_EGDSOCKET", CURLOPT_EGDSOCKET);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_ENCODING", CURLOPT_ENCODING);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_ERRORBUFFER", CURLOPT_ERRORBUFFER);
@@ -591,7 +562,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_EXPECT_100_TIMEOUT_MS", CURLOPT_EXPECT_100_TIMEOUT_MS);
 #endif
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FAILONERROR", CURLOPT_FAILONERROR);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FILE", CURLOPT_FILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FILETIME", CURLOPT_FILETIME);
 #if 0x071500 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FNMATCH_DATA", CURLOPT_FNMATCH_DATA);
@@ -602,8 +572,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FOLLOWLOCATION", CURLOPT_FOLLOWLOCATION);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FORBID_REUSE", CURLOPT_FORBID_REUSE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FRESH_CONNECT", CURLOPT_FRESH_CONNECT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTPAPPEND", CURLOPT_FTPAPPEND);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTPLISTONLY", CURLOPT_FTPLISTONLY);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTPPORT", CURLOPT_FTPPORT);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTPSSLAUTH", CURLOPT_FTPSSLAUTH);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_ACCOUNT", CURLOPT_FTP_ACCOUNT);
@@ -612,7 +580,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_FILEMETHOD", CURLOPT_FTP_FILEMETHOD);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_RESPONSE_TIMEOUT", CURLOPT_FTP_RESPONSE_TIMEOUT);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_SKIP_PASV_IP", CURLOPT_FTP_SKIP_PASV_IP);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_SSL", CURLOPT_FTP_SSL);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_SSL_CCC", CURLOPT_FTP_SSL_CCC);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_USE_EPRT", CURLOPT_FTP_USE_EPRT);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_FTP_USE_EPSV", CURLOPT_FTP_USE_EPSV);
@@ -638,7 +605,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_HTTP_TRANSFER_DECODING", CURLOPT_HTTP_TRANSFER_DECODING);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_HTTP_VERSION", CURLOPT_HTTP_VERSION);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_IGNORE_CONTENT_LENGTH", CURLOPT_IGNORE_CONTENT_LENGTH);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_INFILE", CURLOPT_INFILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_INFILESIZE", CURLOPT_INFILESIZE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_INFILESIZE_LARGE", CURLOPT_INFILESIZE_LARGE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_INTERFACE", CURLOPT_INTERFACE);
@@ -660,7 +626,6 @@ namespace dromozoa {
 #if 0x073300 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_KEEP_SENDING_ON_ERROR", CURLOPT_KEEP_SENDING_ON_ERROR);
 #endif
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_KRB4LEVEL", CURLOPT_KRB4LEVEL);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_KRBLEVEL", CURLOPT_KRBLEVEL);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_LOCALPORT", CURLOPT_LOCALPORT);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_LOCALPORTRANGE", CURLOPT_LOCALPORTRANGE);
@@ -881,12 +846,10 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSH_PRIVATE_KEYFILE", CURLOPT_SSH_PRIVATE_KEYFILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSH_PUBLIC_KEYFILE", CURLOPT_SSH_PUBLIC_KEYFILE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLCERT", CURLOPT_SSLCERT);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLCERTPASSWD", CURLOPT_SSLCERTPASSWD);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLCERTTYPE", CURLOPT_SSLCERTTYPE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLENGINE", CURLOPT_SSLENGINE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLENGINE_DEFAULT", CURLOPT_SSLENGINE_DEFAULT);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLKEY", CURLOPT_SSLKEY);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLKEYPASSWD", CURLOPT_SSLKEYPASSWD);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLKEYTYPE", CURLOPT_SSLKEYTYPE);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSLVERSION", CURLOPT_SSLVERSION);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_SSL_CIPHER_LIST", CURLOPT_SSL_CIPHER_LIST);
@@ -978,7 +941,6 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEDATA", CURLOPT_WRITEDATA);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEFUNCTION", CURLOPT_WRITEFUNCTION);
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEHEADER", CURLOPT_WRITEHEADER);
-    luaX_set_field<lua_Integer>(L, -1, "CURLOPT_WRITEINFO", CURLOPT_WRITEINFO);
 #if 0x072000 <= LIBCURL_VERSION_NUM
     luaX_set_field<lua_Integer>(L, -1, "CURLOPT_XFERINFODATA", CURLOPT_XFERINFODATA);
 #endif
