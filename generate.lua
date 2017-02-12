@@ -112,9 +112,6 @@ local function parse_option_man(name)
   }
 end
 
-local function type_to_enum(param_type)
-end
-
 --[[
 https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 > Before version 7.17.0, strings were not copied. Instead the user was forced
@@ -123,7 +120,6 @@ https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 local version_min = curl_version_bits("7.17.0")
 
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
-local options = sequence()
 local easy_setopts = sequence()
 local easy_setopt_enums = {}
 local multi_setopts = sequence()
@@ -149,8 +145,14 @@ for line in io.lines(symbols_file) do
     deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
     if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
-      if name:match("^CURLM?OPT_") then
-        options:push(parse_option_man(name))
+      if name:match("^CURLOPT_") then
+        local option = parse_option_man(name)
+        easy_setopts:push(option)
+        easy_setopt_enums[option.param_enum] = true
+      elseif name:match("^CURLMOPT_") then
+        local option = parse_option_man(name)
+        multi_setopts:push(option)
+        multi_setopt_enums[option.param_enum] = true
       end
 
       local condition
@@ -179,14 +181,6 @@ out:write([[
 }
 ]])
 out:close()
-
-for option in options:each() do
-  if option.name:match("^CURLOPT_") then
-    easy_setopt_enums[option.param_enum] = true
-  else
-    multi_setopt_enums[option.param_enum] = true
-  end
-end
 
 local out = assert(io.open("symbols.hpp", "w"))
 
