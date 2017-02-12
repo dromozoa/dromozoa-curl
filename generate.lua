@@ -93,9 +93,9 @@ local function parse_option_man(name)
 
   local param_enum
   if name:match("CURLOPT_") then
-    param_enum = "easy_setopt_"
+    param_enum = "easy_setopt_param_"
   else
-    param_enum = "multi_setopt_"
+    param_enum = "multi_setopt_param_"
   end
 
   if param_type:match("callback$") then
@@ -145,12 +145,13 @@ for line in io.lines(symbols_file) do
     deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
     if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
+      local option = {}
       if name:match("^CURLOPT_") then
-        local option = parse_option_man(name)
+        option = parse_option_man(name)
         easy_setopts:push(option)
         easy_setopt_enums[option.param_enum] = true
       elseif name:match("^CURLMOPT_") then
-        local option = parse_option_man(name)
+        option = parse_option_man(name)
         multi_setopts:push(option)
         multi_setopt_enums[option.param_enum] = true
       end
@@ -165,6 +166,8 @@ for line in io.lines(symbols_file) do
         end
         condition = condition .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
       end
+      option.condition = condition
+
       if condition ~= nil then
         out:write("#if ", condition, "\n")
       end
@@ -177,6 +180,42 @@ for line in io.lines(symbols_file) do
 end
 
 out:write([[
+  }
+
+  easy_setopt_param_enum easy_setopt_param(CURLoption option) {
+]])
+
+for option in easy_setopts:each() do
+  local condition = option.condition
+  if condition ~= nil then
+    out:write("#if ", condition, "\n")
+  end
+  out:write(("    if (option == %s) { return %s; }\n"):format(option.name, option.param_enum))
+  if condition ~= nil then
+    out:write("#endif\n")
+  end
+end
+
+out:write([[
+    return easy_setopt_param_unknown;
+  }
+
+  multi_setopt_param_enum multi_setopt_param(CURLMoption option) {
+]])
+
+for option in multi_setopts:each() do
+  local condition = option.condition
+  if condition ~= nil then
+    out:write("#if ", condition, "\n")
+  end
+  out:write(("    if (option == %s) { return %s; }\n"):format(option.name, option.param_enum))
+  if condition ~= nil then
+    out:write("#endif\n")
+  end
+end
+
+out:write([[
+    return multi_setopt_param_unknown;
   }
 }
 ]])
@@ -191,7 +230,8 @@ out:write(([[
 #define DROMOZOA_SYMBOLS_HPP
 
 namespace dromozoa {
-  enum easy_setopt_enum {
+  enum easy_setopt_param_enum {
+    easy_setopt_param_unknown,
 ]]):format(basename(source_dir)))
 
 for enum in keys(easy_setopt_enums):sort():each() do
@@ -201,7 +241,8 @@ end
 out:write([[
   };
 
-  enum multi_setopt_enum {
+  enum multi_setopt_param_enum {
+    multi_setopt_param_unknown,
 ]])
 
 for enum in keys(multi_setopt_enums):sort():each() do
@@ -210,6 +251,10 @@ end
 
 out:write([[
   };
+
+  void initialize_symbols(lua_State* L);
+  easy_setopt_param_enum easy_setopt_param(CURLoption option);
+  multi_setopt_param_enum multi_setopt_param(CURLMoption option);
 }
 
 #endif

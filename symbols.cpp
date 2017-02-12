@@ -1443,4 +1443,517 @@ namespace dromozoa {
     luaX_set_field<lua_Integer>(L, -1, "CURL_WRITEFUNC_PAUSE", CURL_WRITEFUNC_PAUSE);
 #endif
   }
+
+  easy_setopt_param_enum easy_setopt_param(CURLoption option) {
+#if 0x071800 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_ACCEPTTIMEOUT_MS) { return easy_setopt_param_long; }
+#endif
+#if 0x071506 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_ACCEPT_ENCODING) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071300 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_ADDRESS_SCOPE) { return easy_setopt_param_long; }
+#endif
+#if 0x071100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_APPEND) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_AUTOREFERER) { return easy_setopt_param_long; }
+    if (option == CURLOPT_BUFFERSIZE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_CAINFO) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_CAPATH) { return easy_setopt_param_char_p; }
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CERTINFO) { return easy_setopt_param_long; }
+#endif
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CHUNK_BGN_FUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CHUNK_DATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CHUNK_END_FUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x071507 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CLOSESOCKETDATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071507 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CLOSESOCKETFUNCTION) { return easy_setopt_param_callback; }
+#endif
+    if (option == CURLOPT_CONNECTTIMEOUT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_CONNECTTIMEOUT_MS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_CONNECT_ONLY) { return easy_setopt_param_long; }
+#if 0x073100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CONNECT_TO) { return easy_setopt_param_struct_curl_slist_p; }
+#endif
+    if (option == CURLOPT_CONV_FROM_NETWORK_FUNCTION) { return easy_setopt_param_callback; }
+    if (option == CURLOPT_CONV_FROM_UTF8_FUNCTION) { return easy_setopt_param_callback; }
+    if (option == CURLOPT_CONV_TO_NETWORK_FUNCTION) { return easy_setopt_param_callback; }
+    if (option == CURLOPT_COOKIE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_COOKIEFILE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_COOKIEJAR) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_COOKIELIST) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_COOKIESESSION) { return easy_setopt_param_long; }
+#if 0x071101 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_COPYPOSTFIELDS) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_CRLF) { return easy_setopt_param_long; }
+#if 0x071300 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_CRLFILE) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_CUSTOMREQUEST) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_DEBUGDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_DEBUGFUNCTION) { return easy_setopt_param_callback; }
+#if 0x072d00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DEFAULT_PROTOCOL) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DIRLISTONLY) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_DNS_CACHE_TIMEOUT) { return easy_setopt_param_long; }
+#if 0x072100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DNS_INTERFACE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x072100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DNS_LOCAL_IP4) { return easy_setopt_param_char_p; }
+#endif
+#if 0x072100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DNS_LOCAL_IP6) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071800 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_DNS_SERVERS) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_EGDSOCKET) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_ENCODING) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_ERRORBUFFER) { return easy_setopt_param_char_p; }
+#if 0x072400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_EXPECT_100_TIMEOUT_MS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_FAILONERROR) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FILETIME) { return easy_setopt_param_long; }
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_FNMATCH_DATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_FNMATCH_FUNCTION) { return easy_setopt_param_callback; }
+#endif
+    if (option == CURLOPT_FOLLOWLOCATION) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FORBID_REUSE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FRESH_CONNECT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTPPORT) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_FTPSSLAUTH) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_ACCOUNT) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_FTP_ALTERNATIVE_TO_USER) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_FTP_CREATE_MISSING_DIRS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_FILEMETHOD) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_RESPONSE_TIMEOUT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_SKIP_PASV_IP) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_SSL_CCC) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_USE_EPRT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_FTP_USE_EPSV) { return easy_setopt_param_long; }
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_FTP_USE_PRET) { return easy_setopt_param_long; }
+#endif
+#if 0x071600 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_GSSAPI_DELEGATION) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_HEADER) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HEADERDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_HEADERFUNCTION) { return easy_setopt_param_callback; }
+#if 0x072500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_HEADEROPT) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_HTTP200ALIASES) { return easy_setopt_param_struct_curl_slist_p; }
+    if (option == CURLOPT_HTTPAUTH) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HTTPGET) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HTTPHEADER) { return easy_setopt_param_struct_curl_slist_p; }
+    if (option == CURLOPT_HTTPPOST) { return easy_setopt_param_struct_curl_httppost_p; }
+    if (option == CURLOPT_HTTPPROXYTUNNEL) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HTTP_CONTENT_DECODING) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HTTP_TRANSFER_DECODING) { return easy_setopt_param_long; }
+    if (option == CURLOPT_HTTP_VERSION) { return easy_setopt_param_long; }
+    if (option == CURLOPT_IGNORE_CONTENT_LENGTH) { return easy_setopt_param_long; }
+    if (option == CURLOPT_INFILESIZE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_INFILESIZE_LARGE) { return easy_setopt_param_curl_off_t; }
+    if (option == CURLOPT_INTERFACE) { return easy_setopt_param_char_p; }
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_INTERLEAVEDATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_INTERLEAVEFUNCTION) { return easy_setopt_param_callback; }
+#endif
+    if (option == CURLOPT_IOCTLDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_IOCTLFUNCTION) { return easy_setopt_param_callback; }
+    if (option == CURLOPT_IPRESOLVE) { return easy_setopt_param_long; }
+#if 0x071300 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_ISSUERCERT) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_KEYPASSWD) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073300 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_KEEP_SENDING_ON_ERROR) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_KRBLEVEL) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_LOCALPORT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_LOCALPORTRANGE) { return easy_setopt_param_long; }
+#if 0x072200 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_LOGIN_OPTIONS) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_LOW_SPEED_LIMIT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_LOW_SPEED_TIME) { return easy_setopt_param_long; }
+#if 0x071900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_MAIL_AUTH) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_MAIL_FROM) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_MAIL_RCPT) { return easy_setopt_param_struct_curl_slist_p; }
+#endif
+    if (option == CURLOPT_MAXCONNECTS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_MAXFILESIZE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_MAXFILESIZE_LARGE) { return easy_setopt_param_curl_off_t; }
+    if (option == CURLOPT_MAXREDIRS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_MAX_RECV_SPEED_LARGE) { return easy_setopt_param_curl_off_t; }
+    if (option == CURLOPT_MAX_SEND_SPEED_LARGE) { return easy_setopt_param_curl_off_t; }
+    if (option == CURLOPT_NETRC) { return easy_setopt_param_long; }
+    if (option == CURLOPT_NETRC_FILE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_NEW_DIRECTORY_PERMS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_NEW_FILE_PERMS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_NOBODY) { return easy_setopt_param_long; }
+    if (option == CURLOPT_NOPROGRESS) { return easy_setopt_param_long; }
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_NOPROXY) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_NOSIGNAL) { return easy_setopt_param_long; }
+#if 0x071101 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_OPENSOCKETDATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071101 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_OPENSOCKETFUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PASSWORD) { return easy_setopt_param_char_p; }
+#endif
+#if 0x072a00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PATH_AS_IS) { return easy_setopt_param_long; }
+#endif
+#if 0x072700 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PINNEDPUBLICKEY) { return easy_setopt_param_char_p; }
+#endif
+#if 0x072b00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PIPEWAIT) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_PORT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_POST) { return easy_setopt_param_long; }
+#if 0x071101 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_POST301) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_POSTFIELDS) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_POSTFIELDSIZE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_POSTFIELDSIZE_LARGE) { return easy_setopt_param_curl_off_t; }
+    if (option == CURLOPT_POSTQUOTE) { return easy_setopt_param_struct_curl_slist_p; }
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_POSTREDIR) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_PREQUOTE) { return easy_setopt_param_char_p; }
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PRE_PROXY) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_PRIVATE) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_PROGRESSDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_PROGRESSFUNCTION) { return easy_setopt_param_callback; }
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROTOCOLS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_PROXY) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_PROXYAUTH) { return easy_setopt_param_long; }
+#if 0x072500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXYHEADER) { return easy_setopt_param_struct_curl_slist_p; }
+#endif
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXYPASSWORD) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_PROXYPORT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_PROXYTYPE) { return easy_setopt_param_long; }
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXYUSERNAME) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_PROXYUSERPWD) { return easy_setopt_param_char_p; }
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_CAINFO) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_CAPATH) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_CRLFILE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_KEYPASSWD) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_PINNEDPUBLICKEY) { return easy_setopt_param_char_p; }
+#endif
+#if 0x072b00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SERVICE_NAME) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSLCERT) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSLCERTTYPE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSLKEY) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSLKEYTYPE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSLVERSION) { return easy_setopt_param_long; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSL_CIPHER_LIST) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSL_OPTIONS) { return easy_setopt_param_long; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSL_VERIFYHOST) { return easy_setopt_param_long; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_SSL_VERIFYPEER) { return easy_setopt_param_long; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_TLSAUTH_PASSWORD) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_TLSAUTH_TYPE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x073400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_TLSAUTH_USERNAME) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071200 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_PROXY_TRANSFER_MODE) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_PUT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_QUOTE) { return easy_setopt_param_struct_curl_slist_p; }
+    if (option == CURLOPT_RANDOM_FILE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_RANGE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_READDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_READFUNCTION) { return easy_setopt_param_callback; }
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_REDIR_PROTOCOLS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_REFERER) { return easy_setopt_param_char_p; }
+#if 0x071503 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RESOLVE) { return easy_setopt_param_struct_curl_slist_p; }
+#endif
+    if (option == CURLOPT_RESUME_FROM) { return easy_setopt_param_long; }
+    if (option == CURLOPT_RESUME_FROM_LARGE) { return easy_setopt_param_curl_off_t; }
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSPHEADER) { return easy_setopt_param_struct_curl_slist_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_CLIENT_CSEQ) { return easy_setopt_param_long; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_REQUEST) { return easy_setopt_param_long; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_SERVER_CSEQ) { return easy_setopt_param_long; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_SESSION_ID) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_STREAM_URI) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_RTSP_TRANSPORT) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071f00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SASL_IR) { return easy_setopt_param_long; }
+#endif
+#if 0x071200 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SEEKDATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071200 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SEEKFUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x071400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SERVER_RESPONSE_TIMEOUT) { return easy_setopt_param_long; }
+#endif
+#if 0x072b00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SERVICE_NAME) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_SHARE) { return easy_setopt_param_CURLSH_p; }
+    if (option == CURLOPT_SOCKOPTDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_SOCKOPTFUNCTION) { return easy_setopt_param_callback; }
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SOCKS5_GSSAPI_NEC) { return easy_setopt_param_long; }
+#endif
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SOCKS5_GSSAPI_SERVICE) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_SSH_AUTH_TYPES) { return easy_setopt_param_long; }
+#if 0x071101 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSH_HOST_PUBLIC_KEY_MD5) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071306 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSH_KEYDATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x071306 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSH_KEYFUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x071306 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSH_KNOWNHOSTS) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_SSH_PRIVATE_KEYFILE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSH_PUBLIC_KEYFILE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLCERT) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLCERTTYPE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLENGINE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLENGINE_DEFAULT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_SSLKEY) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLKEYTYPE) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSLVERSION) { return easy_setopt_param_long; }
+    if (option == CURLOPT_SSL_CIPHER_LIST) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_SSL_CTX_DATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_SSL_CTX_FUNCTION) { return easy_setopt_param_callback; }
+#if 0x072400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSL_ENABLE_ALPN) { return easy_setopt_param_long; }
+#endif
+#if 0x072400 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSL_ENABLE_NPN) { return easy_setopt_param_long; }
+#endif
+#if 0x072a00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSL_FALSESTART) { return easy_setopt_param_long; }
+#endif
+#if 0x071900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSL_OPTIONS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_SSL_SESSIONID_CACHE) { return easy_setopt_param_long; }
+    if (option == CURLOPT_SSL_VERIFYHOST) { return easy_setopt_param_long; }
+    if (option == CURLOPT_SSL_VERIFYPEER) { return easy_setopt_param_long; }
+#if 0x072900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_SSL_VERIFYSTATUS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_STDERR) { return easy_setopt_param_FILE_p; }
+#if 0x072e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_STREAM_DEPENDS) { return easy_setopt_param_CURL_p; }
+#endif
+#if 0x072e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_STREAM_DEPENDS_E) { return easy_setopt_param_CURL_p; }
+#endif
+#if 0x072e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_STREAM_WEIGHT) { return easy_setopt_param_long; }
+#endif
+#if 0x071900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TCP_KEEPALIVE) { return easy_setopt_param_long; }
+#endif
+#if 0x071900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TCP_KEEPIDLE) { return easy_setopt_param_long; }
+#endif
+#if 0x071900 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TCP_KEEPINTVL) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_TCP_NODELAY) { return easy_setopt_param_long; }
+#if 0x073100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TCP_FASTOPEN) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_TELNETOPTIONS) { return easy_setopt_param_struct_curl_slist_p; }
+#if 0x071304 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TFTP_BLKSIZE) { return easy_setopt_param_long; }
+#endif
+#if 0x073000 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TFTP_NO_OPTIONS) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_TIMECONDITION) { return easy_setopt_param_long; }
+    if (option == CURLOPT_TIMEOUT) { return easy_setopt_param_long; }
+    if (option == CURLOPT_TIMEOUT_MS) { return easy_setopt_param_long; }
+    if (option == CURLOPT_TIMEVALUE) { return easy_setopt_param_long; }
+#if 0x071504 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TLSAUTH_PASSWORD) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071504 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TLSAUTH_TYPE) { return easy_setopt_param_char_p; }
+#endif
+#if 0x071504 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TLSAUTH_USERNAME) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_TRANSFERTEXT) { return easy_setopt_param_long; }
+#if 0x071506 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_TRANSFER_ENCODING) { return easy_setopt_param_long; }
+#endif
+#if 0x072800 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_UNIX_SOCKET_PATH) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_UNRESTRICTED_AUTH) { return easy_setopt_param_long; }
+    if (option == CURLOPT_UPLOAD) { return easy_setopt_param_long; }
+    if (option == CURLOPT_URL) { return easy_setopt_param_char_p; }
+    if (option == CURLOPT_USERAGENT) { return easy_setopt_param_char_p; }
+#if 0x071301 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_USERNAME) { return easy_setopt_param_char_p; }
+#endif
+    if (option == CURLOPT_USERPWD) { return easy_setopt_param_char_p; }
+#if 0x071100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_USE_SSL) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_VERBOSE) { return easy_setopt_param_long; }
+#if 0x071500 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_WILDCARDMATCH) { return easy_setopt_param_long; }
+#endif
+    if (option == CURLOPT_WRITEDATA) { return easy_setopt_param_void_p; }
+    if (option == CURLOPT_WRITEFUNCTION) { return easy_setopt_param_callback; }
+    if (option == CURLOPT_WRITEHEADER) { return easy_setopt_param_void_p; }
+#if 0x072000 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_XFERINFODATA) { return easy_setopt_param_void_p; }
+#endif
+#if 0x072000 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_XFERINFOFUNCTION) { return easy_setopt_param_callback; }
+#endif
+#if 0x072100 <= LIBCURL_VERSION_NUM
+    if (option == CURLOPT_XOAUTH2_BEARER) { return easy_setopt_param_char_p; }
+#endif
+    return easy_setopt_param_unknown;
+  }
+
+  multi_setopt_param_enum multi_setopt_param(CURLMoption option) {
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE) { return multi_setopt_param_long; }
+#endif
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE) { return multi_setopt_param_long; }
+#endif
+    if (option == CURLMOPT_MAXCONNECTS) { return multi_setopt_param_long; }
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_MAX_HOST_CONNECTIONS) { return multi_setopt_param_long; }
+#endif
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_MAX_PIPELINE_LENGTH) { return multi_setopt_param_long; }
+#endif
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_MAX_TOTAL_CONNECTIONS) { return multi_setopt_param_long; }
+#endif
+    if (option == CURLMOPT_PIPELINING) { return multi_setopt_param_long; }
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_PIPELINING_SERVER_BL) { return multi_setopt_param_char_pp; }
+#endif
+#if 0x071e00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_PIPELINING_SITE_BL) { return multi_setopt_param_char_pp; }
+#endif
+#if 0x072c00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_PUSHDATA) { return multi_setopt_param_void_p; }
+#endif
+#if 0x072c00 <= LIBCURL_VERSION_NUM
+    if (option == CURLMOPT_PUSHFUNCTION) { return multi_setopt_param_callback; }
+#endif
+    if (option == CURLMOPT_SOCKETDATA) { return multi_setopt_param_void_p; }
+    if (option == CURLMOPT_SOCKETFUNCTION) { return multi_setopt_param_callback; }
+    if (option == CURLMOPT_TIMERDATA) { return multi_setopt_param_void_p; }
+    if (option == CURLMOPT_TIMERFUNCTION) { return multi_setopt_param_callback; }
+    return multi_setopt_param_unknown;
+  }
 }
