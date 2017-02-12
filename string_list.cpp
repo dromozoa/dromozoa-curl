@@ -31,7 +31,7 @@ namespace dromozoa {
   }
 
   struct curl_slist* string_list::release() {
-    curl_slist* slist = slist_;
+    struct curl_slist* slist = slist_;
     slist_ = 0;
     return slist;
   }
