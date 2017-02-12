@@ -50,12 +50,48 @@ local function curl_version_bits(s)
 end
 
 local function check_option(name)
+  local alias_name
+
   local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
   if doc == nil then
-    local alias_name = alias_symbols[name]
+    alias_name = alias_symbols[name]
     doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, alias_name))
+    assert(doc, "not found symbol " .. name)
   end
-  assert(doc, "not found symbol " .. name)
+
+  local params
+  if name:match("^CURLOPT_") then
+    params = assert(doc:match("CURLcode%s+curl_easy_setopt%((.-)%)"))
+  elseif name:match("^CURLMOPT_") then
+    params = assert(doc:match("CURLMcode%s+curl_multi_setopt%((.-)%)"))
+  end
+  local params = split(params, ",%s*")
+  assert(params[2] == name or params[2] == alias_name)
+  local param = params[3]:gsub("%s+$", ""):gsub("%s+", " ")
+  local param_type
+  if param:match("^char %*%*[%w_]+$") then
+    param_type = "char **"
+  elseif param:match("^char %*[%w_]+$") then
+    param_type = "char *"
+  elseif param:match("^long [%w_]+$") then
+    param_type = "long"
+  elseif param:match("^curl_off_t [%w_]+$") then
+    param_type = "curl_off_t"
+  elseif param:match("^void %*[%w_]+$") then
+    param_type = "void *"
+  elseif param:match("^struct curl_httppost %*[%w_]+$") then
+    param_type = "struct curl_httppost *"
+  elseif param:match("^struct curl_slist %*[%w_]+$") then
+    param_type = "struct curl_slist *"
+  elseif param:match("^CURL %*[%w_]+$") then
+    param_type = "CURL *"
+  elseif param:match("^CURLSH %*[%w_]+$") then
+    param_type = "CURLSH *"
+  elseif param:match("^FILE %*[%w_]+$") then
+    param_type = "FILE *"
+  else
+    local callback_type = assert(param:match("^([%w_]+callback)"))
+  end
 end
 
 --[[
