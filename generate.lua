@@ -18,6 +18,7 @@
 local read_file = require "dromozoa.commons.read_file"
 local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
+local string_matcher = require "dromozoa.commons.string_matcher"
 local unpack = require "dromozoa.commons.unpack"
 
 local source_dir = ...
@@ -67,6 +68,25 @@ local function check_option(name)
   end
   local params = split(params, ",%s*")
   assert(params[2] == name or params[2] == alias_name)
+
+  local param_type
+  local param_name
+
+  local matcher = string_matcher((params[3]:gsub("%s+$", ""):gsub("%s+", " ")))
+  if matcher:match("([%w_]+) ([%w_]+)$")
+      or matcher:match("(char %*%*)([%w_]+)$")
+      or matcher:match("([%w_]+ %*)([%w_]+)$")
+      or matcher:match("(struct [%w_]+ %*)([%w_]+)$")
+      or matcher:match("([%w_]+callback) ([%w_]+)$")
+      or matcher:match("([%w_]+callback)$")
+  then
+    param_type = matcher[1]
+    param_name = matcher[2]
+    print(("%s|%s|%s"):format(name, param_type, param_name or ""))
+  end
+  assert(param_type)
+
+--[[
   local param = params[3]:gsub("%s+$", ""):gsub("%s+", " ")
   local param_type
   if param:match("^char %*%*[%w_]+$") then
@@ -92,6 +112,7 @@ local function check_option(name)
   else
     local callback_type = assert(param:match("^([%w_]+callback)"))
   end
+]]
 end
 
 --[[
