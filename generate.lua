@@ -56,12 +56,11 @@ end
 local function parse_option_man(name)
   assert(name:match("^CURLM?OPT_"))
 
-  local alias_name
-
-  local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, name))
+  local doc_name = name
+  local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, doc_name))
   if doc == nil then
-    alias_name = alias_symbols[name]
-    doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, alias_name))
+    doc_name = alias_symbols[name]
+    doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, doc_name))
     assert(doc, "not found symbol " .. name)
   end
 
@@ -72,7 +71,7 @@ local function parse_option_man(name)
     params = assert(doc:match("CURLMcode%s+curl_multi_setopt%((.-)%)"))
   end
   local params = split(params, ",%s*")
-  assert(params[2] == name or params[2] == alias_name)
+  assert(params[2] == doc_name)
 
   local param_type
   local param_name
@@ -87,7 +86,6 @@ local function parse_option_man(name)
   then
     param_type = matcher[1]
     param_name = matcher[2]
-    -- print(("%s|%s|%s"):format(name, param_type, param_name or ""))
   end
   assert(param_type)
 
@@ -106,6 +104,7 @@ local function parse_option_man(name)
 
   return {
     name = name;
+    doc_name = doc_name;
     param_type = param_type;
     param_name = param_name;
     param_enum = param_enum;
@@ -275,7 +274,7 @@ for option in easy_setopts:each() do
   if param_name == nil then
     param_name = ""
   end
-  out:write(("%s|%s|%s\n"):format(option.name, option.param_type, param_name))
+  out:write(("[%s](https://curl.haxx.se/libcurl/c/%s.html)|%s|%s\n"):format(option.name, option.doc_name, option.param_type, param_name))
 end
 
 out:write([[
@@ -291,7 +290,7 @@ for option in multi_setopts:each() do
   if param_name == nil then
     param_name = ""
   end
-  out:write(("%s|%s|%s\n"):format(option.name, option.param_type, param_name))
+  out:write(("[%s](https://curl.haxx.se/libcurl/c/%s.html)|%s|%s\n"):format(option.name, option.doc_name, option.param_type, param_name))
 end
 
 out:close()
