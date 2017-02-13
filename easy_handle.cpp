@@ -27,16 +27,16 @@ namespace dromozoa {
   }
 
   void easy_handle::cleanup() {
-    CURL* handle = handle_;
-    handle_ = 0;
-    curl_easy_cleanup(handle);
-
     std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
     std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
     for (; i != end; ++i) {
       curl_slist_free_all(i->second);
     }
     slists_.clear();
+
+    CURL* handle = handle_;
+    handle_ = 0;
+    curl_easy_cleanup(handle);
   }
 
   CURL* easy_handle::get() const {

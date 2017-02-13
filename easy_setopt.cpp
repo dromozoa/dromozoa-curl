@@ -40,10 +40,10 @@ namespace dromozoa {
     }
 
     void setopt_slist(lua_State* L, CURLoption option) {
-      if (lua_istable(L, 2)) {
+      if (lua_istable(L, 3)) {
         string_list list;
         for (int i = 1; ; ++i) {
-          luaX_get_field(L, 2, i);
+          luaX_get_field(L, 3, i);
           if (const char* p = lua_tostring(L, -1)) {
             list.append(p);
             lua_pop(L, 1);
@@ -60,6 +60,8 @@ namespace dromozoa {
         } else {
           push_error(L, result);
         }
+      } else {
+        push_error(L, CURLE_UNKNOWN_OPTION);
       }
     }
 
