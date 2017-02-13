@@ -16,9 +16,19 @@
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.hpp"
+#include "symbols.hpp"
 
 namespace dromozoa {
   namespace {
+    void setopt_string(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
     template <class T>
     void setopt_integer(lua_State* L, CURLoption option) {
       CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
@@ -29,20 +39,11 @@ namespace dromozoa {
       }
     }
 
-    void setopt_string(lua_State* L, CURLoption option) {
-      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    void setopt_slist(lua_State* L, CURLoption option, string_list& list) {
-      if (lua_istable(L, 2)) {
-        string_list().swap(list);
+    void setopt_slist(lua_State* L, CURLoption option) {
+      if (lua_istable(L, 3)) {
+        string_list list;
         for (int i = 1; ; ++i) {
-          luaX_get_field(L, 2, i);
+          luaX_get_field(L, 3, i);
           if (const char* p = lua_tostring(L, -1)) {
             list.append(p);
             lua_pop(L, 1);
@@ -51,161 +52,44 @@ namespace dromozoa {
             break;
           }
         }
-        CURLcode result = curl_easy_setopt(check_easy(L, 1), option, list.get());
+        easy_handle* self = check_easy_handle(L, 1);
+        self->set_slist(option, list.get());
+        CURLcode result = curl_easy_setopt(self->get(), option, list.release());
         if (result == CURLE_OK) {
           luaX_push_success(L);
         } else {
           push_error(L, result);
         }
+      } else {
+        push_error(L, CURLE_UNKNOWN_OPTION);
       }
     }
 
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
-      switch (option) {
-        case CURLOPT_VERBOSE:
-        case CURLOPT_HEADER:
-        case CURLOPT_NOPROGRESS:
-        case CURLOPT_NOSIGNAL:
-        case CURLOPT_FAILONERROR:
-#if CURL_AT_LEAST_VERSION(7,51,0)
-        case CURLOPT_KEEP_SENDING_ON_ERROR:
-#endif
-        case CURLOPT_PATH_AS_IS:
-        case CURLOPT_PROTOCOLS:
-        case CURLOPT_REDIR_PROTOCOLS:
-        case CURLOPT_PROXYPORT:
-        case CURLOPT_PROXYTYPE:
-        case CURLOPT_HTTPPROXYTUNNEL:
-        case CURLOPT_SOCKS5_GSSAPI_NEC:
-        case CURLOPT_LOCALPORT:
-        case CURLOPT_LOCALPORTRANGE:
-        case CURLOPT_DNS_CACHE_TIMEOUT:
-        case CURLOPT_DNS_USE_GLOBAL_CACHE:
-        case CURLOPT_BUFFERSIZE:
-        case CURLOPT_PORT:
-#if CURL_AT_LEAST_VERSION(7,49,0)
-        case CURLOPT_TCP_FASTOPEN:
-#endif
-        case CURLOPT_TCP_NODELAY:
-        case CURLOPT_ADDRESS_SCOPE:
-        case CURLOPT_TCP_KEEPALIVE:
-        case CURLOPT_TCP_KEEPIDLE:
-        case CURLOPT_TCP_KEEPINTVL:
-        case CURLOPT_NETRC:
-        case CURLOPT_HTTPAUTH:
-        case CURLOPT_PROXYAUTH:
-        case CURLOPT_SASL_IR:
-        case CURLOPT_AUTOREFERER:
-        case CURLOPT_FOLLOWLOCATION:
-        case CURLOPT_UNRESTRICTED_AUTH:
-        case CURLOPT_MAXREDIRS:
-        case CURLOPT_POSTREDIR:
-        case CURLOPT_PUT:
-        case CURLOPT_POST:
-        case CURLOPT_POSTFIELDSIZE:
-        case CURLOPT_HEADEROPT:
-        case CURLOPT_COOKIESESSION:
-        case CURLOPT_HTTPGET:
-        case CURLOPT_HTTP_VERSION:
-        case CURLOPT_IGNORE_CONTENT_LENGTH:
-        case CURLOPT_HTTP_CONTENT_DECODING:
-        case CURLOPT_HTTP_TRANSFER_DECODING:
-        case CURLOPT_EXPECT_100_TIMEOUT_MS:
-        case CURLOPT_PIPEWAIT:
-#if CURL_AT_LEAST_VERSION(7,46,0)
-        case CURLOPT_STREAM_WEIGHT:
-#endif
-
-        case CURLOPT_FILETIME:
-        case CURLOPT_SSL_VERIFYPEER:
-        case CURLOPT_CERTINFO:
-        case CURLOPT_UPLOAD:
+      switch (easy_setopt_param(option)) {
+        case easy_setopt_param_char_p:
+          switch (option) {
+            case CURLOPT_POSTFIELDS:
+              setopt_string(L, CURLOPT_COPYPOSTFIELDS);
+              return;
+            default:
+              setopt_string(L, option);
+              return;
+          }
+          return;
+        case easy_setopt_param_long:
           setopt_integer<long>(L, option);
           return;
-
-        case CURLOPT_POSTFIELDSIZE_LARGE:
+        case easy_setopt_param_curl_off_t:
           setopt_integer<curl_off_t>(L, option);
           return;
-
-        case CURLOPT_URL:
-#if CURL_AT_LEAST_VERSION(7,45,0)
-        case CURLOPT_DEFAULT_PROTOCOL:
-#endif
-        case CURLOPT_PROXY:
-#if CURL_AT_LEAST_VERSION(7,52,0)
-        case CURLOPT_PRE_PROXY:
-#endif
-        case CURLOPT_NOPROXY:
-        case CURLOPT_SOCKS5_GSSAPI_SERVICE:
-        case CURLOPT_PROXY_SERVICE_NAME:
-        case CURLOPT_SERVICE_NAME:
-        case CURLOPT_INTERFACE:
-        case CURLOPT_UNIX_SOCKET_PATH:
-#if CURL_AT_LEAST_VERSION(7,53,0)
-        case CURLOPT_ABSTRACT_UNIX_SOCKET:
-#endif
-        case CURLOPT_NETRC_FILE:
-        case CURLOPT_USERPWD:
-        case CURLOPT_PROXYUSERPWD:
-        case CURLOPT_USERNAME:
-        case CURLOPT_PASSWORD:
-        case CURLOPT_LOGIN_OPTIONS:
-        case CURLOPT_PROXYUSERNAME:
-        case CURLOPT_PROXYPASSWORD:
-        case CURLOPT_TLSAUTH_USERNAME:
-        case CURLOPT_TLSAUTH_PASSWORD:
-#if CURL_AT_LEAST_VERSION(7,52,0)
-        case CURLOPT_PROXY_TLSAUTH_PASSWORD:
-#endif
-        case CURLOPT_TLSAUTH_TYPE:
-        case CURLOPT_XOAUTH2_BEARER:
-        case CURLOPT_ACCEPT_ENCODING:
-        case CURLOPT_TRANSFER_ENCODING:
-        // case CURLOPT_POSTFIELDS: // [TODO] does not copy...
-        case CURLOPT_COPYPOSTFIELDS:
-        case CURLOPT_REFERER:
-        case CURLOPT_USERAGENT:
-        case CURLOPT_COOKIE:
-        case CURLOPT_COOKIEFILE:
-        case CURLOPT_COOKIEJAR:
-        case CURLOPT_COOKIELIST:
-          setopt_string(L, option);
+        case easy_setopt_param_struct_curl_slist_p:
+          setopt_slist(L, option);
           return;
-
-#if CURL_AT_LEAST_VERSION(7,49,0)
-        case CURLOPT_CONNECT_TO:
-          setopt_slist(L, option, check_easy_handle(L, 1)->connect_to());
-          return;
-#endif
-        case CURLOPT_RESOLVE:
-          setopt_slist(L, option, check_easy_handle(L, 1)->resolve());
-          return;
-        case CURLOPT_HTTPHEADER:
-          setopt_slist(L, option, check_easy_handle(L, 1)->http_header());
-          return;
-        case CURLOPT_PROXYHEADER:
-          setopt_slist(L, option, check_easy_handle(L, 1)->proxy_header());
-          return;
-        case CURLOPT_HTTP200ALIASES:
-          setopt_slist(L, option, check_easy_handle(L, 1)->http_200_aliases());
-          return;
-
-        // [TODO] impl
-        case CURLOPT_HTTPPOST:
-          push_error(L, CURLE_UNKNOWN_OPTION);
-          return;
-
-#if CURL_AT_LEAST_VERSION(7,46,0)
-        // [TODO] impl
-        case CURLOPT_STREAM_DEPENDS:
-        case CURLOPT_STREAM_DEPENDS_E:
-          push_error(L, CURLE_UNKNOWN_OPTION);
-          return;
-#endif
-
         default:
           push_error(L, CURLE_UNKNOWN_OPTION);
+          return;
       }
     }
 

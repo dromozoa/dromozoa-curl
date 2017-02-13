@@ -16,12 +16,12 @@
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.hpp"
+#include "symbols.hpp"
 
 namespace dromozoa {
   void initialize_easy(lua_State* L);
   void initialize_main(lua_State* L);
   void initialize_multi(lua_State* L);
-  void initialize_symbols(lua_State* L);
 
   void initialize(lua_State* L) {
     initialize_easy(L);
