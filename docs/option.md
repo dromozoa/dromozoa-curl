@@ -55,6 +55,7 @@ CURLOPT_DNS_LOCAL_IP4|char *|address
 CURLOPT_DNS_LOCAL_IP6|char *|address
 CURLOPT_DNS_SERVERS|char *|servers
 CURLOPT_EGDSOCKET|char *|path
+CURLOPT_ENCODING|char *|enc
 CURLOPT_ERRORBUFFER|char *|buf
 CURLOPT_EXPECT_100_TIMEOUT_MS|long|milliseconds
 CURLOPT_FAILONERROR|long|fail
@@ -133,6 +134,7 @@ CURLOPT_PINNEDPUBLICKEY|char *|pinnedpubkey
 CURLOPT_PIPEWAIT|long|wait
 CURLOPT_PORT|long|number
 CURLOPT_POST|long|post
+CURLOPT_POST301|long|bitmask
 CURLOPT_POSTFIELDS|char *|postdata
 CURLOPT_POSTFIELDSIZE|long|size
 CURLOPT_POSTFIELDSIZE_LARGE|curl_off_t|size
@@ -182,6 +184,7 @@ CURLOPT_REFERER|char *|where
 CURLOPT_RESOLVE|struct curl_slist *|hosts
 CURLOPT_RESUME_FROM|long|from
 CURLOPT_RESUME_FROM_LARGE|curl_off_t|from
+CURLOPT_RTSPHEADER|struct curl_slist *|headers
 CURLOPT_RTSP_CLIENT_CSEQ|long|cseq
 CURLOPT_RTSP_REQUEST|long|request
 CURLOPT_RTSP_SERVER_CSEQ|long|cseq
@@ -191,6 +194,7 @@ CURLOPT_RTSP_TRANSPORT|char *|transport
 CURLOPT_SASL_IR|long|enable
 CURLOPT_SEEKDATA|void *|pointer
 CURLOPT_SEEKFUNCTION|seek_callback|
+CURLOPT_SERVER_RESPONSE_TIMEOUT|long|timeout
 CURLOPT_SERVICE_NAME|char *|name
 CURLOPT_SHARE|CURLSH *|share
 CURLOPT_SOCKOPTDATA|void *|pointer
@@ -255,6 +259,7 @@ CURLOPT_VERBOSE|long|onoff
 CURLOPT_WILDCARDMATCH|long|onoff
 CURLOPT_WRITEDATA|void *|pointer
 CURLOPT_WRITEFUNCTION|write_callback|
+CURLOPT_WRITEHEADER|void *|pointer
 CURLOPT_XFERINFODATA|void *|pointer
 CURLOPT_XFERINFOFUNCTION|progress_callback|
 CURLOPT_XOAUTH2_BEARER|char *|token

@@ -260,3 +260,28 @@ out:write([[
 #endif
 ]])
 out:close()
+
+local out = assert(io.open("docs/option.md", "w"))
+
+out:write([[
+Option Name|Param Type|Param Name
+----|----|----
+]])
+
+for option in multi_setopts:each() do
+  local param_name = option.param_name
+  if param_name == nil then
+    param_name = ""
+  end
+  out:write(("%s|%s|%s\n"):format(option.name, option.param_type, param_name))
+end
+
+for option in easy_setopts:each() do
+  local param_name = option.param_name
+  if param_name == nil then
+    param_name = ""
+  end
+  out:write(("%s|%s|%s\n"):format(option.name, option.param_type, param_name))
+end
+
+out:close()
