@@ -264,11 +264,13 @@ out:close()
 local out = assert(io.open("doc/option.md", "w"))
 
 out:write([[
+## CURMOPT
+
 Option Name|Param Type|Param Name
 ----|----|----
 ]])
 
-for option in multi_setopts:each() do
+for option in easy_setopts:each() do
   local param_name = option.param_name
   if param_name == nil then
     param_name = ""
@@ -276,7 +278,15 @@ for option in multi_setopts:each() do
   out:write(("%s|%s|%s\n"):format(option.name, option.param_type, param_name))
 end
 
-for option in easy_setopts:each() do
+out:write([[
+
+## CURLMOPT
+
+Option Name|Param Type|Param Name
+----|----|----
+]])
+
+for option in multi_setopts:each() do
   local param_name = option.param_name
   if param_name == nil then
     param_name = ""
