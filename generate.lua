@@ -261,7 +261,7 @@ out:write([[
 ]])
 out:close()
 
-local out = assert(io.open("docs/option.md", "w"))
+local out = assert(io.open("doc/option.md", "w"))
 
 out:write([[
 Option Name|Param Type|Param Name
