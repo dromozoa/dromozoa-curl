@@ -79,10 +79,12 @@ namespace dromozoa {
     CURLM* get() const;
     luaX_reference& socket_function();
     luaX_reference& timer_function();
+    luaX_reference* new_reference(CURLMoption option, lua_State* L);
   private:
     CURLM* handle_;
     luaX_reference socket_function_;
     luaX_reference timer_function_;
+    std::map<CURLMoption, luaX_reference*> references_;
     multi_handle(const multi_handle&);
     multi_handle& operator=(const multi_handle&);
   };

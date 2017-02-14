@@ -36,7 +36,7 @@ assert(multi:add_handle(easy2))
 
 local socket_map = {}
 
-multi:setopt_socket_function(function (easy, s, what)
+multi:setopt(curl.CURLMOPT_SOCKETFUNCTION, function (easy, s, what)
   print("socket", easy, s, what)
   if what == curl.CURL_POLL_REMOVE then
     socket_map[s] = nil
@@ -59,7 +59,7 @@ multi:setopt_socket_function(function (easy, s, what)
   end
 end)
 
-multi:setopt_timer_function(function (multi, timeout_ms)
+multi:setopt(curl.CURLMOPT_TIMERFUNCTION, function (multi, timeout_ms)
   print("timer", multi, timeout_ms)
   if timeout_ms == 0 then
     local running_handles = assert(multi:socket_action(curl.CURL_SOCKET_TIMEOUT, 0))
