@@ -70,10 +70,14 @@ namespace dromozoa {
       easy_handle* self = check_easy_handle(L, 1);
       lua_pushvalue(L, 3);
       luaX_reference* ref = self->new_reference(option, L);
-      curl_easy_setopt(self->get(), option_data, ref);
       CURLcode result = curl_easy_setopt(self->get(), option, callback);
       if (result == CURLE_OK) {
-        luaX_push_success(L);
+        result = curl_easy_setopt(self->get(), option_data, ref);
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
       } else {
         push_error(L, result);
       }
@@ -81,20 +85,22 @@ namespace dromozoa {
 
     size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
-      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
-      lua_State* L = ref.state();
+      luaX_reference* ref = static_cast<luaX_reference*>(userdata);
+      lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref.get_field();
+      ref->get_field();
       luaX_push(L, n);
       size_t result = CURLE_ABORTED_BY_CALLBACK;
       int r = lua_pcall(L, 1, 1, 0);
       if (r == 0) {
-        result = 0;
         if (const char* data = lua_tolstring(L, -1, &result)) {
-          if (result > n) {
-            result = n;
+          if (result <= n) {
+            memcpy(buffer, data, result);
+          } else {
+            result = CURLE_ABORTED_BY_CALLBACK;
           }
-          memcpy(buffer, data, result);
+        } else {
+          result = 0;
         }
       } else {
         DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
@@ -105,10 +111,10 @@ namespace dromozoa {
 
     size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
-      luaX_reference& ref = *static_cast<luaX_reference*>(userdata);
-      lua_State* L = ref.state();
+      luaX_reference* ref = static_cast<luaX_reference*>(userdata);
+      lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref.get_field();
+      ref->get_field();
       lua_pushlstring(L, ptr, n);
       size_t result = 0;
       int r = lua_pcall(L, 1, 1, 0);
