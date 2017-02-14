@@ -25,7 +25,7 @@ assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
 
 local content = ""
-assert(easy:setopt_write_function(function (data)
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   content = content .. data
 end))
 
@@ -36,7 +36,7 @@ local upload_data = {
   "baz\n";
   "qux\n";
 }
-assert(easy:setopt_read_function(function (n)
+assert(easy:setopt(curl.CURLOPT_READFUNCTION, function (n)
   print("read_function", n)
   upload_iterator = upload_iterator + 1
   if upload_data[upload_iterator] then

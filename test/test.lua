@@ -39,13 +39,13 @@ assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
 assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/"))
 -- assert(easy:setopt(curl.CURLOPT_CERTINFO, 1))
 
-assert(easy:setopt_header_function(function (data)
+assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
   print(("header:%q"):format(data))
   return #data
 end))
 
 local content = ""
-assert(easy:setopt_write_function(function (data)
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   content = content .. data
   -- print(("write:%q"):format(data))
   -- print(data)
