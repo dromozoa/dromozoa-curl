@@ -43,14 +43,6 @@ namespace dromozoa {
     return handle_;
   }
 
-  luaX_reference& multi_handle::socket_function() {
-    return socket_function_;
-  }
-
-  luaX_reference& multi_handle::timer_function() {
-    return timer_function_;
-  }
-
   luaX_reference* multi_handle::new_reference(CURLMoption option, lua_State* L) {
     luaX_reference* reference = 0;
     try {
