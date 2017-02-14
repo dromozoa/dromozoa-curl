@@ -57,15 +57,11 @@ namespace dromozoa {
     ~easy_handle();
     void cleanup();
     CURL* get() const;
-    luaX_reference& write_function();
-    luaX_reference& read_function();
-    luaX_reference& header_function();
+    luaX_reference* new_reference(CURLoption option, lua_State* L);
     void save_slist(CURLoption option, struct curl_slist* slist);
   private:
     CURL* handle_;
-    luaX_reference write_function_;
-    luaX_reference read_function_;
-    luaX_reference header_function_;
+    std::map<CURLoption, luaX_reference*> references_;
     std::map<CURLoption, struct curl_slist*> slists_;
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);

@@ -27,12 +27,23 @@ namespace dromozoa {
   }
 
   void easy_handle::cleanup() {
-    std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
-    std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
-    for (; i != end; ++i) {
-      curl_slist_free_all(i->second);
+    {
+      std::map<CURLoption, luaX_reference*>::iterator i = references_.begin();
+      std::map<CURLoption, luaX_reference*>::iterator end = references_.begin();
+      for (; i != end; ++i) {
+        delete i->second;
+      }
+      references_.clear();
     }
-    slists_.clear();
+
+    {
+      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
+      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
+      for (; i != end; ++i) {
+        curl_slist_free_all(i->second);
+      }
+      slists_.clear();
+  }
 
     CURL* handle = handle_;
     handle_ = 0;
@@ -43,16 +54,22 @@ namespace dromozoa {
     return handle_;
   }
 
-  luaX_reference& easy_handle::write_function() {
-    return write_function_;
-  }
-
-  luaX_reference& easy_handle::read_function() {
-    return read_function_;
-  }
-
-  luaX_reference& easy_handle::header_function() {
-    return header_function_;
+  luaX_reference* easy_handle::new_reference(CURLoption option, lua_State* L) {
+    luaX_reference* reference = 0;
+    try {
+      reference = new luaX_reference(L);
+      std::map<CURLoption, luaX_reference*>::iterator i = references_.find(option);
+      if (i == references_.end()) {
+        references_.insert(std::make_pair(option, reference));
+      } else {
+        delete i->second;
+        i->second = reference;
+      }
+      return reference;
+    } catch (...) {
+      delete reference;
+      throw;
+    }
   }
 
   void easy_handle::save_slist(CURLoption option, struct curl_slist* slist) {
