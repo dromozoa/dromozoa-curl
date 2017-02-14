@@ -55,7 +55,7 @@ namespace dromozoa {
     return header_function_;
   }
 
-  void easy_handle::set_slist(CURLoption option, struct curl_slist* slist) {
+  void easy_handle::save_slist(CURLoption option, struct curl_slist* slist) {
     std::map<CURLoption, struct curl_slist*>::iterator i = slists_.find(option);
     if (i == slists_.end()) {
       slists_.insert(std::make_pair(option, slist));

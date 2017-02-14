@@ -60,7 +60,7 @@ namespace dromozoa {
     luaX_reference& write_function();
     luaX_reference& read_function();
     luaX_reference& header_function();
-    void set_slist(CURLoption option, struct curl_slist* slist);
+    void save_slist(CURLoption option, struct curl_slist* slist);
   private:
     CURL* handle_;
     luaX_reference write_function_;

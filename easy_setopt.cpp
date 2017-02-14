@@ -53,7 +53,7 @@ namespace dromozoa {
           }
         }
         easy_handle* self = check_easy_handle(L, 1);
-        self->set_slist(option, list.get());
+        self->save_slist(option, list.get());
         CURLcode result = curl_easy_setopt(self->get(), option, list.release());
         if (result == CURLE_OK) {
           luaX_push_success(L);
