@@ -38,7 +38,7 @@ namespace dromozoa {
     }
 
     void impl_reset(lua_State* L) {
-      curl_easy_reset(check_easy(L, 1));
+      check_easy_handle(L, 1)->reset();
       luaX_push_success(L);
     }
 

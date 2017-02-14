@@ -55,6 +55,7 @@ namespace dromozoa {
   public:
     explicit easy_handle(CURL* handle);
     ~easy_handle();
+    void reset();
     void cleanup();
     CURL* get() const;
     luaX_reference* new_reference(CURLoption option, lua_State* L);
@@ -65,6 +66,7 @@ namespace dromozoa {
     std::map<CURLoption, struct curl_slist*> slists_;
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
+    void clear();
   };
 
   easy_handle* check_easy_handle(lua_State* L, int arg);
