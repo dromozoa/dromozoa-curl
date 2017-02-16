@@ -137,7 +137,7 @@ namespace dromozoa {
         case easy_setopt_param_char_p:
           switch (option) {
             case CURLOPT_POSTFIELDS:
-              setopt_string(L, CURLOPT_COPYPOSTFIELDS);
+              push_error(L, CURLE_UNKNOWN_OPTION);
               return;
             default:
               setopt_string(L, option);
