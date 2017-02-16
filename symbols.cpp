@@ -1956,4 +1956,18 @@ namespace dromozoa {
     if (option == CURLMOPT_TIMERFUNCTION) { return multi_setopt_param_callback; }
     return multi_setopt_param_unknown;
   }
+
+  const char* error_to_string(CURLFORMcode code) {
+    switch (code) {
+      case CURL_FORMADD_DISABLED: return "CURL_FORMADD_DISABLED";
+      case CURL_FORMADD_ILLEGAL_ARRAY: return "CURL_FORMADD_ILLEGAL_ARRAY";
+      case CURL_FORMADD_INCOMPLETE: return "CURL_FORMADD_INCOMPLETE";
+      case CURL_FORMADD_MEMORY: return "CURL_FORMADD_MEMORY";
+      case CURL_FORMADD_NULL: return "CURL_FORMADD_NULL";
+      case CURL_FORMADD_OK: return "CURL_FORMADD_OK";
+      case CURL_FORMADD_OPTION_TWICE: return "CURL_FORMADD_OPTION_TWICE";
+      case CURL_FORMADD_UNKNOWN_OPTION: return "CURL_FORMADD_UNKNOWN_OPTION";
+      default: return "unknown error";
+    }
+  }
 }

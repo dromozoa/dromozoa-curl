@@ -123,6 +123,7 @@ local easy_setopts = sequence()
 local easy_setopt_enums = {}
 local multi_setopts = sequence()
 local multi_setopt_enums = {}
+local form_codes = sequence()
 
 local out = assert(io.open("symbols.cpp", "w"))
 
@@ -153,6 +154,8 @@ for line in io.lines(symbols_file) do
         option = parse_option_man(name)
         multi_setopts:push(option)
         multi_setopt_enums[option.param_enum] = true
+      elseif name:match("^CURL_FORMADD_") then
+        form_codes:push(name)
       end
 
       local condition
@@ -216,6 +219,19 @@ end
 out:write([[
     return multi_setopt_param_unknown;
   }
+
+  const char* error_to_string(CURLFORMcode code) {
+    switch (code) {
+]])
+
+for name in form_codes:each() do
+  out:write(("      case %s: return \"%s\";\n"):format(name, name));
+end
+
+out:write([[
+      default: return "CURLFORMcode unknown";
+    }
+  }
 }
 ]])
 out:close()
@@ -254,6 +270,7 @@ out:write([[
   void initialize_symbols(lua_State* L);
   easy_setopt_param_enum easy_setopt_param(CURLoption option);
   multi_setopt_param_enum multi_setopt_param(CURLMoption option);
+  const char* error_to_string(CURLFORMcode code);
 }
 
 #endif

@@ -37,6 +37,8 @@ namespace dromozoa {
       CURLFORMcode result = check_httppost_handle(L, 1)->add(L);
       if (result == CURL_FORMADD_OK) {
         luaX_push_success(L);
+      } else {
+        push_error(L, result);
       }
     }
   }

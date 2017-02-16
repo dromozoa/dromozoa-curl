@@ -110,6 +110,7 @@ namespace dromozoa {
 
   void push_error(lua_State* L, CURLcode code);
   void push_error(lua_State* L, CURLMcode code);
+  void push_error(lua_State* L, CURLFORMcode code);
 }
 
 #endif
