@@ -39,6 +39,18 @@ namespace dromozoa {
       }
     }
 
+    void setopt_httppost(lua_State* L, CURLoption option) {
+      easy_handle* self = check_easy_handle(L, 1);
+      lua_pushvalue(L, 3);
+      self->new_reference(option, L);
+      CURLcode result = curl_easy_setopt(self->get(), option, check_httppost(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void setopt_slist(lua_State* L, CURLoption option) {
       if (lua_istable(L, 3)) {
         string_list list;
@@ -149,6 +161,9 @@ namespace dromozoa {
           return;
         case easy_setopt_param_curl_off_t:
           setopt_integer<curl_off_t>(L, option);
+          return;
+        case easy_setopt_param_struct_curl_httppost_p:
+          setopt_httppost(L, option);
           return;
         case easy_setopt_param_struct_curl_slist_p:
           setopt_slist(L, option);

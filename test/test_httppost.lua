@@ -20,12 +20,24 @@ local curl = require "dromozoa.curl"
 assert(curl.global_init())
 
 local form = assert(curl.httppost())
-form:add(
+assert(form:add(
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_COPYCONTENTS, "bar",
-    curl.CURLFORM_END)
+    curl.CURLFORM_END))
+assert(form:add(
+    curl.CURLFORM_COPYNAME, "foo\0bar",
+    curl.CURLFORM_COPYCONTENTS, "bar\0baz"))
 
+local easy = assert(curl.easy())
 
-assert(form:free())
+assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi"))
+assert(easy:setopt(curl.CURLOPT_HTTPPOST, form));
+form = nil
+collectgarbage()
+collectgarbage()
+
+assert(easy:perform())
+
+-- assert(form:free())
 
 assert(curl.global_cleanup())

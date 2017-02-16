@@ -16,6 +16,7 @@
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <vector>
 
 #include "common.hpp"
 
@@ -37,27 +38,57 @@ namespace dromozoa {
 
   CURLFORMcode httppost_handle::add(lua_State* L) {
     int top = lua_gettop(L);
+
+    std::vector<struct curl_forms> forms;
+
     for (int arg = 2; arg <= top; arg += 2) {
       CURLformoption option = luaX_check_enum<CURLformoption>(L, arg);
-      std::cout << option << std::endl;
+      if (option == CURLFORM_END) {
+        break;
+      }
+
+      size_t length = 0;
+      switch (option) {
+        case CURLFORM_COPYNAME:
+          if (const char* p = lua_tolstring(L, arg + 1, &length)) {
+            struct curl_forms f = {};
+            f.option = option;
+            f.value = const_cast<char*>(p);
+            forms.push_back(f);
+            f.option = CURLFORM_NAMELENGTH;
+            f.value = reinterpret_cast<char*>(length);
+            forms.push_back(f);
+          } else {
+            return CURL_FORMADD_NULL;
+          }
+          break;
+        case CURLFORM_COPYCONTENTS:
+          if (const char* p = lua_tolstring(L, arg + 1, &length)) {
+            struct curl_forms f = {};
+            f.option = option;
+            f.value = const_cast<char*>(p);
+            forms.push_back(f);
+#if CURL_AT_LEAST_VERSION(7, 46, 0)
+            f.option = CURLFORM_CONTENTLEN;
+#else
+            f.option = CURLFORM_CONTENTS_LENGTH;
+#endif
+            f.value = reinterpret_cast<char*>(length);
+            forms.push_back(f);
+          } else {
+            return CURL_FORMADD_NULL;
+          }
+          break;
+        default:
+          return CURL_FORMADD_UNKNOWN_OPTION;
+      }
     }
 
-/*
-    size_t size = 0;
-    switch (option) {
-      case CURLFORM_COPYNAME:
-        if (const char* name = lua_tolstring(L, index, &size)) {
-          return curl_formadd(&first_, &last_,
-              option, name,
-              CURLFORM_NAMELENGTH, size,
-              CURLFORM_END);
-        } else {
-          return 
-        }
-        break;
-    }
-*/
-    return CURL_FORMADD_OK;
+    struct curl_forms f = {};
+    f.option = CURLFORM_END;
+    forms.push_back(f);
+
+    return curl_formadd(&first_, &last_, CURLFORM_ARRAY, &forms[0], CURLFORM_END);
   }
 
   struct curl_httppost* httppost_handle::get() const {
