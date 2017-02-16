@@ -26,6 +26,8 @@ OBJS = \
 	easy_handle.o \
 	easy_setopt.o \
 	error.o \
+	httppost.o \
+	httppost_handle.o \
 	main.o \
 	module.o \
 	multi.o \

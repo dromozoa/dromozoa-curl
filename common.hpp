@@ -51,6 +51,23 @@ namespace dromozoa {
     string_list& operator=(const string_list&);
   };
 
+  class httppost_handle {
+  public:
+    httppost_handle();
+    ~httppost_handle();
+    void free();
+    CURLFORMcode add(lua_State* L);
+    struct curl_httppost* get() const;
+  private:
+    struct curl_httppost* first_;
+    struct curl_httppost* last_;
+    httppost_handle(const httppost_handle&);
+    httppost_handle& operator=(const httppost_handle&);
+  };
+
+  httppost_handle* check_httppost_handle(lua_State* L, int arg);
+  struct curl_httppost* check_httppost(lua_State* L, int arg);
+
   class easy_handle {
   public:
     explicit easy_handle(CURL* handle);
