@@ -62,6 +62,7 @@ namespace dromozoa {
     struct curl_httppost* get() const;
     luaX_reference* new_reference(lua_State* L);
     void save_slist(struct curl_slist* slist);
+    bool have_stream() const;
   private:
     struct curl_httppost* first_;
     struct curl_httppost* last_;

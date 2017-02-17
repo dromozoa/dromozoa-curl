@@ -28,6 +28,9 @@ assert(form:add(
     curl.CURLFORM_COPYNAME, "foo\0bar",
     curl.CURLFORM_COPYCONTENTS, "bar\0baz"))
 
+local stream_bar_count = 0
+local stream_baz_count = 0
+
 assert(form
 :add(
     curl.CURLFORM_COPYNAME, "foo",
@@ -44,7 +47,31 @@ assert(form
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_BUFFER, "test.html",
     curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>",
-    curl.CURLFORM_CONTENTHEADER, { "X-Foo: foo", "X-Bar: bar" }))
+    curl.CURLFORM_CONTENTHEADER, { "X-Foo: foo", "X-Bar: bar" })
+:add(
+    curl.CURLFORM_COPYNAME, "bar",
+    curl.CURLFORM_FILENAME, "bar.txt",
+    curl.CURLFORM_CONTENTSLENGTH, 3,
+    curl.CURLFORM_STREAM, function (n)
+      print("stream bar", n)
+      if stream_bar_count < 3 then
+        stream_bar_count = stream_bar_count + 1
+        return "X"
+      else
+        return ""
+      end
+    end)
+:add(
+    curl.CURLFORM_COPYNAME, "baz",
+    curl.CURLFORM_STREAM, function (n)
+      print("stream bar", n)
+      if stream_baz_count < 3 then
+        stream_baz_count = stream_baz_count + 1
+        return "XYZ\r\n"
+      else
+        return ""
+      end
+    end))
 
 local easy = assert(curl.easy())
 

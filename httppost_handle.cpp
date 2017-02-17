@@ -21,6 +21,13 @@
 
 namespace dromozoa {
   namespace {
+    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, const char* value) {
+      struct curl_forms f = {};
+      f.option = option;
+      f.value = const_cast<char*>(value);
+      forms.push_back(f);
+    }
+
     void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, size_t value) {
       struct curl_forms f = {};
       f.option = option;
@@ -28,10 +35,10 @@ namespace dromozoa {
       forms.push_back(f);
     }
 
-    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, const char* value) {
+    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, luaX_reference* value) {
       struct curl_forms f = {};
       f.option = option;
-      f.value = const_cast<char*>(value);
+      f.value = reinterpret_cast<char*>(value);
       forms.push_back(f);
     }
 
@@ -60,6 +67,20 @@ namespace dromozoa {
       } else {
         return CURL_FORMADD_NULL;
       }
+    }
+
+    template <class T>
+    CURLFORMcode save_forms_integer(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      save_forms(forms, option, luaX_check_integer<T>(L, arg));
+      return CURL_FORMADD_OK;
+    }
+
+    CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      httppost_handle* self = check_httppost_handle(L, 1);
+      lua_pushvalue(L, arg);
+      luaX_reference* ref = self->new_reference(L);
+      save_forms(forms, option, ref);
+      return CURL_FORMADD_OK;
     }
 
     CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
@@ -146,9 +167,16 @@ namespace dromozoa {
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
 
+#if CURL_AT_LEAST_VERSION(7,46,0)
+        case CURLFORM_CONTENTLEN:
+#endif
+        case CURLFORM_CONTENTSLENGTH:
+          result = save_forms_integer<size_t>(forms, L, arg + 1, option);
+          break;
+
 #if CURL_AT_LEAST_VERSION(7,18,2)
         case CURLFORM_STREAM:
-          result = CURL_FORMADD_UNKNOWN_OPTION;
+          result = save_forms_function(forms, L, arg + 1, option);
           break;
 #endif
 
@@ -190,5 +218,9 @@ namespace dromozoa {
 
   void httppost_handle::save_slist(struct curl_slist* slist) {
     slists_.insert(slist);
+  }
+
+  bool httppost_handle::have_stream() const {
+    return !references_.empty();
   }
 }
