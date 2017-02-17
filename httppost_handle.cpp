@@ -159,7 +159,7 @@ namespace dromozoa {
 #if CURL_AT_LEAST_VERSION(7,46,0)
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
 #else
-          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTS_LENGTH);
+          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTSLENGTH);
 #endif
           break;
 
