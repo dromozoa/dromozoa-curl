@@ -36,7 +36,14 @@ namespace dromozoa {
       forms.push_back(f);
     }
 
-    CURLFORMcode save_forms(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, struct curl_slist* value) {
+      struct curl_forms f = {};
+      f.option = option;
+      f.value = reinterpret_cast<char*>(value);
+      forms.push_back(f);
+    }
+
+    CURLFORMcode save_forms_string(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       if (const char* p = lua_tostring(L, arg)) {
         save_forms(forms, option, p);
         return CURL_FORMADD_OK;
@@ -45,11 +52,23 @@ namespace dromozoa {
       }
     }
 
-    CURLFORMcode save_forms(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
+    CURLFORMcode save_forms_string(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
       size_t length = 0;
       if (const char* p = lua_tolstring(L, arg, &length)) {
         save_forms(forms, option, p);
         save_forms(forms, option_length, length);
+        return CURL_FORMADD_OK;
+      } else {
+        return CURL_FORMADD_NULL;
+      }
+    }
+
+    CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      string_list list(L, arg);
+      if (list.get()) {
+        httppost_handle* self = check_httppost_handle(L, 1);
+        self->save_slist(list.get());
+        save_forms(forms, option, list.release());
         return CURL_FORMADD_OK;
       } else {
         return CURL_FORMADD_NULL;
@@ -109,23 +128,23 @@ namespace dromozoa {
         case CURLFORM_CONTENTTYPE:
         case CURLFORM_FILENAME:
         case CURLFORM_BUFFER:
-          result = save_forms(forms, L, arg + 1, option);
+          result = save_forms_string(forms, L, arg + 1, option);
           break;
 
         case CURLFORM_COPYNAME:
-          result = save_forms(forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
+          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
           break;
 
         case CURLFORM_COPYCONTENTS:
 #if CURL_AT_LEAST_VERSION(7,46,0)
-          result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
+          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
 #else
-          result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTS_LENGTH);
+          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTS_LENGTH);
 #endif
           break;
 
         case CURLFORM_BUFFERPTR:
-          result = save_forms(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
+          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
 
 #if CURL_AT_LEAST_VERSION(7,18,2)
@@ -135,7 +154,7 @@ namespace dromozoa {
 #endif
 
         case CURLFORM_CONTENTHEADER:
-          result = CURL_FORMADD_UNKNOWN_OPTION;
+          result = save_forms_slist(forms, L, arg + 1, option);
           break;
 
         default:

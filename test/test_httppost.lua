@@ -43,7 +43,8 @@ assert(form
 :add(
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_BUFFER, "test.html",
-    curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>"))
+    curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>",
+    curl.CURLFORM_CONTENTHEADER, { "X-Foo: foo", "X-Bar: bar" }))
 
 local easy = assert(curl.easy())
 

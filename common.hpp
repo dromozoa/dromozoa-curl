@@ -41,6 +41,7 @@ namespace dromozoa {
   class string_list {
   public:
     explicit string_list(struct curl_slist* slist = 0);
+    string_list(lua_State* L, int index);
     ~string_list();
     struct curl_slist* get() const;
     struct curl_slist* release();

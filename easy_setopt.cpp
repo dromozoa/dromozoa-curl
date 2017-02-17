@@ -52,18 +52,8 @@ namespace dromozoa {
     }
 
     void setopt_slist(lua_State* L, CURLoption option) {
-      if (lua_istable(L, 3)) {
-        string_list list;
-        for (int i = 1; ; ++i) {
-          luaX_get_field(L, 3, i);
-          if (const char* p = lua_tostring(L, -1)) {
-            list.append(p);
-            lua_pop(L, 1);
-          } else {
-            lua_pop(L, 1);
-            break;
-          }
-        }
+      string_list list(L, 3);
+      if (list.get()) {
         easy_handle* self = check_easy_handle(L, 1);
         self->save_slist(option, list.get());
         CURLcode result = curl_easy_setopt(self->get(), option, list.release());
