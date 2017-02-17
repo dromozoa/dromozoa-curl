@@ -21,6 +21,42 @@
 #include "common.hpp"
 
 namespace dromozoa {
+  namespace {
+    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, size_t value) {
+      struct curl_forms f = {};
+      f.option = option;
+      f.value = reinterpret_cast<char*>(value);
+      forms.push_back(f);
+    }
+
+    void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, const char* value) {
+      struct curl_forms f = {};
+      f.option = option;
+      f.value = const_cast<char*>(value);
+      forms.push_back(f);
+    }
+
+    CURLFORMcode save_forms(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      if (const char* p = lua_tostring(L, arg)) {
+        save_forms(forms, option, p);
+        return CURL_FORMADD_OK;
+      } else {
+        return CURL_FORMADD_NULL;
+      }
+    }
+
+    CURLFORMcode save_forms(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
+      size_t length = 0;
+      if (const char* p = lua_tolstring(L, arg, &length)) {
+        save_forms(forms, option, p);
+        save_forms(forms, option_length, length);
+        return CURL_FORMADD_OK;
+      } else {
+        return CURL_FORMADD_NULL;
+      }
+    }
+  }
+
   httppost_handle::httppost_handle() : first_(), last_() {}
 
   httppost_handle::~httppost_handle() {
@@ -47,40 +83,39 @@ namespace dromozoa {
         break;
       }
 
-      size_t length = 0;
+      CURLFORMcode result = CURL_FORMADD_OK;
+
       switch (option) {
+        case CURLFORM_FILECONTENT:
+        case CURLFORM_FILE:
+        case CURLFORM_CONTENTTYPE:
+        case CURLFORM_FILENAME:
+        case CURLFORM_BUFFER:
+          result = save_forms(forms, L, arg + 1, option);
+          break;
+
         case CURLFORM_COPYNAME:
-          if (const char* p = lua_tolstring(L, arg + 1, &length)) {
-            struct curl_forms f = {};
-            f.option = option;
-            f.value = const_cast<char*>(p);
-            forms.push_back(f);
-            f.option = CURLFORM_NAMELENGTH;
-            f.value = reinterpret_cast<char*>(length);
-            forms.push_back(f);
-          } else {
-            return CURL_FORMADD_NULL;
-          }
+          result = save_forms(forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
           break;
+
         case CURLFORM_COPYCONTENTS:
-          if (const char* p = lua_tolstring(L, arg + 1, &length)) {
-            struct curl_forms f = {};
-            f.option = option;
-            f.value = const_cast<char*>(p);
-            forms.push_back(f);
 #if CURL_AT_LEAST_VERSION(7, 46, 0)
-            f.option = CURLFORM_CONTENTLEN;
+          result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
 #else
-            f.option = CURLFORM_CONTENTS_LENGTH;
+          result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTS_LENGTH);
 #endif
-            f.value = reinterpret_cast<char*>(length);
-            forms.push_back(f);
-          } else {
-            return CURL_FORMADD_NULL;
-          }
           break;
+
+        case CURLFORM_BUFFERPTR:
+          result = save_forms(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
+          break;
+
         default:
-          return CURL_FORMADD_UNKNOWN_OPTION;
+          result = CURL_FORMADD_UNKNOWN_OPTION;
+      }
+
+      if (result != CURL_FORMADD_OK) {
+        return result;
       }
     }
 

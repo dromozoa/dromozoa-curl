@@ -28,6 +28,23 @@ assert(form:add(
     curl.CURLFORM_COPYNAME, "foo\0bar",
     curl.CURLFORM_COPYCONTENTS, "bar\0baz"))
 
+assert(form
+:add(
+    curl.CURLFORM_COPYNAME, "foo",
+    curl.CURLFORM_FILECONTENT, "test.sh")
+:add(
+    curl.CURLFORM_COPYNAME, "foo",
+    curl.CURLFORM_FILE, "test.sh")
+:add(
+    curl.CURLFORM_COPYNAME, "foo",
+    curl.CURLFORM_FILE, "test.sh",
+    curl.CURLFORM_CONTENTTYPE, "text/plain",
+    curl.CURLFORM_FILENAME, "foo.sh")
+:add(
+    curl.CURLFORM_COPYNAME, "foo",
+    curl.CURLFORM_BUFFER, "test.html",
+    curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>"))
+
 local easy = assert(curl.easy())
 
 assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi"))
@@ -37,7 +54,5 @@ collectgarbage()
 collectgarbage()
 
 assert(easy:perform())
-
--- assert(form:free())
 
 assert(curl.global_cleanup())
