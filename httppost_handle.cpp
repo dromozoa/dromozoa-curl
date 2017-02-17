@@ -99,7 +99,7 @@ namespace dromozoa {
           break;
 
         case CURLFORM_COPYCONTENTS:
-#if CURL_AT_LEAST_VERSION(7, 46, 0)
+#if CURL_AT_LEAST_VERSION(7,46,0)
           result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
 #else
           result = save_forms(forms, L, arg + 1, option, CURLFORM_CONTENTS_LENGTH);
