@@ -53,7 +53,7 @@ end))
 
 local result, message, code = easy.setopt(9999999, 1)
 assert(result == nil)
-assert(code == curl.CURLE_UNKNOWN_OPTION)
+assert(code == curl.CURLE_UNKNOWN_OPTION or code == curl.CURLE_BAD_FUNCTION_ARGUMENT)
 print(message)
 
 assert(easy:perform())
