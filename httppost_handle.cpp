@@ -22,30 +22,22 @@
 namespace dromozoa {
   namespace {
     void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, const char* value) {
-      struct curl_forms f = {};
-      f.option = option;
-      f.value = const_cast<char*>(value);
+      struct curl_forms f = { option, const_cast<char*>(value) };
       forms.push_back(f);
     }
 
     void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, size_t value) {
-      struct curl_forms f = {};
-      f.option = option;
-      f.value = reinterpret_cast<char*>(value);
+      struct curl_forms f = { option, reinterpret_cast<char*>(value) };
       forms.push_back(f);
     }
 
     void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, luaX_reference* value) {
-      struct curl_forms f = {};
-      f.option = option;
-      f.value = reinterpret_cast<char*>(value);
+      struct curl_forms f = { option, reinterpret_cast<char*>(value) };
       forms.push_back(f);
     }
 
     void save_forms(std::vector<struct curl_forms>& forms, CURLformoption option, struct curl_slist* value) {
-      struct curl_forms f = {};
-      f.option = option;
-      f.value = reinterpret_cast<char*>(value);
+      struct curl_forms f = { option, reinterpret_cast<char*>(value) };
       forms.push_back(f);
     }
 
@@ -193,8 +185,7 @@ namespace dromozoa {
       }
     }
 
-    struct curl_forms f = {};
-    f.option = CURLFORM_END;
+    struct curl_forms f = { CURLFORM_END, 0 };
     forms.push_back(f);
 
     return curl_formadd(&first_, &last_, CURLFORM_ARRAY, &forms[0], CURLFORM_END);
