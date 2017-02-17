@@ -48,7 +48,7 @@ namespace dromozoa {
 
     void getinfo_certinfo(lua_State* L, CURLINFO info) {
       struct curl_certinfo* certinfo = 0;
-      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &info);
+      CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &certinfo);
       if (result == CURLE_OK) {
         lua_newtable(L);
         for (int i = 0; i < certinfo->num_of_certs; ++i) {
