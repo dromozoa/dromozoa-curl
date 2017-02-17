@@ -16,6 +16,7 @@
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.hpp"
+#include "symbols.hpp"
 
 namespace dromozoa {
   void push_error(lua_State* L, CURLcode code) {
@@ -27,6 +28,12 @@ namespace dromozoa {
   void push_error(lua_State* L, CURLMcode code) {
     luaX_push(L, luaX_nil);
     luaX_push(L, curl_multi_strerror(code));
+    luaX_push<lua_Integer>(L, code);
+  }
+
+  void push_error(lua_State* L, CURLFORMcode code) {
+    luaX_push(L, luaX_nil);
+    luaX_push(L, error_to_string(code));
     luaX_push<lua_Integer>(L, code);
   }
 }

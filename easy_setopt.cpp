@@ -20,69 +20,6 @@
 
 namespace dromozoa {
   namespace {
-    void setopt_string(lua_State* L, CURLoption option) {
-      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    template <class T>
-    void setopt_integer(lua_State* L, CURLoption option) {
-      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
-      if (result == CURLE_OK) {
-        luaX_push_success(L);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    void setopt_slist(lua_State* L, CURLoption option) {
-      if (lua_istable(L, 3)) {
-        string_list list;
-        for (int i = 1; ; ++i) {
-          luaX_get_field(L, 3, i);
-          if (const char* p = lua_tostring(L, -1)) {
-            list.append(p);
-            lua_pop(L, 1);
-          } else {
-            lua_pop(L, 1);
-            break;
-          }
-        }
-        easy_handle* self = check_easy_handle(L, 1);
-        self->save_slist(option, list.get());
-        CURLcode result = curl_easy_setopt(self->get(), option, list.release());
-        if (result == CURLE_OK) {
-          luaX_push_success(L);
-        } else {
-          push_error(L, result);
-        }
-      } else {
-        push_error(L, CURLE_UNKNOWN_OPTION);
-      }
-    }
-
-    template <class T>
-    void setopt_function(lua_State* L, CURLoption option, CURLoption option_data, const T& callback) {
-      easy_handle* self = check_easy_handle(L, 1);
-      lua_pushvalue(L, 3);
-      luaX_reference* ref = self->new_reference(option, L);
-      CURLcode result = curl_easy_setopt(self->get(), option, callback);
-      if (result == CURLE_OK) {
-        result = curl_easy_setopt(self->get(), option_data, ref);
-        if (result == CURLE_OK) {
-          luaX_push_success(L);
-        } else {
-          push_error(L, result);
-        }
-      } else {
-        push_error(L, result);
-      }
-    }
-
     size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference* ref = static_cast<luaX_reference*>(userdata);
@@ -131,13 +68,88 @@ namespace dromozoa {
       return result;
     }
 
+    void setopt_string(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    template <class T>
+    void setopt_integer(lua_State* L, CURLoption option) {
+      CURLcode result = curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
+      if (result == CURLE_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void setopt_httppost(lua_State* L, CURLoption option) {
+      easy_handle* self = check_easy_handle(L, 1);
+      lua_pushvalue(L, 3);
+      self->new_reference(option, L);
+      httppost_handle* that = check_httppost_handle(L, 3);
+      CURLcode result = curl_easy_setopt(self->get(), option, that->get());
+      if (result == CURLE_OK) {
+        if (that->have_stream()) {
+          result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
+          if (result == CURLE_OK) {
+            luaX_push_success(L);
+          } else {
+            push_error(L, result);
+          }
+        } else {
+          luaX_push_success(L);
+        }
+      } else {
+        push_error(L, result);
+      }
+    }
+
+    void setopt_slist(lua_State* L, CURLoption option) {
+      string_list list(L, 3);
+      if (list.get()) {
+        easy_handle* self = check_easy_handle(L, 1);
+        self->save_slist(option, list.get());
+        CURLcode result = curl_easy_setopt(self->get(), option, list.release());
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
+      } else {
+        push_error(L, CURLE_UNKNOWN_OPTION);
+      }
+    }
+
+    template <class T>
+    void setopt_function(lua_State* L, CURLoption option, CURLoption option_data, const T& callback) {
+      easy_handle* self = check_easy_handle(L, 1);
+      lua_pushvalue(L, 3);
+      luaX_reference* ref = self->new_reference(option, L);
+      CURLcode result = curl_easy_setopt(self->get(), option, callback);
+      if (result == CURLE_OK) {
+        result = curl_easy_setopt(self->get(), option_data, ref);
+        if (result == CURLE_OK) {
+          luaX_push_success(L);
+        } else {
+          push_error(L, result);
+        }
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void impl_setopt(lua_State* L) {
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       switch (easy_setopt_param(option)) {
         case easy_setopt_param_char_p:
           switch (option) {
             case CURLOPT_POSTFIELDS:
-              setopt_string(L, CURLOPT_COPYPOSTFIELDS);
+              push_error(L, CURLE_UNKNOWN_OPTION);
               return;
             default:
               setopt_string(L, option);
@@ -149,6 +161,9 @@ namespace dromozoa {
           return;
         case easy_setopt_param_curl_off_t:
           setopt_integer<curl_off_t>(L, option);
+          return;
+        case easy_setopt_param_struct_curl_httppost_p:
+          setopt_httppost(L, option);
           return;
         case easy_setopt_param_struct_curl_slist_p:
           setopt_slist(L, option);

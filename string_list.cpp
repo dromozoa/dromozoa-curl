@@ -20,6 +20,21 @@
 namespace dromozoa {
   string_list::string_list(struct curl_slist* slist) : slist_(slist) {}
 
+  string_list::string_list(lua_State* L, int index) : slist_() {
+    if (lua_istable(L, index)) {
+      for (int i = 1; ; ++i) {
+        luaX_get_field(L, index, i);
+        if (const char* p = lua_tostring(L, -1)) {
+          append(p);
+          lua_pop(L, 1);
+        } else {
+          lua_pop(L, 1);
+          break;
+        }
+      }
+    }
+  }
+
   string_list::~string_list() {
     if (slist_) {
       curl_slist_free_all(slist_);
