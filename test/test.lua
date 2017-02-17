@@ -36,7 +36,7 @@ assert(easy:setopt(curl.CURLOPT_FAILONERROR, 1))
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
 assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
-assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/"))
+assert(assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/")) == easy)
 -- assert(easy:setopt(curl.CURLOPT_CERTINFO, 1))
 
 assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
@@ -50,6 +50,11 @@ assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   -- print(("write:%q"):format(data))
   -- print(data)
 end))
+
+local result, message, code = easy.setopt(9999999, 1)
+assert(result == nil)
+assert(code == curl.CURLE_UNKNOWN_OPTION)
+print(message)
 
 assert(easy:perform())
 
