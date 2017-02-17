@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <string.h>
+
 #include "common.hpp"
 #include "symbols.hpp"
 
