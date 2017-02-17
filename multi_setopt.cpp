@@ -100,6 +100,11 @@ namespace dromozoa {
         default:
           result = CURLM_UNKNOWN_OPTION;
       }
+      if (result == CURLM_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
     }
   }
 
