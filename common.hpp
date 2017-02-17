@@ -19,6 +19,7 @@
 #define DROMOZOA_COMMON_HPP
 
 #include <map>
+#include <set>
 
 #include <curl/curl.h>
 
@@ -58,9 +59,13 @@ namespace dromozoa {
     void free();
     CURLFORMcode add(lua_State* L);
     struct curl_httppost* get() const;
+    luaX_reference* new_reference(lua_State* L);
+    void save_slist(struct curl_slist* slist);
   private:
     struct curl_httppost* first_;
     struct curl_httppost* last_;
+    std::set<luaX_reference*> references_;
+    std::set<struct curl_slist*> slists_;
     httppost_handle(const httppost_handle&);
     httppost_handle& operator=(const httppost_handle&);
   };

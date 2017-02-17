@@ -66,6 +66,24 @@ namespace dromozoa {
   }
 
   void httppost_handle::free() {
+    {
+      std::set<luaX_reference*>::iterator i = references_.begin();
+      std::set<luaX_reference*>::iterator end = references_.end();
+      for (; i != end; ++i) {
+        delete *i;
+      }
+      references_.clear();
+    }
+
+    {
+      std::set<struct curl_slist*>::iterator i = slists_.begin();
+      std::set<struct curl_slist*>::iterator end = slists_.end();
+      for (; i != end; ++i) {
+        curl_slist_free_all(*i);
+      }
+      slists_.clear();
+    }
+
     struct curl_httppost* first = first_;
     first_ = 0;
     last_ = 0;
@@ -110,6 +128,16 @@ namespace dromozoa {
           result = save_forms(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
 
+#if CURL_AT_LEAST_VERSION(7,18,2)
+        case CURLFORM_STREAM:
+          result = CURL_FORMADD_UNKNOWN_OPTION;
+          break;
+#endif
+
+        case CURLFORM_CONTENTHEADER:
+          result = CURL_FORMADD_UNKNOWN_OPTION;
+          break;
+
         default:
           result = CURL_FORMADD_UNKNOWN_OPTION;
       }
@@ -128,5 +156,21 @@ namespace dromozoa {
 
   struct curl_httppost* httppost_handle::get() const {
     return first_;
+  }
+
+  luaX_reference* httppost_handle::new_reference(lua_State* L) {
+    luaX_reference* reference = 0;
+    try {
+      reference = new luaX_reference(L);
+      references_.insert(reference);
+      return reference;
+    } catch (...) {
+      delete reference;
+      throw;
+    }
+  }
+
+  void httppost_handle::save_slist(struct curl_slist* slist) {
+    slists_.insert(slist);
   }
 }
