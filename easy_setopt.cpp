@@ -29,14 +29,16 @@ namespace dromozoa {
       int top = lua_gettop(L);
       ref->get_field();
       luaX_push(L, n);
-      size_t result = CURLE_ABORTED_BY_CALLBACK;
+      size_t result = CURL_READFUNC_ABORT;
       int r = lua_pcall(L, 1, 1, 0);
       if (r == 0) {
-        if (const char* data = lua_tolstring(L, -1, &result)) {
+        if (luaX_is_integer(L, -1)) {
+          result = lua_tointeger(L, -1);
+        } else if (const char* data = lua_tolstring(L, -1, &result)) {
           if (result <= n) {
             memcpy(buffer, data, result);
           } else {
-            result = CURLE_ABORTED_BY_CALLBACK;
+            result = CURL_READFUNC_ABORT;
           }
         } else {
           result = 0;
@@ -71,21 +73,23 @@ namespace dromozoa {
     }
 
     CURLcode setopt_string(lua_State* L, CURLoption option) {
-      return curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
+      const char* parameter = luaL_checkstring(L, 3);
+      return curl_easy_setopt(check_easy(L, 1), option, parameter);
     }
 
     template <class T>
     inline CURLcode setopt_integer(lua_State* L, CURLoption option) {
-      return curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
+      T parameter = luaX_check_integer<T>(L, 3);
+      return curl_easy_setopt(check_easy(L, 1), option, parameter);
     }
 
     CURLcode setopt_httppost(lua_State* L, CURLoption option) {
       easy_handle* self = check_easy_handle(L, 1);
       lua_pushvalue(L, 3);
       self->new_reference(option, L);
-      httppost_handle* that = check_httppost_handle(L, 3);
-      CURLcode result = curl_easy_setopt(self->get(), option, that->get());
-      if (result == CURLE_OK && that->have_stream()) {
+      httppost_handle* form = check_httppost_handle(L, 3);
+      CURLcode result = curl_easy_setopt(self->get(), option, form->get());
+      if (result == CURLE_OK && form->have_stream()) {
         result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
       }
       return result;
