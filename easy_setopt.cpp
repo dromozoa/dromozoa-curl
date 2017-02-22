@@ -75,7 +75,7 @@ namespace dromozoa {
     }
 
     template <class T>
-    CURLcode setopt_integer(lua_State* L, CURLoption option) {
+    inline CURLcode setopt_integer(lua_State* L, CURLoption option) {
       return curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
     }
 
@@ -103,7 +103,7 @@ namespace dromozoa {
     }
 
     template <class T>
-    CURLcode setopt_function(lua_State* L, CURLoption option, CURLoption option_data, const T& callback) {
+    inline CURLcode setopt_function(lua_State* L, CURLoption option, CURLoption option_data, const T& callback) {
       easy_handle* self = check_easy_handle(L, 1);
       lua_pushvalue(L, 3);
       luaX_reference* ref = self->new_reference(option, L);

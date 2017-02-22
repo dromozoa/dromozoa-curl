@@ -20,7 +20,7 @@
 namespace dromozoa {
   namespace {
     template <class T>
-    CURLcode getinfo(lua_State* L, CURLINFO info) {
+    inline CURLcode getinfo(lua_State* L, CURLINFO info) {
       T value = 0;
       CURLcode result = curl_easy_getinfo(check_easy(L, 1), info, &value);
       if (result == CURLE_OK) {
