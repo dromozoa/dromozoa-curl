@@ -50,6 +50,15 @@ namespace dromozoa {
       }
     }
 
+    void impl_remove_handle(lua_State* L) {
+      CURLMcode result = curl_multi_remove_handle(check_multi(L, 1), check_easy(L, 2));
+      if (result == CURLM_OK) {
+        luaX_push_success(L);
+      } else {
+        push_error(L, result);
+      }
+    }
+
     void impl_socket_action(lua_State* L) {
       curl_socket_t sockfd = luaX_check_integer<curl_socket_t>(L, 2);
       int ev_bitmask = luaX_opt_integer<int>(L, 3, 0);
@@ -57,15 +66,6 @@ namespace dromozoa {
       CURLMcode result = curl_multi_socket_action(check_multi(L, 1), sockfd, ev_bitmask, &running_handles);
       if (result == CURLM_OK) {
         luaX_push(L, running_handles);
-      } else {
-        push_error(L, result);
-      }
-    }
-
-    void impl_remove_handle(lua_State* L) {
-      CURLMcode result = curl_multi_remove_handle(check_multi(L, 1), check_easy(L, 2));
-      if (result == CURLM_OK) {
-        luaX_push_success(L);
       } else {
         push_error(L, result);
       }
