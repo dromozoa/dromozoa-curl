@@ -70,6 +70,22 @@ namespace dromozoa {
         push_error(L, result);
       }
     }
+
+    void impl_info_read(lua_State* L) {
+      int msgs_in_queue = 0;
+      if (CURLMsg* msg = curl_multi_info_read(check_multi(L, 1), &msgs_in_queue)) {
+        lua_newtable(L);
+        luaX_set_field<lua_Integer>(L, -1, "msg", msg->msg);
+        new_easy_ref(L, msg->easy_handle);
+        luaX_set_field(L, -2, "easy_handle");
+        if (msg->msg == CURLMSG_DONE) {
+          luaX_set_field<lua_Integer>(L, -1, "result", msg->data.result);
+        }
+        luaX_push(L, msgs_in_queue);
+      } else {
+        luaX_push(L, luaX_nil);
+      }
+    }
   }
 
   multi_handle* check_multi_handle(lua_State* L, int arg) {
@@ -106,6 +122,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "add_handle", impl_add_handle);
       luaX_set_field(L, -1, "remove_handle", impl_remove_handle);
       luaX_set_field(L, -1, "socket_action", impl_socket_action);
+      luaX_set_field(L, -1, "info_read", impl_info_read);
 
       initialize_multi_setopt(L);
     }
