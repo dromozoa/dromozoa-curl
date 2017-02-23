@@ -105,11 +105,10 @@ namespace dromozoa {
       if (lua_isnoneornil(L, 3)) {
         result = curl_easy_setopt(self->get(), option, 0);
       } else {
+        luaL_checktype(L, 3, LUA_TTABLE);
         string_list list(L, 3);
-        if (list.get()) {
-          self->save_slist(option, list.get());
-          result = curl_easy_setopt(self->get(), option, list.release());
-        }
+        self->save_slist(option, list.get());
+        result = curl_easy_setopt(self->get(), option, list.release());
       }
       return result;
     }
