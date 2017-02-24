@@ -76,6 +76,7 @@ namespace dromozoa {
     }
 
     CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      luaL_checktype(L, arg, LUA_TTABLE);
       string_list list(L, arg);
       if (list.get()) {
         httppost_handle* self = check_httppost_handle(L, 1);
