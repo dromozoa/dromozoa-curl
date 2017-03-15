@@ -1,8 +1,8 @@
 package = "dromozoa-curl"
-version = "1.6-1"
+version = "1.7-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-curl/archive/v1.6.tar.gz";
-  file = "dromozoa-curl-1.6.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-curl/archive/v1.7.tar.gz";
+  file = "dromozoa-curl-1.7.tar.gz";
 }
 description = {
   summary = "Lua bindings for libcurl";
