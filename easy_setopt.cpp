@@ -28,7 +28,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref->get_field();
+      ref->get_field(L);
       luaX_push(L, n);
       size_t result = CURL_READFUNC_ABORT;
       int r = lua_pcall(L, 1, 1, 0);
@@ -56,7 +56,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref->get_field();
+      ref->get_field(L);
       lua_pushlstring(L, ptr, n);
       size_t result = 0;
       int r = lua_pcall(L, 1, 1, 0);
