@@ -11,6 +11,7 @@ namespace dromozoa {
     easy_setopt_param_FILE_p,
     easy_setopt_param_callback,
     easy_setopt_param_char_p,
+    easy_setopt_param_curl_mime_p,
     easy_setopt_param_curl_off_t,
     easy_setopt_param_long,
     easy_setopt_param_struct_curl_httppost_p,

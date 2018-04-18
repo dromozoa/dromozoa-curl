@@ -37,6 +37,11 @@ local alias_symbols = {
   CURLOPT_WRITEHEADER = "CURLOPT_HEADERDATA";
 }
 
+local param_names = {
+  mime = "curl_mime *";
+  string = "char *";
+}
+
 local function curl_version_bits(source)
   if not source or source == "-" then
     return
@@ -94,15 +99,21 @@ local function parse_option_man(name)
   if not param_type then
     param_type, param_name = param:match "^([%w_]+callback)$"
   end
+  if not param_type then
+    param_type, param_name = param:match "^([%w_]+cb)$"
+  end
+  if not param_type then
+    param_type, param_name = param_names[param], param
+  end
   assert(param_type)
 
   local param_enum
-  if name:match("CURLOPT_") then
+  if name:find "CURLOPT_" then
     param_enum = "easy_setopt_param_"
   else
     param_enum = "multi_setopt_param_"
   end
-  if param_type:match("callback$") then
+  if param_type:find "callback$" or param_type:find "cb$" then
     param_enum = param_enum .. "callback"
   else
     param_enum = param_enum .. param_type:gsub("%*", "p"):gsub(" ", "_")
