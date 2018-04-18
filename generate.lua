@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -15,8 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local basename = require "dromozoa.commons.basename"
-local json = require "dromozoa.commons.json"
 local keys = require "dromozoa.commons.keys"
 local read_file = require "dromozoa.commons.read_file"
 local sequence = require "dromozoa.commons.sequence"
@@ -131,15 +129,13 @@ local form_codes = sequence()
 
 local out = assert(io.open("symbols.cpp", "w"))
 
-out:write(([[
-// generated from %s
-
+out:write [[
 #include "common.hpp"
 #include "symbols.hpp"
 
 namespace dromozoa {
   void initialize_symbols(lua_State* L) {
-]]):format(basename(source_dir)))
+]]
 
 for line in io.lines(symbols_file) do
   if line:match("^CURL") then
@@ -242,9 +238,7 @@ out:close()
 
 local out = assert(io.open("symbols.hpp", "w"))
 
-out:write(([[
-// generate from %s
-
+out:write [[
 #ifndef DROMOZOA_SYMBOLS_HPP
 #define DROMOZOA_SYMBOLS_HPP
 
@@ -253,7 +247,7 @@ out:write(([[
 namespace dromozoa {
   enum easy_setopt_param_enum {
     easy_setopt_param_unknown,
-]]):format(basename(source_dir)))
+]]
 
 for enum in keys(easy_setopt_enums):sort():each() do
   out:write("    ", enum, ",\n")

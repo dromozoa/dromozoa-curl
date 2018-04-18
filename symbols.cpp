@@ -1,5 +1,3 @@
-// generated from curl-7.52.1
-
 #include "common.hpp"
 #include "symbols.hpp"
 

@@ -1,7 +1,7 @@
-// generate from curl-7.52.1
-
 #ifndef DROMOZOA_SYMBOLS_HPP
 #define DROMOZOA_SYMBOLS_HPP
+
+#include "common.hpp"
 
 namespace dromozoa {
   enum easy_setopt_param_enum {
