@@ -16,7 +16,6 @@
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 local read_file = require "dromozoa.commons.read_file"
-local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 
@@ -142,8 +141,12 @@ namespace dromozoa {
 
 for line in io.lines(symbols_file) do
   if line:find "^CURL" then
-    local data = split(line, "%s+")
-    local name, introduced, deprecated, removed = unpack(data)
+    -- local data = split(line, "%s+")
+    local items = {}
+    for item in line:gmatch "%S+" do
+      items[#items + 1] = item
+    end
+    local name, introduced, deprecated, removed = unpack(items)
     introduced = assert(curl_version_bits(introduced))
     deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
