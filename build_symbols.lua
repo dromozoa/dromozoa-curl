@@ -69,9 +69,9 @@ local function parse_option_man(name)
 
   local params
   if name:match("^CURLOPT_") then
-    params = assert(doc:match("CURLcode%s+curl_easy_setopt%((.-)%)")) .. ","
+    params = assert(doc:match "CURLcode%s+curl_easy_setopt%(%s*(.-)%)") .. ","
   elseif name:match("^CURLMOPT_") then
-    params = assert(doc:match("CURLMcode%s+curl_multi_setopt%((.-)%)")) .. ","
+    params = assert(doc:match "CURLMcode%s+curl_multi_setopt%(%s*(.-)%)") .. ","
   end
   local items = {}
   for item in params:gmatch "(.-),%s*" do
@@ -79,10 +79,11 @@ local function parse_option_man(name)
   end
   assert(items[2] == doc_name)
 
+  local param = items[3]:gsub("%s+", " ")
   local param_type
   local param_name
 
-  local matcher = string_matcher((items[3]:gsub("%s+$", ""):gsub("%s+", " ")))
+  local matcher = string_matcher(param)
   if matcher:match("([%w_]+) ([%w_]+)$")
       or matcher:match("(char %*%*)([%w_]+)$")
       or matcher:match("([%w_]+ %*)([%w_]+)$")
