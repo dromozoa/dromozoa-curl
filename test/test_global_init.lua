@@ -17,5 +17,9 @@
 
 local curl = require "dromozoa.curl"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(curl.global_init())
--- assert(curl.global_cleanup())
+if verbose then
+  io.stderr:write(curl.version(), "\n")
+end
