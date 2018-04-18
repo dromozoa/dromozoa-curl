@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -17,10 +17,8 @@
 
 local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
-local sequence = require "dromozoa.commons.sequence"
 local curl = require "dromozoa.curl"
 
-assert(curl.global_init())
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
@@ -104,19 +102,3 @@ end
 
 -- local result = json.decode(content)
 -- print(json.encode(result, { pretty = true }))
-
-assert(easy:cleanup())
-
-local data = sequence()
-for k, v in pairs(curl) do
-  if k:match("^CURLOPT") then
-    data:push({ name = k, value = v })
-  end
-end
-data:sort(function (a, b) return a.value < b.value end)
-for item in data:each() do
-  -- print(item.name, item.value)
-end
-
-print("version", curl.version())
-assert(curl.global_cleanup())
