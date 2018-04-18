@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -24,7 +24,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref->get_field();
+      ref->get_field(L);
       new_easy_ref(L, easy);
       luaX_push(L, s);
       luaX_push(L, what);
@@ -45,7 +45,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int top = lua_gettop(L);
-      ref->get_field();
+      ref->get_field(L);
       new_multi_ref(L, multi);
       luaX_push(L, timeout_ms);
       int result = 0;
