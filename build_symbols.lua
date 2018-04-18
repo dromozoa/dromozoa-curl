@@ -15,8 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local string_matcher = require "dromozoa.commons.string_matcher"
-
 local unpack = table.unpack or unpack
 
 local source_dir = ...
@@ -80,19 +78,21 @@ local function parse_option_man(name)
   assert(items[2] == doc_name)
 
   local param = items[3]:gsub("%s+", " ")
-  local param_type
-  local param_name
-
-  local matcher = string_matcher(param)
-  if matcher:match("([%w_]+) ([%w_]+)$")
-      or matcher:match("(char %*%*)([%w_]+)$")
-      or matcher:match("([%w_]+ %*)([%w_]+)$")
-      or matcher:match("(struct [%w_]+ %*)([%w_]+)$")
-      or matcher:match("([%w_]+callback) ([%w_]+)$")
-      or matcher:match("([%w_]+callback)$")
-  then
-    param_type = matcher[1]
-    param_name = matcher[2]
+  local param_type, param_name = param:match "^([%w_]+) ([%w_]+)$"
+  if not param_type then
+    param_type, param_name = param:match "^(char %*%*)([%w_]+)$"
+  end
+  if not param_type then
+    param_type, param_name = param:match "^([%w_]+ %*)([%w_]+)$"
+  end
+  if not param_type then
+    param_type, param_name = param:match "^(struct [%w_]+ %*)([%w_]+)$"
+  end
+  if not param_type then
+    param_type, param_name = param:match "^([%w_]+callback) ([%w_]+)$"
+  end
+  if not param_type then
+    param_type, param_name = param:match "^([%w_]+callback)$"
   end
   assert(param_type)
 
@@ -102,7 +102,6 @@ local function parse_option_man(name)
   else
     param_enum = "multi_setopt_param_"
   end
-
   if param_type:match("callback$") then
     param_enum = param_enum .. "callback"
   else
