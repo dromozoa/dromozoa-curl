@@ -19,10 +19,14 @@ local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
+assert(curl.CURLE_OK == 0)
+
 local easy_options = {}
 local easy_option_name_max = 0
 local multi_options = {}
 local multi_option_name_max = 0
+local error_codes = {}
+local error_code_name_max = 0
 
 for name, value in pairs(curl) do
   if name:find "^CURLOPT_" then
@@ -35,11 +39,17 @@ for name, value in pairs(curl) do
     if multi_option_name_max < #name then
       multi_option_name_max = #name
     end
+  elseif name:find "^CURLE_" then
+    error_codes[#error_codes + 1] = { name = name, value = value }
+    if error_code_name_max < #name then
+      error_code_name_max = #name
+    end
   end
 end
 
 table.sort(easy_options, function (a, b) return a.value < b.value end)
 table.sort(multi_options, function (a, b) return a.value < b.value end)
+table.sort(error_codes, function (a, b) return a.value < b.value end)
 
 if verbose then
   local format = "%-" .. easy_option_name_max .. "s | %d\n"
@@ -54,5 +64,12 @@ if verbose then
   for i = 1, #multi_options do
     local option = multi_options[i]
     io.stderr:write(format:format(option.name, option.value))
+  end
+
+  local format = "%-" .. error_code_name_max .. "s | %d\n"
+  io.stderr:write(("-"):rep(70), "\n")
+  for i = 1, #error_codes do
+    local code = error_codes[i]
+    io.stderr:write(format:format(code.name, code.value))
   end
 end
