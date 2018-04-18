@@ -298,39 +298,103 @@ out:write [[
 ]]
 out:close()
 
---[====[
-local out = assert(io.open("doc/option.md", "w"))
+local out = assert(io.open("docs/option.html", "w"))
 
-out:write([[
-## CURMOPT
+out:write [[
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>dromozoa-curl</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<style>
+.markdown-body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+}
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="markdown-body">
 
-Option Name|Param Type|Param Name
-----|----|----
-]])
+<h1>dromozoa-curl</h1>
 
-for option in easy_setopts:each() do
+<h2>CURLOPT</h2>
+
+<table>
+  <tr>
+    <th>Option Name</th>
+    <th>Param Type</th>
+    <th>Param Name</th>
+  </tr>
+]]
+
+for i = 1, #easy_setopts do
+  local option = easy_setopts[i]
+  local param_name = option.param_name
+  if not param_name then
+    param_name = ""
+  end
+  out:write(([[
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/%s.html">%s</a></td>
+    <td>%s</td>
+    <td>%s</td>
+  </tr>
+]]):format(
+    option.doc_name,
+    option.name,
+    option.param_type,
+    param_name))
+end
+
+out:write [[
+</table>
+
+<h2>CURLMOPT</h2>
+
+<table>
+  <tr>
+    <th>Option Name</th>
+    <th>Param Type</th>
+    <th>Param Name</th>
+  </tr>
+]]
+
+for i = 1, #multi_setopts do
+  local option = multi_setopts[i]
   local param_name = option.param_name
   if param_name == nil then
     param_name = ""
   end
-  out:write(("[%s](https://curl.haxx.se/libcurl/c/%s.html)|%s|%s\n"):format(option.name, option.doc_name, option.param_type, param_name))
+  out:write(([[
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/%s.html">%s</a></td>
+    <td>%s</td>
+    <td>%s</td>
+  </tr>
+]]):format(
+    option.doc_name,
+    option.name,
+    option.param_type,
+    param_name))
 end
 
-out:write([[
+out:write [[
+</table>
 
-## CURLMOPT
-
-Option Name|Param Type|Param Name
-----|----|----
-]])
-
-for option in multi_setopts:each() do
-  local param_name = option.param_name
-  if param_name == nil then
-    param_name = ""
-  end
-  out:write(("[%s](https://curl.haxx.se/libcurl/c/%s.html)|%s|%s\n"):format(option.name, option.doc_name, option.param_type, param_name))
-end
+</div>
+</body>
+</html>
+]]
 
 out:close()
-]====]
