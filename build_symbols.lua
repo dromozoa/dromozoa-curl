@@ -43,13 +43,13 @@ local alias_symbols = {
   CURLOPT_WRITEHEADER = "CURLOPT_HEADERDATA";
 }
 
-local function curl_version_bits(s)
-  if not s or s == "-" then
+local function curl_version_bits(source)
+  if not source or source == "-" then
     return
   else
-    local major, minor, patch = s:match "^(%d+)%.(%d+)%.(%d+)$"
+    local major, minor, patch = source:match "^(%d+)%.(%d+)%.(%d+)$"
     if not major then
-      major, minor = assert(s:match "^(%d+)%.(%d+)$")
+      major, minor = assert(source:match "^(%d+)%.(%d+)$")
       if not major then
         return
       end
