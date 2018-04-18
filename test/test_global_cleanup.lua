@@ -18,4 +18,3 @@
 local curl = require "dromozoa.curl"
 
 assert(curl.global_init())
--- assert(curl.global_cleanup())
