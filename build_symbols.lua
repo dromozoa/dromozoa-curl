@@ -172,15 +172,17 @@ for line in io.lines(symbols_file) do
       if removed then
         condition = condition .. " && " .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
       end
-      option.condition = condition
+      if condition then
+        option.condition_begin = "#if " .. condition .. "\n"
+        option.condition_end = "#endif\n"
+      else
+        option.condition_begin = ""
+        option.condition_end = ""
+      end
 
-      if condition then
-        out:write("#if ", condition, "\n")
-      end
-      out:write([[    luaX_set_field<lua_Integer>(L, -1, "]], name, [[", ]], name, ");\n")
-      if condition then
-        out:write "#endif\n"
-      end
+      out:write(option.condition_begin)
+      out:write(([[    luaX_set_field<lua_Integer>(L, -1, "%s", %s);]]):format(name, name), "\n")
+      out:write(option.condition_end)
     end
   end
 end
@@ -193,14 +195,9 @@ out:write [[
 
 for i = 1, #easy_setopts do
   local option = easy_setopts[i]
-  local condition = option.condition
-  if condition ~= nil then
-    out:write("#if ", condition, "\n")
-  end
+  out:write(option.condition_begin)
   out:write(("    if (option == %s) { return %s; }\n"):format(option.name, option.param_enum))
-  if condition ~= nil then
-    out:write("#endif\n")
-  end
+  out:write(option.condition_end)
 end
 
 out:write [[
@@ -213,13 +210,9 @@ out:write [[
 for i = 1, #multi_setopts do
   local option = multi_setopts[i]
   local condition = option.condition
-  if condition ~= nil then
-    out:write("#if ", condition, "\n")
-  end
+  out:write(option.condition_begin)
   out:write(("    if (option == %s) { return %s; }\n"):format(option.name, option.param_enum))
-  if condition ~= nil then
-    out:write("#endif\n")
-  end
+  out:write(option.condition_end)
 end
 
 out:write [[
