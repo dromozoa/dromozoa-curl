@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local read_file = require "dromozoa.commons.read_file"
 local string_matcher = require "dromozoa.commons.string_matcher"
 
 local unpack = table.unpack or unpack
@@ -60,12 +59,13 @@ local function parse_option_man(name)
   assert(name:find "^CURLM?OPT_")
 
   local doc_name = name
-  local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, doc_name))
-  if doc == nil then
+  local handle = io.open(source_dir .. "/docs/libcurl/opts/" .. doc_name .. ".3")
+  if not handle then
     doc_name = alias_symbols[name]
-    doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, doc_name))
-    assert(doc, "not found symbol " .. name)
+    handle = assert(io.open(source_dir .. "/docs/libcurl/opts/" .. doc_name .. ".3"))
   end
+  local doc = handle:read "*a"
+  handle:close()
 
   local params
   if name:match("^CURLOPT_") then
