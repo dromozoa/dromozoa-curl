@@ -20,7 +20,8 @@ local read_file = require "dromozoa.commons.read_file"
 local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
-local unpack = require "dromozoa.commons.unpack"
+
+local unpack = table.unpack or unpack
 
 local source_dir = ...
 
@@ -43,15 +44,18 @@ local alias_symbols = {
 }
 
 local function curl_version_bits(s)
-  if s == nil or s == "-" then
-    return nil
+  if not s or s == "-" then
+    return
   else
-    local data = split(s, "%.")
-    if data[3] == nil then
-      data[3] = 0
+    local major, minor, patch = s:match "^(%d+)%.(%d+)%.(%d+)$"
+    if not major then
+      major, minor = assert(s:match "^(%d+)%.(%d+)$")
+      if not major then
+        return
+      end
+      patch = 0
     end
-    local major, minor, patch = assert(tonumber(data[1])), assert(tonumber(data[2])), assert(tonumber(data[3]))
-    return major * 65536 + minor * 256 + patch
+    return tonumber(major) * 65536 + tonumber(minor) * 256 + tonumber(patch)
   end
 end
 
@@ -138,23 +142,23 @@ namespace dromozoa {
 ]]
 
 for line in io.lines(symbols_file) do
-  if line:match("^CURL") then
+  if line:find "^CURL" then
     local data = split(line, "%s+")
     local name, introduced, deprecated, removed = unpack(data)
     introduced = assert(curl_version_bits(introduced))
     deprecated = curl_version_bits(deprecated)
     removed = curl_version_bits(removed)
-    if not ignore_symbols[name] and (deprecated == nil or deprecated > version_min) and (removed == nil or removed > version_min) then
+    if not ignore_symbols[name] and (not deprecated or deprecated > version_min) and (not removed or removed > version_min) then
       local option = {}
-      if name:match("^CURLOPT_") then
+      if name:find "^CURLOPT_" then
         option = parse_option_man(name)
         easy_setopts:push(option)
         easy_setopt_enums[option.param_enum] = true
-      elseif name:match("^CURLMOPT_") then
+      elseif name:find "^CURLMOPT_" then
         option = parse_option_man(name)
         multi_setopts:push(option)
         multi_setopt_enums[option.param_enum] = true
-      elseif name:match("^CURL_FORMADD_") then
+      elseif name:find "^CURL_FORMADD_" then
         form_codes:push(name)
       end
 
@@ -162,8 +166,8 @@ for line in io.lines(symbols_file) do
       if introduced >= version_min then
         condition = ("0x%06x <= LIBCURL_VERSION_NUM"):format(introduced)
       end
-      if removed ~= nil then
-        if condition ~= nil then
+      if removed then
+        if condition then
           condition = condition .. " && "
         end
         condition = condition .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
@@ -277,6 +281,7 @@ out:write([[
 ]])
 out:close()
 
+--[====[
 local out = assert(io.open("doc/option.md", "w"))
 
 out:write([[
@@ -311,3 +316,4 @@ for option in multi_setopts:each() do
 end
 
 out:close()
+]====]
