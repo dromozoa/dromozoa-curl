@@ -103,9 +103,15 @@ local function parse_option_man(name)
     param_type, param_name = param:match "^([%w_]+cb)$"
   end
   if not param_type then
-    param_type, param_name = param_names[param], param
+    param_type = param_names[param]
+    if param_type then
+      param_name = param
+    end
   end
   assert(param_type)
+  if not param_name then
+    param_name = ""
+  end
 
   local param_enum
   if name:find "CURLOPT_" then
@@ -340,10 +346,6 @@ out:write [[
 
 for i = 1, #easy_setopts do
   local option = easy_setopts[i]
-  local param_name = option.param_name
-  if not param_name then
-    param_name = ""
-  end
   out:write(([[
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/%s.html">%s</a></td>
@@ -354,7 +356,7 @@ for i = 1, #easy_setopts do
     option.doc_name,
     option.name,
     option.param_type,
-    param_name))
+    option.param_name))
 end
 
 out:write [[
@@ -372,10 +374,6 @@ out:write [[
 
 for i = 1, #multi_setopts do
   local option = multi_setopts[i]
-  local param_name = option.param_name
-  if param_name == nil then
-    param_name = ""
-  end
   out:write(([[
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/%s.html">%s</a></td>
@@ -386,7 +384,7 @@ for i = 1, #multi_setopts do
     option.doc_name,
     option.name,
     option.param_type,
-    param_name))
+    option.param_name))
 end
 
 out:write [[
