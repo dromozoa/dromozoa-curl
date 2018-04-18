@@ -167,29 +167,26 @@ for line in io.lines(symbols_file) do
         condition = ("0x%06x <= LIBCURL_VERSION_NUM"):format(introduced)
       end
       if removed then
-        if condition then
-          condition = condition .. " && "
-        end
-        condition = condition .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
+        condition = condition .. " && " .. ("LIBCURL_VERSION_NUM < 0x%06x"):format(removed)
       end
       option.condition = condition
 
-      if condition ~= nil then
+      if condition then
         out:write("#if ", condition, "\n")
       end
-      out:write("    luaX_set_field<lua_Integer>(L, -1, \"", name, "\", ", name, ");\n")
-      if condition ~= nil then
-        out:write("#endif\n")
+      out:write([[    luaX_set_field<lua_Integer>(L, -1, "]], name, [[", ]], name, ");\n")
+      if condition then
+        out:write "#endif\n"
       end
     end
   end
 end
 
-out:write([[
+out:write [[
   }
 
   easy_setopt_param_enum easy_setopt_param(CURLoption option) {
-]])
+]]
 
 for option in easy_setopts:each() do
   local condition = option.condition
@@ -202,12 +199,12 @@ for option in easy_setopts:each() do
   end
 end
 
-out:write([[
+out:write [[
     return easy_setopt_param_unknown;
   }
 
   multi_setopt_param_enum multi_setopt_param(CURLMoption option) {
-]])
+]]
 
 for option in multi_setopts:each() do
   local condition = option.condition
@@ -220,24 +217,24 @@ for option in multi_setopts:each() do
   end
 end
 
-out:write([[
+out:write [[
     return multi_setopt_param_unknown;
   }
 
   const char* error_to_string(CURLFORMcode code) {
     switch (code) {
-]])
+]]
 
 for name in form_codes:each() do
   out:write(("      case %s: return \"%s\";\n"):format(name, name));
 end
 
-out:write([[
+out:write [[
       default: return "CURLFORMcode unknown";
     }
   }
 }
-]])
+]]
 out:close()
 
 local out = assert(io.open("symbols.hpp", "w"))
@@ -257,18 +254,18 @@ for enum in keys(easy_setopt_enums):sort():each() do
   out:write("    ", enum, ",\n")
 end
 
-out:write([[
+out:write [[
   };
 
   enum multi_setopt_param_enum {
     multi_setopt_param_unknown,
-]])
+]]
 
 for enum in keys(multi_setopt_enums):sort():each() do
   out:write("    ", enum, ",\n")
 end
 
-out:write([[
+out:write [[
   };
 
   void initialize_symbols(lua_State* L);
@@ -278,7 +275,7 @@ out:write([[
 }
 
 #endif
-]])
+]]
 out:close()
 
 --[====[
