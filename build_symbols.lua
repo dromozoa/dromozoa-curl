@@ -57,7 +57,7 @@ local function curl_version_bits(source)
 end
 
 local function parse_option_man(name)
-  assert(name:match("^CURLM?OPT_"))
+  assert(name:find "^CURLM?OPT_")
 
   local doc_name = name
   local doc = read_file(("%s/docs/libcurl/opts/%s.3"):format(source_dir, doc_name))
@@ -225,7 +225,7 @@ out:write [[
 
 for i = 1, #form_codes do
   local name = form_codes[i]
-  out:write(("      case %s: return \"%s\";\n"):format(name, name));
+  out:write(([[      case %s: return "%s";]]):format(name, name), "\n");
 end
 
 out:write [[
