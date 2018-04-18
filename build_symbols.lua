@@ -16,7 +16,6 @@
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 local read_file = require "dromozoa.commons.read_file"
-local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 
 local unpack = table.unpack or unpack
@@ -70,17 +69,20 @@ local function parse_option_man(name)
 
   local params
   if name:match("^CURLOPT_") then
-    params = assert(doc:match("CURLcode%s+curl_easy_setopt%((.-)%)"))
+    params = assert(doc:match("CURLcode%s+curl_easy_setopt%((.-)%)")) .. ","
   elseif name:match("^CURLMOPT_") then
-    params = assert(doc:match("CURLMcode%s+curl_multi_setopt%((.-)%)"))
+    params = assert(doc:match("CURLMcode%s+curl_multi_setopt%((.-)%)")) .. ","
   end
-  local params = split(params, ",%s*")
-  assert(params[2] == doc_name)
+  local items = {}
+  for item in params:gmatch "(.-),%s*" do
+    items[#items + 1] = item
+  end
+  assert(items[2] == doc_name)
 
   local param_type
   local param_name
 
-  local matcher = string_matcher((params[3]:gsub("%s+$", ""):gsub("%s+", " ")))
+  local matcher = string_matcher((items[3]:gsub("%s+$", ""):gsub("%s+", " ")))
   if matcher:match("([%w_]+) ([%w_]+)$")
       or matcher:match("(char %*%*)([%w_]+)$")
       or matcher:match("([%w_]+ %*)([%w_]+)$")
@@ -141,7 +143,6 @@ namespace dromozoa {
 
 for line in io.lines(symbols_file) do
   if line:find "^CURL" then
-    -- local data = split(line, "%s+")
     local items = {}
     for item in line:gmatch "%S+" do
       items[#items + 1] = item
