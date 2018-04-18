@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local keys = require "dromozoa.commons.keys"
 local read_file = require "dromozoa.commons.read_file"
 local sequence = require "dromozoa.commons.sequence"
 local split = require "dromozoa.commons.split"
@@ -122,14 +121,14 @@ https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 > Before version 7.17.0, strings were not copied. Instead the user was forced
 > keep them available until libcurl no longer needed them.
 ]]
-local version_min = curl_version_bits("7.17.0")
+local version_min = curl_version_bits "7.17.0"
 
 local symbols_file = source_dir .. "/docs/libcurl/symbols-in-versions"
-local easy_setopts = sequence()
+local easy_setopts = {}
 local easy_setopt_enums = {}
-local multi_setopts = sequence()
+local multi_setopts = {}
 local multi_setopt_enums = {}
-local form_codes = sequence()
+local form_codes = {}
 
 local out = assert(io.open("symbols.cpp", "w"))
 
@@ -152,14 +151,14 @@ for line in io.lines(symbols_file) do
       local option = {}
       if name:find "^CURLOPT_" then
         option = parse_option_man(name)
-        easy_setopts:push(option)
+        easy_setopts[#easy_setopts + 1] = option
         easy_setopt_enums[option.param_enum] = true
       elseif name:find "^CURLMOPT_" then
         option = parse_option_man(name)
-        multi_setopts:push(option)
+        multi_setopts[#multi_setopts + 1] = option
         multi_setopt_enums[option.param_enum] = true
       elseif name:find "^CURL_FORMADD_" then
-        form_codes:push(name)
+        form_codes[#form_codes + 1] = name
       end
 
       local condition
@@ -188,7 +187,8 @@ out:write [[
   easy_setopt_param_enum easy_setopt_param(CURLoption option) {
 ]]
 
-for option in easy_setopts:each() do
+for i = 1, #easy_setopts do
+  local option = easy_setopts[i]
   local condition = option.condition
   if condition ~= nil then
     out:write("#if ", condition, "\n")
@@ -206,7 +206,8 @@ out:write [[
   multi_setopt_param_enum multi_setopt_param(CURLMoption option) {
 ]]
 
-for option in multi_setopts:each() do
+for i = 1, #multi_setopts do
+  local option = multi_setopts[i]
   local condition = option.condition
   if condition ~= nil then
     out:write("#if ", condition, "\n")
@@ -225,7 +226,8 @@ out:write [[
     switch (code) {
 ]]
 
-for name in form_codes:each() do
+for i = 1, #form_codes do
+  local name = form_codes[i]
   out:write(("      case %s: return \"%s\";\n"):format(name, name));
 end
 
@@ -250,8 +252,13 @@ namespace dromozoa {
     easy_setopt_param_unknown,
 ]]
 
-for enum in keys(easy_setopt_enums):sort():each() do
-  out:write("    ", enum, ",\n")
+local enums = {}
+for enum in pairs(easy_setopt_enums) do
+  enums[#enums + 1] = enum
+end
+table.sort(enums)
+for i = 1, #enums do
+  out:write("    ", enums[i], ",\n")
 end
 
 out:write [[
@@ -261,8 +268,13 @@ out:write [[
     multi_setopt_param_unknown,
 ]]
 
-for enum in keys(multi_setopt_enums):sort():each() do
-  out:write("    ", enum, ",\n")
+local enums = {}
+for enum in pairs(multi_setopt_enums) do
+  enums[#enums + 1] = enum
+end
+table.sort(enums)
+for i = 1, #enums do
+  out:write("    ", enums[i], ",\n")
 end
 
 out:write [[
