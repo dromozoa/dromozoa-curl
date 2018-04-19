@@ -34,7 +34,7 @@ local easy = assert(curl.easy())
 if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
-assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"))
+assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data
@@ -62,7 +62,7 @@ end
 local result = assert(assert((loadstring or load)(body))())
 assert(result.REQUEST_METHOD == "PUT")
 assert(result.REQUEST_SCHEME == "https")
-assert(result.REQUEST_URI == "/cgi-bin/dromozoa-curl-echo.cgi")
+assert(result.REQUEST_URI == "/cgi-bin/dromozoa-curl.cgi")
 assert(result.QUERY_STRING == "")
 assert(result.HTTP_HOST == "kotori.dromozoa.com")
 assert(result.HTTP_USER_AGENT == "")

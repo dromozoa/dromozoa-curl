@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -17,7 +17,6 @@
 
 local unix = require "dromozoa.unix"
 local curl = require "dromozoa.curl"
-local multimap = require "dromozoa.commons.multimap"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
@@ -25,13 +24,26 @@ assert(curl.global_init())
 
 local selector = assert(unix.selector())
 local selector_time = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW))
-local timers = multimap()
+local timer = unix.timer()
 
 local multi = assert(curl.multi())
+local multi_timer
 
-for i = 1, 2 do
+for i = 1, 10 do
   local easy = assert(curl.easy())
-  assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"))
+  local j = 0
+  if verbose then
+    assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
+  end
+  assert(easy:setopt(curl.CURLOPT_URL, "http://kotori.dromozoa.com/cgi-bin/nph-dromozoa-curl.cgi"))
+  assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+    j = j + 1
+    if verbose then
+      io.stderr:write(i, " ", j, " ", data)
+      io.stderr:flush()
+    end
+    assert(data == j .. "\n")
+  end))
   assert(multi:add_handle(easy))
 end
 
@@ -60,33 +72,24 @@ assert(multi:setopt(curl.CURLMOPT_SOCKETFUNCTION, function (easy, s, what)
 end))
 
 assert(multi:setopt(curl.CURLMOPT_TIMERFUNCTION, function (multi, timeout_ms)
-  -- print("timer", multi, timeout_ms)
   if timeout_ms == 0 then
     local running_handles = assert(multi:socket_action(curl.CURL_SOCKET_TIMEOUT, 0))
-    -- print("1:running_handles", running_handles)
   elseif timeout_ms > 0 then
-    local tv = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
-    tv:add(timeout_ms * 0.001)
-    timers:insert(tv, function ()
-      local running_handles = assert(multi:socket_action(curl.CURL_SOCKET_TIMEOUT, 0))
-      -- print("2:running_handles", running_handles)
-    end)
+    multi_timer = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW) + unix.timespec(timeout_ms * 0.001)
+  else
+    multi_timer = nil
   end
 end))
 
+timer:start()
+
 local running_handles = assert(multi:socket_action(curl.CURL_SOCKET_TIMEOUT, 0))
--- print("0:running_handles", running_handles)
 while true do
   selector_time = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW))
-
-  local range = timers:upper_bound(selector_time)
-  for _, f in range:each() do
-    f()
+  if multi_timer then
+    multi_timer = nil
+    local running_handles = assert(multi:socket_action(curl.CURL_SOCKET_TIMEOUT, 0))
   end
-  for _, _, h in range:each() do
-    h:remove()
-  end
-
   local result = selector:select(0.1)
   local running_handles
   for i = 1, result do
@@ -99,7 +102,6 @@ while true do
       curl_events = unix.bor(curl_events, curl.CURL_POLL_OUT)
     end
     running_handles = assert(multi:socket_action(fd, curl_events))
-    -- print("3:running_handles", running_handles)
     if running_handles == 0 then
       break
     end
@@ -111,12 +113,17 @@ end
 
 while true do
   local info, n = multi:info_read()
-  -- print(info, n)
-  if info == nil then
-    break
-  else
+  if info then
     assert(info.msg == curl.CURLMSG_DONE)
     assert(info.result == curl.CURLE_OK)
-    local address = info.easy_handle:get_address()
+  else
+    break
   end
 end
+
+timer:stop()
+
+if verbose then
+  io.stderr:write(timer:elapsed(), "\n")
+end
+assert(timer:elapsed() < 5)

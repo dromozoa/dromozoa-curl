@@ -117,7 +117,7 @@ end
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data
 end))
-assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"))
+assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
 assert(easy:setopt(curl.CURLOPT_HTTPPOST, form))
 form = nil
 collectgarbage()
