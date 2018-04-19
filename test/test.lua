@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -17,10 +17,8 @@
 
 local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
-local sequence = require "dromozoa.commons.sequence"
 local curl = require "dromozoa.curl"
 
-assert(curl.global_init())
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
@@ -31,7 +29,7 @@ assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/inde
 -- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=redirect&redirect_count=3"))
 -- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=sleep&sleep_duration=0.5&sleep_count=10"))
 assert(easy:setopt(curl.CURLOPT_VERBOSE, 0))
-assert(easy:setopt(curl.CURLOPT_NOPROGRESS, 0))
+assert(easy:setopt(curl.CURLOPT_NOPROGRESS, 1))
 assert(easy:setopt(curl.CURLOPT_FAILONERROR, 1))
 assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
 assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
@@ -51,10 +49,9 @@ assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   -- print(data)
 end))
 
-local result, message, code = easy.setopt(9999999, 1)
-assert(result == nil)
+local result, message, code = easy:setopt(9999999, 1)
+assert(not result)
 assert(code == curl.CURLE_UNKNOWN_OPTION or code == curl.CURLE_BAD_FUNCTION_ARGUMENT)
-print(message)
 
 assert(easy:perform())
 
@@ -104,19 +101,3 @@ end
 
 -- local result = json.decode(content)
 -- print(json.encode(result, { pretty = true }))
-
-assert(easy:cleanup())
-
-local data = sequence()
-for k, v in pairs(curl) do
-  if k:match("^CURLOPT") then
-    data:push({ name = k, value = v })
-  end
-end
-data:sort(function (a, b) return a.value < b.value end)
-for item in data:each() do
-  -- print(item.name, item.value)
-end
-
-print("version", curl.version())
-assert(curl.global_cleanup())
