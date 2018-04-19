@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -17,38 +17,59 @@
 
 local curl = require "dromozoa.curl"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
+local url = "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"
+local body_data = {}
+local upload_cursor = 1
+local upload_data = [[
+foo
+bar
+baz
+qux
+]]
+
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
-
-assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi"))
+if verbose then
+  assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
+end
+assert(easy:setopt(curl.CURLOPT_URL, url))
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
-
-local content = ""
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
-  content = content .. data
+  body_data[#body_data + 1] = data
 end))
-
-local upload_iterator = 0
-local upload_data = {
-  "foo\n";
-  "bar\n";
-  "baz\n";
-  "qux\n";
-}
 assert(easy:setopt(curl.CURLOPT_READFUNCTION, function (n)
-  print("read_function", n)
-  upload_iterator = upload_iterator + 1
-  if upload_data[upload_iterator] then
-    return upload_data[upload_iterator]:sub(1, n)
+  if verbose then
+    io.stderr:write(n, "\n")
+  end
+  assert(n > 3)
+  if upload_cursor <= #upload_data then
+    local i = upload_cursor
+    upload_cursor = upload_cursor + 4
+    return upload_data:sub(i, i + 3)
   else
     return nil
   end
 end))
 
 assert(easy:perform())
-print(content)
 
-assert(easy:cleanup())
-
-assert(curl.global_cleanup())
+local body = table.concat(body_data)
+if verbose then
+  io.stderr:write(body)
+end
+local result = assert(assert((loadstring or load)(body))())
+assert(result.REQUEST_METHOD == "PUT")
+assert(result.REQUEST_SCHEME == "https")
+assert(result.REQUEST_URI == "/cgi-bin/dromozoa-curl-echo.cgi")
+assert(result.QUERY_STRING == "")
+assert(result.HTTP_HOST == "kotori.dromozoa.com")
+assert(result.HTTP_USER_AGENT == "")
+assert(result[1] == [[
+foo
+bar
+baz
+qux
+]])

@@ -35,5 +35,5 @@ return {
   os.getenv "REQUEST_URI",
   os.getenv "QUERY_STRING",
   os.getenv "HTTP_HOST",
-  os.getenv "HTTP_USER_AGENT",
+  os.getenv "HTTP_USER_AGENT" or "",
   io.read "*a"))

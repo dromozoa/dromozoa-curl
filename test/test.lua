@@ -32,6 +32,10 @@ local function parse_header(data)
   return line, result
 end
 
+local url = "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"
+local header_data
+local body_data
+
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
@@ -44,21 +48,20 @@ end
 assert(not result)
 assert(code == curl.CURLE_UNKNOWN_OPTION or code == curl.CURLE_BAD_FUNCTION_ARGUMENT)
 
-local url = "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"
-
+if verbose then
+  assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
+end
 assert(easy:setopt(curl.CURLOPT_URL, url))
 assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
-
-local header_data = {}
 assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
   header_data[#header_data + 1] = data
 end))
-
-local body_data = {}
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data
 end))
 
+header_data = {}
+body_data = {}
 assert(easy:perform())
 assert(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL) == url)
 assert(easy:getinfo(curl.CURLINFO_RESPONSE_CODE) == 200)
@@ -88,11 +91,10 @@ assert(body == [[
 8. qux
 ]])
 
-header_data = {}
-body_data = {}
-
 assert(easy:setopt(curl.CURLOPT_RANGE, "14-41"))
 
+header_data = {}
+body_data = {}
 assert(easy:perform())
 assert(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL) == url)
 assert(easy:getinfo(curl.CURLINFO_RESPONSE_CODE) == 206)
