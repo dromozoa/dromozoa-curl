@@ -19,6 +19,19 @@ local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
+local function parse_header(data)
+  local line, header = assert(table.concat(data):gsub("\r\n\r\n$", "\r\n"):gsub("\r\n%s+", " "):match "(.-)\r\n(.*)")
+  local result = {}
+  for item in header:gmatch "(.-)\r\n" do
+    if verbose then
+      io.stderr:write(item, "\n")
+    end
+    local name, value = assert(item:match "(.-):%s*(.*)")
+    result[name] = value
+  end
+  return line, result
+end
+
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
@@ -36,14 +49,14 @@ local url = "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"
 assert(easy:setopt(curl.CURLOPT_URL, url))
 assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
 
-local header = {}
+local header_data = {}
 assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
-  header[#header + 1] = data
+  header_data[#header_data + 1] = data
 end))
 
-local body = {}
+local body_data = {}
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
-  body[#body + 1] = data
+  body_data[#body_data + 1] = data
 end))
 
 assert(easy:perform())
@@ -52,24 +65,19 @@ assert(easy:getinfo(curl.CURLINFO_RESPONSE_CODE) == 200)
 assert(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD) == 56)
 assert(easy:getinfo(curl.CURLINFO_CONTENT_TYPE) == "text/plain")
 
-local header = table.concat(header):gsub("\r\n\r\n$", "\r\n"):gsub("\r\n%s+", " ")
-local header = assert(header:match "^HTTP/1%.1 200 OK\r\n(.*)")
-local headers = {}
-for item in header:gmatch "(.-)\r\n" do
-  if verbose then
-    io.stderr:write(item, "\n")
-  end
-  local name, value = assert(item:match "^([^:]+):%s*(.*)")
-  headers[name] = value
+local line, header = parse_header(header_data)
+assert(line == "HTTP/1.1 200 OK")
+assert(header["ETag"] == [["edea258640a0460e6156cfb98d6cdf3b"]])
+assert(header["Accept-Ranges"] == "bytes")
+assert(header["Content-Type"] == "text/plain")
+assert(header["Content-Length"] == "56")
+assert(header["Server"] == "AmazonS3")
+
+local body = table.concat(body_data)
+if verbose then
+  io.stderr:write(body)
 end
-
-assert(headers["ETag"] == [["edea258640a0460e6156cfb98d6cdf3b"]])
-assert(headers["Accept-Ranges"] == "bytes")
-assert(headers["Content-Type"] == "text/plain")
-assert(headers["Content-Length"] == "56")
-assert(headers["Server"] == "AmazonS3")
-
-assert(table.concat(body) == [[
+assert(body == [[
 1. foo
 2. bar
 3. baz
@@ -78,4 +86,35 @@ assert(table.concat(body) == [[
 6. bar
 7. baz
 8. qux
+]])
+
+header_data = {}
+body_data = {}
+
+assert(easy:setopt(curl.CURLOPT_RANGE, "14-41"))
+
+assert(easy:perform())
+assert(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL) == url)
+assert(easy:getinfo(curl.CURLINFO_RESPONSE_CODE) == 206)
+assert(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD) == 28)
+assert(easy:getinfo(curl.CURLINFO_CONTENT_TYPE) == "text/plain")
+
+local line, header = parse_header(header_data)
+assert(line == "HTTP/1.1 206 Partial Content")
+assert(header["ETag"] == [["edea258640a0460e6156cfb98d6cdf3b"]])
+assert(header["Accept-Ranges"] == "bytes")
+assert(header["Content-Range"] == "bytes 14-41/56")
+assert(header["Content-Type"] == "text/plain")
+assert(header["Content-Length"] == "28")
+assert(header["Server"] == "AmazonS3")
+
+local body = table.concat(body_data)
+if verbose then
+  io.stderr:write(body)
+end
+assert(body == [[
+3. baz
+4. qux
+5. foo
+6. bar
 ]])
