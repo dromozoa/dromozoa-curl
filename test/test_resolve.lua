@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -17,10 +17,33 @@
 
 local curl = require "dromozoa.curl"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(curl.global_init())
 
-local easy = assert(curl.easy())
+local body_data = {}
 
-assert(easy:setopt(curl.CURLOPT_RESOLVE, { "example.com:80:127.0.0.1", "www.example.com:80:127.0.0.1" }))
-assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi"))
+local easy = assert(curl.easy())
+if verbose then
+  assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
+end
+assert(easy:setopt(curl.CURLOPT_RESOLVE, { "minalinsky.dromozoa.com:80:49.212.22.139" }))
+assert(easy:setopt(curl.CURLOPT_URL, "http://minalinsky.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+  body_data[#body_data + 1] = data
+end))
+
 assert(easy:perform())
+
+local body = table.concat(body_data)
+if verbose then
+  io.stderr:write(body)
+end
+local result = assert(assert((loadstring or load)(body))())
+assert(result.REQUEST_METHOD == "GET")
+assert(result.REQUEST_SCHEME == "http")
+assert(result.REQUEST_URI == "/cgi-bin/dromozoa-curl.cgi")
+assert(result.QUERY_STRING == "")
+assert(result.HTTP_HOST == "minalinsky.dromozoa.com")
+assert(result.HTTP_USER_AGENT == "")
+assert(result[1] == "")

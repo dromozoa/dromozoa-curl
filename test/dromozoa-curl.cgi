@@ -1,4 +1,6 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+#! /usr/bin/env lua
+
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -15,18 +17,23 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local curl = require "dromozoa.curl"
+io.write(([[
+Content-Type: text/plain; charset=UTF-8
 
-assert(curl.global_init())
-
-local easy = assert(curl.easy())
-assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
-assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
-  print(data)
-end))
-assert(easy:perform())
-assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION))
-assert(easy:perform())
-
-assert(easy:cleanup())
-assert(curl.global_cleanup())
+return {
+  REQUEST_METHOD = %q;
+  REQUEST_SCHEME = %q;
+  REQUEST_URI = %q;
+  QUERY_STRING = %q;
+  HTTP_HOST = %q;
+  HTTP_USER_AGENT = %q;
+  %q;
+}
+]]):format(
+  os.getenv "REQUEST_METHOD",
+  os.getenv "REQUEST_SCHEME",
+  os.getenv "REQUEST_URI",
+  os.getenv "QUERY_STRING",
+  os.getenv "HTTP_HOST",
+  os.getenv "HTTP_USER_AGENT" or "",
+  io.read "*a"))
