@@ -17,8 +17,6 @@
 
 local curl = require "dromozoa.curl"
 
-assert(curl.global_init())
-
 local verbose = os.getenv "VERBOSE" == "1"
 
 local url = "http://minalinsky.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"
