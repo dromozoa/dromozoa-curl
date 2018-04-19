@@ -51,6 +51,7 @@ assert(code == curl.CURLE_UNKNOWN_OPTION or code == curl.CURLE_BAD_FUNCTION_ARGU
 if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
+assert(easy:setopt(curl.CURLOPT_IPRESOLVE, curl.CURL_IPRESOLVE_V4))
 assert(easy:setopt(curl.CURLOPT_URL, url))
 assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
   header_data[#header_data + 1] = data
