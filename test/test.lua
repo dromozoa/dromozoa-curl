@@ -15,89 +15,67 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local json = require "dromozoa.commons.json"
-local pairs = require "dromozoa.commons.pairs"
 local curl = require "dromozoa.curl"
+
+local verbose = os.getenv "VERBOSE" == "1"
 
 assert(curl.global_init())
 
 local easy = assert(curl.easy())
 assert(easy:reset())
 
-assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/index.html"))
--- assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/no-such-file.html"))
--- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=redirect&redirect_count=3"))
--- assert(easy:setopt(curl.CURLOPT_URL, "http://localhost/cgi-bin/nph-dromozoa-curl-test.cgi?command=sleep&sleep_duration=0.5&sleep_count=10"))
-assert(easy:setopt(curl.CURLOPT_VERBOSE, 0))
-assert(easy:setopt(curl.CURLOPT_NOPROGRESS, 1))
-assert(easy:setopt(curl.CURLOPT_FAILONERROR, 1))
-assert(easy:setopt(curl.CURLOPT_FILETIME, 1))
-assert(easy:setopt(curl.CURLOPT_SSL_VERIFYPEER, 1))
-assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
-assert(assert(easy:setopt(curl.CURLOPT_REFERER, "http://localhost/")) == easy)
--- assert(easy:setopt(curl.CURLOPT_CERTINFO, 1))
-
-assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
-  print(("header:%q"):format(data))
-  return #data
-end))
-
-local content = ""
-assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
-  content = content .. data
-  -- print(("write:%q"):format(data))
-  -- print(data)
-end))
-
-local result, message, code = easy:setopt(9999999, 1)
+local result, message, code = easy:setopt(-1, 1)
+if verbose then
+  io.stderr:write(message, "\n")
+end
 assert(not result)
 assert(code == curl.CURLE_UNKNOWN_OPTION or code == curl.CURLE_BAD_FUNCTION_ARGUMENT)
 
+local url = "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"
+
+assert(easy:setopt(curl.CURLOPT_URL, url))
+assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
+
+local header = {}
+assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
+  header[#header + 1] = data
+end))
+
+local body = {}
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+  body[#body + 1] = data
+end))
+
 assert(easy:perform())
+assert(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL) == url)
+assert(easy:getinfo(curl.CURLINFO_RESPONSE_CODE) == 200)
+assert(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD) == 56)
+assert(easy:getinfo(curl.CURLINFO_CONTENT_TYPE) == "text/plain")
 
-print(easy:getinfo(curl.CURLINFO_EFFECTIVE_URL))
-if false then
-  print(easy:getinfo(curl.CURLINFO_RESPONSE_CODE))
-  print(os.date("!%Y-%m-%dT%H:%M:%SZ", easy:getinfo(curl.CURLINFO_FILETIME)))
-  print(easy:getinfo(curl.CURLINFO_TOTAL_TIME))
-  print(easy:getinfo(curl.CURLINFO_NAMELOOKUP_TIME))
-  print(easy:getinfo(curl.CURLINFO_CONNECT_TIME))
-  print(easy:getinfo(curl.CURLINFO_APPCONNECT_TIME))
-  print(easy:getinfo(curl.CURLINFO_PRETRANSFER_TIME))
-  print(easy:getinfo(curl.CURLINFO_STARTTRANSFER_TIME))
-  print(easy:getinfo(curl.CURLINFO_REDIRECT_TIME))
-  print(easy:getinfo(curl.CURLINFO_REDIRECT_COUNT))
-  print(easy:getinfo(curl.CURLINFO_REDIRECT_URL))
-  print(easy:getinfo(curl.CURLINFO_SIZE_UPLOAD))
-  print(easy:getinfo(curl.CURLINFO_SIZE_DOWNLOAD))
-  print(easy:getinfo(curl.CURLINFO_SPEED_DOWNLOAD))
-  print(easy:getinfo(curl.CURLINFO_SPEED_UPLOAD))
-  print(easy:getinfo(curl.CURLINFO_HEADER_SIZE))
-  print(easy:getinfo(curl.CURLINFO_REQUEST_SIZE))
-  print(easy:getinfo(curl.CURLINFO_SSL_VERIFYRESULT))
-  print(json.encode(easy:getinfo(curl.CURLINFO_SSL_ENGINES)))
-  print(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD))
-  print(easy:getinfo(curl.CURLINFO_CONTENT_LENGTH_UPLOAD))
-  print(easy:getinfo(curl.CURLINFO_CONTENT_TYPE))
-  print(easy:getinfo(curl.CURLINFO_HTTPAUTH_AVAIL))
-  print(easy:getinfo(curl.CURLINFO_PROXYAUTH_AVAIL))
-  print(easy:getinfo(curl.CURLINFO_OS_ERRNO))
-  print(easy:getinfo(curl.CURLINFO_NUM_CONNECTS))
-  print(easy:getinfo(curl.CURLINFO_PRIMARY_IP))
-  print(easy:getinfo(curl.CURLINFO_PRIMARY_PORT))
-  print(easy:getinfo(curl.CURLINFO_LOCAL_IP))
-  print(easy:getinfo(curl.CURLINFO_LOCAL_PORT))
-  print(json.encode(easy:getinfo(curl.CURLINFO_COOKIELIST)))
-end
-print(json.encode(easy:getinfo(curl.CURLINFO_CERTINFO)))
-
-if curl.CURLINFO_ACTIVESOCKET then
-  print(json.encode(easy:getinfo(curl.CURLINFO_ACTIVESOCKET)))
+local header = table.concat(header):gsub("\r\n\r\n$", "\r\n"):gsub("\r\n%s+", " ")
+local header = assert(header:match "^HTTP/1%.1 200 OK\r\n(.*)")
+local headers = {}
+for item in header:gmatch "(.-)\r\n" do
+  if verbose then
+    io.stderr:write(item, "\n")
+  end
+  local name, value = assert(item:match "^([^:]+):%s*(.*)")
+  headers[name] = value
 end
 
--- print(curl.CURL_HTTP_VERSION_1_0)
--- print(curl.CURL_HTTP_VERSION_1_1)
--- print(curl.CURL_HTTP_VERSION_2_0)
+assert(headers["ETag"] == [["edea258640a0460e6156cfb98d6cdf3b"]])
+assert(headers["Accept-Ranges"] == "bytes")
+assert(headers["Content-Type"] == "text/plain")
+assert(headers["Content-Length"] == "56")
+assert(headers["Server"] == "AmazonS3")
 
--- local result = json.decode(content)
--- print(json.encode(result, { pretty = true }))
+assert(table.concat(body) == [[
+1. foo
+2. bar
+3. baz
+4. qux
+5. foo
+6. bar
+7. baz
+8. qux
+]])
