@@ -34,11 +34,9 @@ local easy = assert(curl.easy())
 if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
+assert(easy:setopt(curl.CURLOPT_IPRESOLVE, curl.CURL_IPRESOLVE_V4))
 assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
-assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
-  body_data[#body_data + 1] = data
-end))
 assert(easy:setopt(curl.CURLOPT_READFUNCTION, function (n)
   if verbose then
     io.stderr:write(n, "\n")
@@ -51,6 +49,9 @@ assert(easy:setopt(curl.CURLOPT_READFUNCTION, function (n)
   else
     return nil
   end
+end))
+assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
+  body_data[#body_data + 1] = data
 end))
 
 assert(easy:perform())
