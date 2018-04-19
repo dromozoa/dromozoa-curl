@@ -19,11 +19,11 @@
 
 namespace dromozoa {
   namespace {
-    class global {
+    class global_handle {
     public:
-      global() : initialized_(true) {}
+      global_handle() : initialized_(true) {}
 
-      ~global() {
+      ~global_handle() {
         if (initialized_) {
           curl_global_cleanup();
         }
@@ -36,12 +36,12 @@ namespace dromozoa {
 
     private:
       bool initialized_;
-      global(const global&);
-      global& operator=(const global&);
+      global_handle(const global_handle&);
+      global_handle& operator=(const global_handle&);
     };
 
     void impl_gc(lua_State* L) {
-      luaX_check_udata<global>(L, 1, "dromozoa.curl.global")->~global();
+      luaX_check_udata<global_handle>(L, 1, "dromozoa.curl.global_handle")->~global_handle();
     }
 
     void impl_global_init(lua_State* L) {
@@ -51,8 +51,8 @@ namespace dromozoa {
       if (is_nil) {
         CURLcode result = curl_global_init(CURL_GLOBAL_ALL);
         if (result == 0) {
-          luaX_new<global>(L);
-          luaX_set_metatable(L, "dromozoa.curl.global");
+          luaX_new<global_handle>(L);
+          luaX_set_metatable(L, "dromozoa.curl.global_handle");
           luaX_set_field(L, LUA_REGISTRYINDEX, "dromozoa.curl.global");
           luaX_push_success(L);
         } else {
@@ -65,7 +65,7 @@ namespace dromozoa {
 
     void impl_global_cleanup(lua_State* L) {
       luaX_get_field(L, LUA_REGISTRYINDEX, "dromozoa.curl.global");
-      if (global* self = luaX_to_udata<global>(L, -1, "dromozoa.curl.global")) {
+      if (global_handle* self = luaX_to_udata<global_handle>(L, -1, "dromozoa.curl.global_handle")) {
         self->cleanup();
       }
       lua_pop(L, 1);
@@ -79,7 +79,7 @@ namespace dromozoa {
   }
 
   void initialize_main(lua_State* L) {
-    luaL_newmetatable(L, "dromozoa.curl.global");
+    luaL_newmetatable(L, "dromozoa.curl.global_handle");
     luaX_set_field(L, -1, "__gc", impl_gc);
     lua_pop(L, 1);
 
