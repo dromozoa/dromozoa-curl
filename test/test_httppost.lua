@@ -76,6 +76,7 @@ assert(form:add(
 assert(form:add(
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_BUFFER, "test.html",
+    curl.CURLFORM_CONTENTTYPE, "text/html",
     curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>",
     curl.CURLFORM_CONTENTHEADER, { "X-Foo: foo", "X-Bar: bar" }))
 assert(form:add(
