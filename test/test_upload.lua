@@ -19,7 +19,8 @@ local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
-local url = "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"
+assert(curl.global_init())
+
 local body_data = {}
 local upload_cursor = 1
 local upload_data = [[
@@ -29,13 +30,11 @@ baz
 qux
 ]]
 
-assert(curl.global_init())
-
 local easy = assert(curl.easy())
 if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
-assert(easy:setopt(curl.CURLOPT_URL, url))
+assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"))
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data

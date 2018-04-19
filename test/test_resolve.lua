@@ -19,17 +19,16 @@ local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
-local url = "http://minalinsky.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"
-local body_data = {}
-
 assert(curl.global_init())
+
+local body_data = {}
 
 local easy = assert(curl.easy())
 if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
 assert(easy:setopt(curl.CURLOPT_RESOLVE, { "minalinsky.dromozoa.com:80:49.212.22.139" }))
-assert(easy:setopt(curl.CURLOPT_URL, url))
+assert(easy:setopt(curl.CURLOPT_URL, "http://minalinsky.dromozoa.com/cgi-bin/dromozoa-curl-echo.cgi"))
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data
 end))

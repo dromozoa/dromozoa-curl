@@ -32,11 +32,11 @@ local function parse_header(data)
   return line, result
 end
 
+assert(curl.global_init())
+
 local url = "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"
 local header_data
 local body_data
-
-assert(curl.global_init())
 
 local easy = assert(curl.easy())
 assert(easy:reset())
@@ -52,7 +52,6 @@ if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
 assert(easy:setopt(curl.CURLOPT_URL, url))
-assert(easy:setopt(curl.CURLOPT_FOLLOWLOCATION, 1))
 assert(easy:setopt(curl.CURLOPT_HEADERFUNCTION, function (data)
   header_data[#header_data + 1] = data
 end))
