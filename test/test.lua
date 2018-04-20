@@ -15,9 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local dyld = require "dromozoa.dyld"
 local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
+
+assert(dyld.dlopen_pthread())
 
 local function parse_header(data)
   local line, header = assert(table.concat(data):gsub("\r\n\r\n$", "\r\n"):gsub("\r\n%s+", " "):match "(.-)\r\n(.*)")

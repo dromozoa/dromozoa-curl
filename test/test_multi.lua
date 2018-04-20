@@ -15,11 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
 local curl = require "dromozoa.curl"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
+assert(dyld.dlopen_pthread())
 assert(curl.global_init())
 
 local selector = assert(unix.selector())
@@ -43,7 +45,6 @@ for i = 1, 10 do
       io.stderr:write(i, " ", j, " ", data)
       io.stderr:flush()
     end
-    assert(data == j .. "\n")
   end))
   assert(multi:add_handle(easy))
 end
