@@ -16,8 +16,8 @@
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
 local dyld = require "dromozoa.dyld"
-local unix = require "dromozoa.unix"
 local curl = require "dromozoa.curl"
+local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
