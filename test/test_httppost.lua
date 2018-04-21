@@ -80,7 +80,7 @@ assert(form:add(
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_BUFFER, "test.html",
     curl.CURLFORM_CONTENTTYPE, "text/html",
-    curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1></body></html>",
+    curl.CURLFORM_BUFFERPTR, "<html><body><h1>test</h1><div>" .. ("X"):rep(16) .. "</div></body></html>",
     curl.CURLFORM_CONTENTHEADER, { "X-Foo: foo", "X-Bar: bar" }))
 assert(form:add(
     curl.CURLFORM_COPYNAME, "bar",
@@ -186,7 +186,7 @@ assert(part6["Content-Disposition"].filename == [["test.html"]])
 assert(part6["Content-Type"][1] == "text/html")
 assert(part6["X-Foo"][1] == "foo")
 assert(part6["X-Bar"][1] == "bar")
-assert(part6[1] == "<html><body><h1>test</h1></body></html>")
+assert(part6[1]:find "^<html><body><h1>test</h1><div>X+</div></body></html>$")
 assert(part7["Content-Disposition"].name == [["bar"]])
 assert(part7["Content-Disposition"].filename == [["bar.txt"]])
 assert(part7[1] == ("X"):rep(16))
