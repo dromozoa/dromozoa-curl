@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -14,6 +14,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
+
+#include <utility>
 
 #include "common.hpp"
 
@@ -56,8 +58,6 @@ namespace dromozoa {
   }
 
   void string_list::swap(string_list& that) {
-    struct curl_slist* slist = slist_;
-    slist_ = that.slist_;
-    that.slist_ = slist;
+    std::swap(slist_, that.slist_);
   }
 }
