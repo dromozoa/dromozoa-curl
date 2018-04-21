@@ -50,7 +50,6 @@ namespace dromozoa {
     struct curl_slist* get() const;
     struct curl_slist* release();
     void append(const char* string);
-    void swap(string_list& that);
   private:
     struct curl_slist* slist_;
     string_list(const string_list&);

@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <utility>
-
 #include "common.hpp"
 
 namespace dromozoa {
@@ -55,9 +53,5 @@ namespace dromozoa {
 
   void string_list::append(const char* string) {
     slist_ = curl_slist_append(slist_, string);
-  }
-
-  void string_list::swap(string_list& that) {
-    std::swap(slist_, that.slist_);
   }
 }
