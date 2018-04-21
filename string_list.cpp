@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -53,11 +53,5 @@ namespace dromozoa {
 
   void string_list::append(const char* string) {
     slist_ = curl_slist_append(slist_, string);
-  }
-
-  void string_list::swap(string_list& that) {
-    struct curl_slist* slist = slist_;
-    slist_ = that.slist_;
-    that.slist_ = slist;
   }
 }

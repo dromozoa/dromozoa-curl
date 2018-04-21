@@ -149,6 +149,7 @@ namespace dromozoa {
 #endif
           break;
         case CURLFORM_BUFFERPTR:
+          new_reference(L, arg + 1); // copy
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
 #if CURL_AT_LEAST_VERSION(7,46,0)
