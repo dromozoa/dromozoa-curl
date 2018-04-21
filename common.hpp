@@ -71,6 +71,7 @@ namespace dromozoa {
     struct curl_httppost* last_;
     std::set<luaX_binder*> references_;
     std::set<struct curl_slist*> slists_;
+    bool have_stream_;
     httppost_handle(const httppost_handle&);
     httppost_handle& operator=(const httppost_handle&);
   };

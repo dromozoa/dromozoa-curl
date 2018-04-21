@@ -88,7 +88,7 @@ namespace dromozoa {
     }
   }
 
-  httppost_handle::httppost_handle() : first_(), last_() {}
+  httppost_handle::httppost_handle() : first_(), last_(), have_stream_() {}
 
   httppost_handle::~httppost_handle() {
     if (first_) {
@@ -161,6 +161,7 @@ namespace dromozoa {
 #if CURL_AT_LEAST_VERSION(7,18,2)
         case CURLFORM_STREAM:
           result = save_forms_function(forms, L, arg + 1, option);
+          have_stream_ = true;
           break;
 #endif
         case CURLFORM_CONTENTHEADER:
@@ -199,6 +200,6 @@ namespace dromozoa {
   }
 
   bool httppost_handle::have_stream() const {
-    return !references_.empty();
+    return have_stream_;
   }
 }
