@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -27,15 +27,15 @@ namespace dromozoa {
   }
 
   void easy_handle::reset() {
-    clear();
     curl_easy_reset(handle_);
+    clear();
   }
 
   void easy_handle::cleanup() {
-    clear();
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
+    clear();
   }
 
   CURL* easy_handle::get() const {
