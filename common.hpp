@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -44,12 +44,11 @@
 namespace dromozoa {
   class string_list {
   public:
-    explicit string_list(struct curl_slist* slist = 0);
+    explicit string_list(struct curl_slist* slist);
     string_list(lua_State* L, int index);
     ~string_list();
     struct curl_slist* get() const;
     struct curl_slist* release();
-    void append(const char* string);
   private:
     struct curl_slist* slist_;
     string_list(const string_list&);
@@ -63,16 +62,18 @@ namespace dromozoa {
     void free();
     CURLFORMcode add(lua_State* L);
     struct curl_httppost* get() const;
-    luaX_reference<>* new_reference(lua_State* L, int index);
-    void save_slist(struct curl_slist* slist);
-    bool have_stream() const;
+    int stream() const;
   private:
+    friend class httppost_handle_impl;
     struct curl_httppost* first_;
     struct curl_httppost* last_;
     std::set<luaX_binder*> references_;
     std::set<struct curl_slist*> slists_;
+    int stream_;
     httppost_handle(const httppost_handle&);
     httppost_handle& operator=(const httppost_handle&);
+    luaX_reference<>* new_reference(lua_State* L, int index);
+    void save_slist(struct curl_slist* slist);
   };
 
   httppost_handle* check_httppost_handle(lua_State* L, int arg);
