@@ -63,7 +63,6 @@ namespace dromozoa {
     void free();
     CURLFORMcode add(lua_State* L);
     struct curl_httppost* get() const;
-    void save_slist(struct curl_slist* slist);
     int stream() const;
   private:
     friend class httppost_handle_impl;
@@ -75,6 +74,7 @@ namespace dromozoa {
     httppost_handle(const httppost_handle&);
     httppost_handle& operator=(const httppost_handle&);
     luaX_reference<>* new_reference(lua_State* L, int index);
+    void save_slist(struct curl_slist* slist);
   };
 
   httppost_handle* check_httppost_handle(lua_State* L, int arg);

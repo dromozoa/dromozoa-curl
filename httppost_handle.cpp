@@ -67,7 +67,18 @@ namespace dromozoa {
       return CURL_FORMADD_OK;
     }
 
-    CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+  }
+
+  class httppost_handle_impl {
+  public:
+    static CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      httppost_handle* self = check_httppost_handle(L, 1);
+      luaX_reference<>* ref = self->new_reference(L, arg);
+      save_forms(forms, option, ref);
+      return CURL_FORMADD_OK;
+    }
+
+    static CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       luaL_checktype(L, arg, LUA_TTABLE);
       string_list list(L, arg);
       if (list.get()) {
@@ -78,16 +89,6 @@ namespace dromozoa {
       } else {
         return CURL_FORMADD_NULL;
       }
-    }
-  }
-
-  class httppost_handle_impl {
-  public:
-    static CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      httppost_handle* self = check_httppost_handle(L, 1);
-      luaX_reference<>* ref = self->new_reference(L, arg);
-      save_forms(forms, option, ref);
-      return CURL_FORMADD_OK;
     }
   };
 
@@ -168,7 +169,7 @@ namespace dromozoa {
           break;
 #endif
         case CURLFORM_CONTENTHEADER:
-          result = save_forms_slist(forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_slist(forms, L, arg + 1, option);
           break;
         default:
           result = CURL_FORMADD_UNKNOWN_OPTION;
