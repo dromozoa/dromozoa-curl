@@ -47,10 +47,6 @@ namespace dromozoa {
     return luaX_check_udata<httppost_handle>(L, arg, "dromozoa.curl.httppost");
   }
 
-  struct curl_httppost* check_httppost(lua_State* L, int arg) {
-    return check_httppost_handle(L, arg)->get();
-  }
-
   void initialize_httppost(lua_State* L) {
     lua_newtable(L);
     {

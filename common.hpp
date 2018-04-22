@@ -77,7 +77,6 @@ namespace dromozoa {
   };
 
   httppost_handle* check_httppost_handle(lua_State* L, int arg);
-  struct curl_httppost* check_httppost(lua_State* L, int arg);
 
   class easy_handle {
   public:
