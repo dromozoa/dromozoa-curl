@@ -41,7 +41,11 @@ namespace dromozoa {
       forms.push_back(f);
     }
 
-    CURLFORMcode save_forms_string(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+  }
+
+  class httppost_handle_impl {
+  public:
+    static CURLFORMcode save_forms_string(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       if (const char* p = lua_tostring(L, arg)) {
         save_forms(forms, option, p);
         return CURL_FORMADD_OK;
@@ -50,7 +54,7 @@ namespace dromozoa {
       }
     }
 
-    CURLFORMcode save_forms_string(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
+    static CURLFORMcode save_forms_string(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
       size_t length = 0;
       if (const char* p = lua_tolstring(L, arg, &length)) {
         save_forms(forms, option, p);
@@ -61,34 +65,29 @@ namespace dromozoa {
       }
     }
 
-    template <class T>
-    inline CURLFORMcode save_forms_integer(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      save_forms(forms, option, luaX_check_integer<T>(L, arg));
-      return CURL_FORMADD_OK;
-    }
-
-  }
-
-  class httppost_handle_impl {
-  public:
-    static CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      httppost_handle* self = check_httppost_handle(L, 1);
+    static CURLFORMcode save_forms_function(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       luaX_reference<>* ref = self->new_reference(L, arg);
+      ++self->stream_;
       save_forms(forms, option, ref);
       return CURL_FORMADD_OK;
     }
 
-    static CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+    static CURLFORMcode save_forms_slist(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       luaL_checktype(L, arg, LUA_TTABLE);
       string_list list(L, arg);
       if (list.get()) {
-        httppost_handle* self = check_httppost_handle(L, 1);
         self->save_slist(list.get());
         save_forms(forms, option, list.release());
         return CURL_FORMADD_OK;
       } else {
         return CURL_FORMADD_NULL;
       }
+    }
+
+    template <class T>
+    static CURLFORMcode save_forms_integer(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      save_forms(forms, option, luaX_check_integer<T>(L, arg));
+      return CURL_FORMADD_OK;
     }
   };
 
@@ -142,42 +141,44 @@ namespace dromozoa {
         case CURLFORM_CONTENTTYPE:
         case CURLFORM_FILENAME:
         case CURLFORM_BUFFER:
-          result = save_forms_string(forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_string(this, forms, L, arg + 1, option);
           break;
 
         case CURLFORM_COPYNAME:
-          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
+          result = httppost_handle_impl::save_forms_string(this, forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
+          break;
+
+        case CURLFORM_PTRNAME:
           break;
 
         case CURLFORM_COPYCONTENTS:
 #if CURL_AT_LEAST_VERSION(7,46,0)
-          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
+          result = httppost_handle_impl::save_forms_string(this, forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
 #else
-          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTSLENGTH);
+          result = httppost_handle_impl::save_forms_string(this, forms, L, arg + 1, option, CURLFORM_CONTENTSLENGTH);
 #endif
           break;
 
         case CURLFORM_BUFFERPTR:
           new_reference(L, arg + 1); // copy
-          result = save_forms_string(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
+          result = httppost_handle_impl::save_forms_string(this, forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
 
 #if CURL_AT_LEAST_VERSION(7,46,0)
         case CURLFORM_CONTENTLEN:
 #endif
         case CURLFORM_CONTENTSLENGTH:
-          result = save_forms_integer<size_t>(forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_integer<size_t>(this, forms, L, arg + 1, option);
           break;
 
 #if CURL_AT_LEAST_VERSION(7,18,2)
         case CURLFORM_STREAM:
-          result = httppost_handle_impl::save_forms_function(forms, L, arg + 1, option);
-          ++stream_;
+          result = httppost_handle_impl::save_forms_function(this, forms, L, arg + 1, option);
           break;
 #endif
 
         case CURLFORM_CONTENTHEADER:
-          result = httppost_handle_impl::save_forms_slist(forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_slist(this, forms, L, arg + 1, option);
           break;
 
         default:
