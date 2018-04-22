@@ -63,8 +63,8 @@ assert(form:add(
     curl.CURLFORM_COPYCONTENTS, "bar",
     curl.CURLFORM_END))
 assert(form:add(
-    curl.CURLFORM_COPYNAME, "foo\0bar",
-    curl.CURLFORM_COPYCONTENTS, "bar\0baz"))
+    curl.CURLFORM_PTRNAME, "foo" .. "\0" .. "bar",
+    curl.CURLFORM_PTRCONTENTS, "bar" .. ("\0"):rep(16) .. "baz"))
 assert(form:add(
     curl.CURLFORM_COPYNAME, "foo",
     curl.CURLFORM_FILECONTENT, "test/test.txt"))
@@ -170,7 +170,7 @@ local part1, part2, part3, part4, part5, part6, part7, part8 = (table.unpack or 
 assert(part1["Content-Disposition"].name == [["foo"]])
 assert(part1[1] == "bar")
 assert(part2["Content-Disposition"].name == "\"foo\0bar\"")
-assert(part2[1] == "bar\0baz")
+assert(part2[1]:find "bar%z+baz")
 assert(part3["Content-Disposition"].name == [["foo"]])
 assert(part3[1] == test_data)
 assert(part4["Content-Disposition"].name == [["foo"]])
