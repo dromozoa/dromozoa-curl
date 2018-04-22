@@ -101,14 +101,7 @@ namespace dromozoa {
   }
 
   void httppost_handle::free() {
-    {
-      std::set<luaX_binder*>::iterator i = references_.begin();
-      std::set<luaX_binder*>::iterator end = references_.end();
-      for (; i != end; ++i) {
-        delete *i;
-      }
-      references_.clear();
-    }
+    stream_ = 0;
 
     {
       std::set<struct curl_slist*>::iterator i = slists_.begin();
@@ -117,6 +110,15 @@ namespace dromozoa {
         curl_slist_free_all(*i);
       }
       slists_.clear();
+    }
+
+    {
+      std::set<luaX_binder*>::iterator i = references_.begin();
+      std::set<luaX_binder*>::iterator end = references_.end();
+      for (; i != end; ++i) {
+        delete *i;
+      }
+      references_.clear();
     }
 
     struct curl_httppost* first = first_;
@@ -142,9 +144,11 @@ namespace dromozoa {
         case CURLFORM_BUFFER:
           result = save_forms_string(forms, L, arg + 1, option);
           break;
+
         case CURLFORM_COPYNAME:
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_NAMELENGTH);
           break;
+
         case CURLFORM_COPYCONTENTS:
 #if CURL_AT_LEAST_VERSION(7,46,0)
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTLEN);
@@ -152,32 +156,39 @@ namespace dromozoa {
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_CONTENTSLENGTH);
 #endif
           break;
+
         case CURLFORM_BUFFERPTR:
           new_reference(L, arg + 1); // copy
           result = save_forms_string(forms, L, arg + 1, option, CURLFORM_BUFFERLENGTH);
           break;
+
 #if CURL_AT_LEAST_VERSION(7,46,0)
         case CURLFORM_CONTENTLEN:
 #endif
         case CURLFORM_CONTENTSLENGTH:
           result = save_forms_integer<size_t>(forms, L, arg + 1, option);
           break;
+
 #if CURL_AT_LEAST_VERSION(7,18,2)
         case CURLFORM_STREAM:
           result = httppost_handle_impl::save_forms_function(forms, L, arg + 1, option);
           ++stream_;
           break;
 #endif
+
         case CURLFORM_CONTENTHEADER:
           result = httppost_handle_impl::save_forms_slist(forms, L, arg + 1, option);
           break;
+
         default:
           result = CURL_FORMADD_UNKNOWN_OPTION;
       }
+
       if (result != CURL_FORMADD_OK) {
         return result;
       }
     }
+
     struct curl_forms f = { CURLFORM_END, 0 };
     forms.push_back(f);
     return curl_formadd(&first_, &last_, CURLFORM_ARRAY, &forms[0], CURLFORM_END);
@@ -185,6 +196,10 @@ namespace dromozoa {
 
   struct curl_httppost* httppost_handle::get() const {
     return first_;
+  }
+
+  int httppost_handle::stream() const {
+    return stream_;
   }
 
   luaX_reference<>* httppost_handle::new_reference(lua_State* L, int index) {
@@ -201,9 +216,5 @@ namespace dromozoa {
 
   void httppost_handle::save_slist(struct curl_slist* slist) {
     slists_.insert(slist);
-  }
-
-  int httppost_handle::stream() const {
-    return stream_;
   }
 }
