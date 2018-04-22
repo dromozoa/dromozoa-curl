@@ -92,7 +92,7 @@ namespace dromozoa {
       self->new_reference(option, L, 3);
       httppost_handle* form = check_httppost_handle(L, 3);
       CURLcode result = curl_easy_setopt(self->get(), option, form->get());
-      if (result == CURLE_OK && form->have_stream()) {
+      if (result == CURLE_OK && form->stream() > 0) {
         result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
       }
       return result;

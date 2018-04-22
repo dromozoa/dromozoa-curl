@@ -65,13 +65,13 @@ namespace dromozoa {
     struct curl_httppost* get() const;
     luaX_reference<>* new_reference(lua_State* L, int index);
     void save_slist(struct curl_slist* slist);
-    bool have_stream() const;
+    int stream() const;
   private:
     struct curl_httppost* first_;
     struct curl_httppost* last_;
     std::set<luaX_binder*> references_;
     std::set<struct curl_slist*> slists_;
-    bool have_stream_;
+    int stream_;
     httppost_handle(const httppost_handle&);
     httppost_handle& operator=(const httppost_handle&);
   };
