@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -67,13 +67,6 @@ namespace dromozoa {
       return CURL_FORMADD_OK;
     }
 
-    CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      httppost_handle* self = check_httppost_handle(L, 1);
-      luaX_reference<>* ref = self->new_reference(L, arg);
-      save_forms(forms, option, ref);
-      return CURL_FORMADD_OK;
-    }
-
     CURLFORMcode save_forms_slist(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       luaL_checktype(L, arg, LUA_TTABLE);
       string_list list(L, arg);
@@ -87,6 +80,16 @@ namespace dromozoa {
       }
     }
   }
+
+  class httppost_handle_impl {
+  public:
+    static CURLFORMcode save_forms_function(std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      httppost_handle* self = check_httppost_handle(L, 1);
+      luaX_reference<>* ref = self->new_reference(L, arg);
+      save_forms(forms, option, ref);
+      return CURL_FORMADD_OK;
+    }
+  };
 
   httppost_handle::httppost_handle() : first_(), last_(), stream_() {}
 
@@ -160,7 +163,7 @@ namespace dromozoa {
           break;
 #if CURL_AT_LEAST_VERSION(7,18,2)
         case CURLFORM_STREAM:
-          result = save_forms_function(forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_function(forms, L, arg + 1, option);
           ++stream_;
           break;
 #endif
