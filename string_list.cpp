@@ -25,7 +25,7 @@ namespace dromozoa {
       for (int i = 1; ; ++i) {
         luaX_get_field(L, index, i);
         if (const char* p = lua_tostring(L, -1)) {
-          append(p);
+          slist_ = curl_slist_append(slist_, p);
           lua_pop(L, 1);
         } else {
           lua_pop(L, 1);
@@ -49,9 +49,5 @@ namespace dromozoa {
     struct curl_slist* slist = slist_;
     slist_ = 0;
     return slist;
-  }
-
-  void string_list::append(const char* string) {
-    slist_ = curl_slist_append(slist_, string);
   }
 }

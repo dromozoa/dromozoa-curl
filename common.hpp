@@ -53,7 +53,6 @@ namespace dromozoa {
     struct curl_slist* slist_;
     string_list(const string_list&);
     string_list& operator=(const string_list&);
-    void append(const char* string);
   };
 
   class httppost_handle {
