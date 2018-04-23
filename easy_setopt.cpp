@@ -23,9 +23,8 @@
 #include "symbols.hpp"
 
 namespace dromozoa {
-  class easy_setopt_impl {
-  public:
-    static size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
+  namespace {
+    size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
@@ -53,7 +52,7 @@ namespace dromozoa {
       return result;
     }
 
-    static size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
@@ -75,6 +74,10 @@ namespace dromozoa {
       return result;
     }
 
+  }
+
+  class easy_setopt_impl {
+  public:
     static CURLcode setopt_string(easy_handle* self, lua_State* L, CURLoption option) {
       if (lua_isnoneornil(L, 3)) {
         return curl_easy_setopt(self->get(), option, 0);
@@ -170,13 +173,13 @@ namespace dromozoa {
         case easy_setopt_param_callback:
           switch (option) {
             case CURLOPT_READFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_READDATA, easy_setopt_impl::read_callback, stdin);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_READDATA, read_callback, stdin);
               break;
             case CURLOPT_HEADERFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_HEADERDATA, easy_setopt_impl::write_callback, 0);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_HEADERDATA, write_callback, 0);
               break;
             case CURLOPT_WRITEFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_WRITEDATA, easy_setopt_impl::write_callback, stdout);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_WRITEDATA, write_callback, stdout);
               break;
             default:
               result = CURLE_UNKNOWN_OPTION;
