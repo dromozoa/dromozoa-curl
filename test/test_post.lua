@@ -31,7 +31,7 @@ if verbose then
 end
 assert(easy:setopt(curl.CURLOPT_IPRESOLVE, curl.CURL_IPRESOLVE_V4))
 assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
-assert(easy:setopt(curl.CURLOPT_POSTFIELDS, "foo=bar&baz=" .. ("X"):rep(16)))
+assert(easy:setopt(curl.CURLOPT_POSTFIELDS, "foo=bar&baz\0=" .. ("X"):rep(16)))
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   body_data[#body_data + 1] = data
 end))
@@ -52,4 +52,4 @@ assert(result.REQUEST_URI == "/cgi-bin/dromozoa-curl.cgi")
 assert(result.QUERY_STRING == "")
 assert(result.HTTP_HOST == "kotori.dromozoa.com")
 assert(result.HTTP_USER_AGENT == "")
-assert(result[1]:find "^foo=bar&baz=X+$")
+assert(result[1]:find "^foo=bar&baz%z=X+$")
