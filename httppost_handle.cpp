@@ -66,6 +66,12 @@ namespace dromozoa {
       }
     }
 
+    template <class T>
+    static CURLFORMcode save_forms_integer(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      save_forms(forms, option, luaX_check_integer<T>(L, arg));
+      return CURL_FORMADD_OK;
+    }
+
     static CURLFORMcode save_forms_function_ref(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
       luaX_reference<>* ref = self->new_reference(L, arg);
       ++self->stream_;
@@ -84,12 +90,6 @@ namespace dromozoa {
       } else {
         return CURL_FORMADD_NULL;
       }
-    }
-
-    template <class T>
-    static CURLFORMcode save_forms_integer(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      save_forms(forms, option, luaX_check_integer<T>(L, arg));
-      return CURL_FORMADD_OK;
     }
 
   private:

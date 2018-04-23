@@ -73,7 +73,6 @@ namespace dromozoa {
       lua_settop(L, top);
       return result;
     }
-
   }
 
   class easy_setopt_impl {
@@ -111,19 +110,6 @@ namespace dromozoa {
       return result;
     }
 
-    static CURLcode setopt_slist(easy_handle* self, lua_State* L, CURLoption option) {
-      CURLcode result = CURLE_UNKNOWN_OPTION;
-      if (lua_isnoneornil(L, 3)) {
-        result = curl_easy_setopt(self->get(), option, 0);
-      } else {
-        luaL_checktype(L, 3, LUA_TTABLE);
-        string_list list(L, 3);
-        self->save_slist(option, list.get());
-        result = curl_easy_setopt(self->get(), option, list.release());
-      }
-      return result;
-    }
-
     template <class T>
     static CURLcode setopt_function_ref(easy_handle* self, lua_State* L, CURLoption option, CURLoption option_data, const T& callback, void* default_data) {
       CURLcode result = CURLE_UNKNOWN_OPTION;
@@ -138,6 +124,19 @@ namespace dromozoa {
         if (result == CURLE_OK) {
           result = curl_easy_setopt(self->get(), option_data, ref);
         }
+      }
+      return result;
+    }
+
+    static CURLcode setopt_slist(easy_handle* self, lua_State* L, CURLoption option) {
+      CURLcode result = CURLE_UNKNOWN_OPTION;
+      if (lua_isnoneornil(L, 3)) {
+        result = curl_easy_setopt(self->get(), option, 0);
+      } else {
+        luaL_checktype(L, 3, LUA_TTABLE);
+        string_list list(L, 3);
+        self->save_slist(option, list.get());
+        result = curl_easy_setopt(self->get(), option, list.release());
       }
       return result;
     }
