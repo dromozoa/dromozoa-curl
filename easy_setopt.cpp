@@ -22,8 +22,9 @@
 #include "symbols.hpp"
 
 namespace dromozoa {
-  namespace {
-    size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
+  class easy_setopt_impl {
+  public:
+    static size_t read_callback(char* buffer, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
@@ -51,7 +52,7 @@ namespace dromozoa {
       return result;
     }
 
-    size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    static size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
@@ -72,26 +73,22 @@ namespace dromozoa {
       lua_settop(L, top);
       return result;
     }
-  }
 
-  class easy_setopt_impl {
-  public:
-    static CURLcode setopt_string(lua_State* L, CURLoption option) {
+    static CURLcode setopt_string(easy_handle* self, lua_State* L, CURLoption option) {
       if (lua_isnoneornil(L, 3)) {
-        return curl_easy_setopt(check_easy(L, 1), option, 0);
+        return curl_easy_setopt(self->get(), option, 0);
       } else {
-        return curl_easy_setopt(check_easy(L, 1), option, luaL_checkstring(L, 3));
+        return curl_easy_setopt(self->get(), option, luaL_checkstring(L, 3));
       }
     }
 
     template <class T>
-    static CURLcode setopt_integer(lua_State* L, CURLoption option) {
-      return curl_easy_setopt(check_easy(L, 1), option, luaX_check_integer<T>(L, 3));
+    static CURLcode setopt_integer(easy_handle* self, lua_State* L, CURLoption option) {
+      return curl_easy_setopt(self->get(), option, luaX_check_integer<T>(L, 3));
     }
 
-    static CURLcode setopt_httppost_ref(lua_State* L, CURLoption option) {
+    static CURLcode setopt_httppost_ref(easy_handle* self, lua_State* L, CURLoption option) {
       luaL_checkany(L, 3);
-      easy_handle* self = check_easy_handle(L, 1);
       self->new_reference(option, L, 3);
       httppost_handle* form = check_httppost_handle(L, 3);
       CURLcode result = curl_easy_setopt(self->get(), option, form->get());
@@ -101,8 +98,7 @@ namespace dromozoa {
       return result;
     }
 
-    static CURLcode setopt_slist(lua_State* L, CURLoption option) {
-      easy_handle* self = check_easy_handle(L, 1);
+    static CURLcode setopt_slist(easy_handle* self, lua_State* L, CURLoption option) {
       CURLcode result = CURLE_UNKNOWN_OPTION;
       if (lua_isnoneornil(L, 3)) {
         result = curl_easy_setopt(self->get(), option, 0);
@@ -116,8 +112,7 @@ namespace dromozoa {
     }
 
     template <class T>
-    static CURLcode setopt_function_ref(lua_State* L, CURLoption option, CURLoption option_data, const T& callback, void* default_data) {
-      easy_handle* self = check_easy_handle(L, 1);
+    static CURLcode setopt_function_ref(easy_handle* self, lua_State* L, CURLoption option, CURLoption option_data, const T& callback, void* default_data) {
       CURLcode result = CURLE_UNKNOWN_OPTION;
       if (lua_isnoneornil(L, 3)) {
         result = curl_easy_setopt(self->get(), option, 0);
@@ -137,6 +132,7 @@ namespace dromozoa {
 
   namespace {
     void impl_setopt(lua_State* L) {
+      easy_handle* self = check_easy_handle(L, 1);
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       CURLcode result = CURLE_UNKNOWN_OPTION;
       switch (easy_setopt_param(option)) {
@@ -146,31 +142,31 @@ namespace dromozoa {
               result = CURLE_UNKNOWN_OPTION;
               break;
             default:
-              result = easy_setopt_impl::setopt_string(L, option);
+              result = easy_setopt_impl::setopt_string(self, L, option);
           }
           break;
         case easy_setopt_param_long:
-          result = easy_setopt_impl::setopt_integer<long>(L, option);
+          result = easy_setopt_impl::setopt_integer<long>(self, L, option);
           break;
         case easy_setopt_param_curl_off_t:
-          result = easy_setopt_impl::setopt_integer<curl_off_t>(L, option);
+          result = easy_setopt_impl::setopt_integer<curl_off_t>(self, L, option);
           break;
         case easy_setopt_param_struct_curl_httppost_p:
-          result = easy_setopt_impl::setopt_httppost_ref(L, option);
+          result = easy_setopt_impl::setopt_httppost_ref(self, L, option);
           break;
         case easy_setopt_param_struct_curl_slist_p:
-          result = easy_setopt_impl::setopt_slist(L, option);
+          result = easy_setopt_impl::setopt_slist(self, L, option);
           break;
         case easy_setopt_param_callback:
           switch (option) {
             case CURLOPT_READFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(L, option, CURLOPT_READDATA, read_callback, stdin);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_READDATA, easy_setopt_impl::read_callback, stdin);
               break;
             case CURLOPT_HEADERFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(L, option, CURLOPT_HEADERDATA, write_callback, 0);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_HEADERDATA, easy_setopt_impl::write_callback, 0);
               break;
             case CURLOPT_WRITEFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(L, option, CURLOPT_WRITEDATA, write_callback, stdout);
+              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_WRITEDATA, easy_setopt_impl::write_callback, stdout);
               break;
             default:
               result = CURLE_UNKNOWN_OPTION;
