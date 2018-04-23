@@ -42,6 +42,26 @@ namespace dromozoa {
     return handle_;
   }
 
+  void easy_handle::clear() {
+    {
+      std::map<CURLoption, luaX_binder*>::iterator i = references_.begin();
+      std::map<CURLoption, luaX_binder*>::iterator end = references_.end();
+      for (; i != end; ++i) {
+        delete i->second;
+      }
+      references_.clear();
+    }
+
+    {
+      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
+      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
+      for (; i != end; ++i) {
+        curl_slist_free_all(i->second);
+      }
+      slists_.clear();
+    }
+  }
+
   luaX_reference<>* easy_handle::new_reference(CURLoption option, lua_State* L, int index) {
     luaX_reference<>* reference = 0;
     try {
@@ -67,26 +87,6 @@ namespace dromozoa {
     } else {
       curl_slist_free_all(i->second);
       i->second = slist;
-    }
-  }
-
-  void easy_handle::clear() {
-    {
-      std::map<CURLoption, luaX_binder*>::iterator i = references_.begin();
-      std::map<CURLoption, luaX_binder*>::iterator end = references_.end();
-      for (; i != end; ++i) {
-        delete i->second;
-      }
-      references_.clear();
-    }
-
-    {
-      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
-      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
-      for (; i != end; ++i) {
-        curl_slist_free_all(i->second);
-      }
-      slists_.clear();
     }
   }
 }
