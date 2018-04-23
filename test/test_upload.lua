@@ -39,6 +39,7 @@ end
 assert(easy:setopt(curl.CURLOPT_IPRESOLVE, curl.CURL_IPRESOLVE_V4))
 assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
 assert(easy:setopt(curl.CURLOPT_UPLOAD, 1))
+assert(easy:setopt(curl.CURLOPT_INFILESIZE, 16))
 assert(easy:setopt(curl.CURLOPT_READFUNCTION, function (n)
   if verbose then
     io.stderr:write(n, "\n")
