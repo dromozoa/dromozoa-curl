@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -82,6 +83,15 @@ namespace dromozoa {
       }
     }
 
+    static CURLcode setopt_string_ref(easy_handle* self, lua_State* L, CURLoption option) {
+      if (lua_isnoneornil(L, 3)) {
+        return curl_easy_setopt(self->get(), option, 0);
+      } else {
+        self->new_reference(option, L, 3);
+        return curl_easy_setopt(self->get(), option, luaL_checkstring(L, 3));
+      }
+    }
+
     template <class T>
     static CURLcode setopt_integer(easy_handle* self, lua_State* L, CURLoption option) {
       return curl_easy_setopt(self->get(), option, luaX_check_integer<T>(L, 3));
@@ -139,7 +149,7 @@ namespace dromozoa {
         case easy_setopt_param_char_p:
           switch (option) {
             case CURLOPT_POSTFIELDS:
-              result = CURLE_UNKNOWN_OPTION;
+              result = easy_setopt_impl::setopt_string_ref(self, L, option);
               break;
             default:
               result = easy_setopt_impl::setopt_string(self, L, option);
