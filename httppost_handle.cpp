@@ -86,8 +86,9 @@ namespace dromozoa {
       }
     }
 
-    static CURLFORMcode save_forms_size_t(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      save_forms(forms, option, luaX_check_integer<size_t>(L, arg));
+    template <class T>
+    static CURLFORMcode save_forms_integer(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
+      save_forms(forms, option, luaX_check_integer<T>(L, arg));
       return CURL_FORMADD_OK;
     }
 
@@ -177,7 +178,7 @@ namespace dromozoa {
         case CURLFORM_CONTENTLEN:
 #endif
         case CURLFORM_CONTENTSLENGTH:
-          result = httppost_handle_impl::save_forms_size_t(this, forms, L, arg + 1, option);
+          result = httppost_handle_impl::save_forms_integer<size_t>(this, forms, L, arg + 1, option);
           break;
 
         case CURLFORM_FILECONTENT:
