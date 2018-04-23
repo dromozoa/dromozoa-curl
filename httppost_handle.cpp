@@ -25,44 +25,44 @@ namespace dromozoa {
   class httppost_handle_impl {
   public:
     static CURLFORMcode save_forms_string(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      if (const char* p = lua_tostring(L, arg)) {
-        save_forms(forms, option, p);
-        return CURL_FORMADD_OK;
-      } else {
+      if (lua_isnoneornil(L, arg)) {
         return CURL_FORMADD_NULL;
+      } else {
+        save_forms(forms, option, luaL_checkstring(L, arg));
+        return CURL_FORMADD_OK;
       }
     }
 
     static CURLFORMcode save_forms_string(httppost_handle*, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
-      size_t length = 0;
-      if (const char* p = lua_tolstring(L, arg, &length)) {
-        save_forms(forms, option, p);
+      if (lua_isnoneornil(L, arg)) {
+        return CURL_FORMADD_NULL;
+      } else {
+        size_t length = 0;
+        save_forms(forms, option, luaL_checklstring(L, arg, &length));
         save_forms(forms, option_length, length);
         return CURL_FORMADD_OK;
-      } else {
-        return CURL_FORMADD_NULL;
       }
     }
 
     static CURLFORMcode save_forms_string_ref(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      if (const char* p = lua_tostring(L, arg)) {
-        self->new_reference(L, arg);
-        save_forms(forms, option, p);
-        return CURL_FORMADD_OK;
-      } else {
+      if (lua_isnoneornil(L, arg)) {
         return CURL_FORMADD_NULL;
+      } else {
+        self->new_reference(L, arg);
+        save_forms(forms, option, luaL_checkstring(L, arg));
+        return CURL_FORMADD_OK;
       }
     }
 
     static CURLFORMcode save_forms_string_ref(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option, CURLformoption option_length) {
-      size_t length = 0;
-      if (const char* p = lua_tolstring(L, arg, &length)) {
+      if (lua_isnoneornil(L, arg)) {
+        return CURL_FORMADD_NULL;
+      } else {
         self->new_reference(L, arg);
-        save_forms(forms, option, p);
+        size_t length = 0;
+        save_forms(forms, option, luaL_checklstring(L, arg, &length));
         save_forms(forms, option_length, length);
         return CURL_FORMADD_OK;
-      } else {
-        return CURL_FORMADD_NULL;
       }
     }
 
