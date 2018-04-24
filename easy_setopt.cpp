@@ -189,6 +189,7 @@ namespace dromozoa {
       easy_handle* self = check_easy_handle(L, 1);
       CURLoption option = luaX_check_enum<CURLoption>(L, 2);
       CURLcode result = CURLE_UNKNOWN_OPTION;
+
       switch (easy_setopt_param(option)) {
         case easy_setopt_param_char_p:
           switch (option) {
@@ -237,6 +238,7 @@ namespace dromozoa {
         default:
           result = CURLE_UNKNOWN_OPTION;
       }
+
       if (result == CURLE_OK) {
         luaX_push_success(L);
       } else {

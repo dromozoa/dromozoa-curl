@@ -19,6 +19,8 @@
 
 io.write(([[
 Content-Type: text/plain; charset=UTF-8
+Set-Cookie: bar=baz; Secure; Path=/
+Set-Cookie: baz=qux; Secure; Path=/
 
 return {
   REQUEST_METHOD = %q;
