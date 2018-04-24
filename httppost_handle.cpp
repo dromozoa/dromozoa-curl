@@ -48,8 +48,9 @@ namespace dromozoa {
       if (lua_isnoneornil(L, arg)) {
         return CURL_FORMADD_NULL;
       } else {
+        const char* ptr = luaL_checkstring(L, arg);
         self->new_reference(L, arg);
-        save_forms(forms, option, luaL_checkstring(L, arg));
+        save_forms(forms, option, ptr);
         return CURL_FORMADD_OK;
       }
     }
@@ -58,9 +59,10 @@ namespace dromozoa {
       if (lua_isnoneornil(L, arg)) {
         return CURL_FORMADD_NULL;
       } else {
-        self->new_reference(L, arg);
         size_t length = 0;
-        save_forms(forms, option, luaL_checklstring(L, arg, &length));
+        const char* ptr = luaL_checklstring(L, arg, &length);
+        self->new_reference(L, arg);
+        save_forms(forms, option, ptr);
         save_forms(forms, option_length, length);
         return CURL_FORMADD_OK;
       }
@@ -73,23 +75,28 @@ namespace dromozoa {
     }
 
     static CURLFORMcode save_forms_function_ref(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      luaX_reference<>* ref = self->new_reference(L, arg);
-      ++self->stream_;
-      save_forms(forms, option, ref);
-      return CURL_FORMADD_OK;
+      if (lua_isnoneornil(L, arg)) {
+        return CURL_FORMADD_NULL;
+      } else {
+        luaX_reference<>* ref = self->new_reference(L, arg);
+        save_forms(forms, option, ref);
+        ++self->stream_;
+        return CURL_FORMADD_OK;
+      }
     }
 
     static CURLFORMcode save_forms_slist(httppost_handle* self, std::vector<struct curl_forms>& forms, lua_State* L, int arg, CURLformoption option) {
-      luaL_checktype(L, arg, LUA_TTABLE);
-      string_list list(L, arg);
-      if (struct curl_slist* slist = list.get()) {
-        self->save_slist(slist);
-        save_forms(forms, option, slist);
-        list.release();
-        return CURL_FORMADD_OK;
-      } else {
-        return CURL_FORMADD_NULL;
+      if (!lua_isnoneornil(L, arg)) {
+        luaL_checktype(L, arg, LUA_TTABLE);
+        string_list list(L, arg);
+        if (struct curl_slist* slist = list.get()) {
+          self->save_slist(slist);
+          list.release();
+          save_forms(forms, option, slist);
+          return CURL_FORMADD_OK;
+        }
       }
+      return CURL_FORMADD_NULL;
     }
 
   private:
