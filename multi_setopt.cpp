@@ -62,12 +62,12 @@ namespace dromozoa {
     }
 
     template <class T>
-    inline CURLMcode setopt_integer(lua_State* L, CURLMoption option) {
+    CURLMcode setopt_integer(lua_State* L, CURLMoption option) {
       return curl_multi_setopt(check_multi(L, 1), option, luaX_check_integer<T>(L, 3));
     }
 
     template <class T>
-    inline CURLMcode setopt_function(lua_State* L, CURLMoption option, CURLMoption option_data, const T& callback) {
+    CURLMcode setopt_function(lua_State* L, CURLMoption option, CURLMoption option_data, const T& callback) {
       multi_handle* self = check_multi_handle(L, 1);
       CURLMcode result = CURLM_UNKNOWN_OPTION;
       if (lua_isnoneornil(L, 3)) {

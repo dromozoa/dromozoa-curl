@@ -86,7 +86,7 @@ namespace dromozoa {
     void cleanup();
     CURL* get() const;
   private:
-    friend class easy_setopt_impl;
+    friend class easy_handle_impl;
     CURL* handle_;
     std::map<CURLoption, luaX_binder*> references_;
     std::map<CURLoption, struct curl_slist*> slists_;
@@ -94,7 +94,9 @@ namespace dromozoa {
     easy_handle& operator=(const easy_handle&);
     void clear();
     luaX_reference<>* new_reference(CURLoption option, lua_State* L, int index);
+    void delete_reference(CURLoption option);
     void save_slist(CURLoption option, struct curl_slist* slist);
+    void free_slist(CURLoption option);
   };
 
   easy_handle* check_easy_handle(lua_State* L, int arg);
