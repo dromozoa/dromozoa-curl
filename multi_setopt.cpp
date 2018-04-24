@@ -74,7 +74,7 @@ namespace dromozoa {
     }
 
     template <class T>
-    static CURLMcode setopt_function(lua_State* L, CURLMoption option, CURLMoption option_data, const T& callback) {
+    static CURLMcode setopt_function_ref(lua_State* L, CURLMoption option, CURLMoption option_data, const T& callback) {
       multi_handle* self = check_multi_handle(L, 1);
       CURLMcode result = CURLM_UNKNOWN_OPTION;
       if (lua_isnoneornil(L, 3)) {
@@ -104,10 +104,10 @@ namespace dromozoa {
         case multi_setopt_param_callback:
           switch (option) {
             case CURLMOPT_SOCKETFUNCTION:
-              result = multi_handle_impl::setopt_function(L, option, CURLMOPT_SOCKETDATA, socket_callback);
+              result = multi_handle_impl::setopt_function_ref(L, option, CURLMOPT_SOCKETDATA, socket_callback);
               break;
             case CURLMOPT_TIMERFUNCTION:
-              result = multi_handle_impl::setopt_function(L, option, CURLMOPT_TIMERDATA, timer_callback);
+              result = multi_handle_impl::setopt_function_ref(L, option, CURLMOPT_TIMERDATA, timer_callback);
               break;
             default:
               result = CURLM_UNKNOWN_OPTION;
