@@ -47,10 +47,12 @@ assert(#data == 2)
 assert(data[1]:find "\tbar\tbaz$")
 assert(data[2]:find "\tbaz\tqux$")
 
-local info = assert(easy:getinfo(curl.CURLINFO_TLS_SESSION))
-if verbose then
-  io.stderr:write(info.backend, "\n")
-  io.stderr:write(tostring(info.internals), "\n")
+if curl.CURLINFO_TLS_SESSION then
+  local info = assert(easy:getinfo(curl.CURLINFO_TLS_SESSION))
+  if verbose then
+    io.stderr:write(info.backend, "\n")
+    io.stderr:write(tostring(info.internals), "\n")
+  end
+  assert(info.backend > 0)
+  assert(type(info.internals) == "userdata")
 end
-assert(info.backend == 9)
-assert(type(info.internals) == "userdata")
