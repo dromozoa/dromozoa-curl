@@ -80,6 +80,14 @@ namespace dromozoa {
     }
   }
 
+  void easy_handle::delete_reference(CURLoption option) {
+    std::map<CURLoption, luaX_binder*>::iterator i = references_.find(option);
+    if (i != references_.end()) {
+      delete i->second;
+      references_.erase(i);
+    }
+  }
+
   void easy_handle::save_slist(CURLoption option, struct curl_slist* slist) {
     std::map<CURLoption, struct curl_slist*>::iterator i = slists_.find(option);
     if (i == slists_.end()) {
@@ -87,6 +95,14 @@ namespace dromozoa {
     } else {
       curl_slist_free_all(i->second);
       i->second = slist;
+    }
+  }
+
+  void easy_handle::free_slist(CURLoption option) {
+    std::map<CURLoption, struct curl_slist*>::iterator i = slists_.find(option);
+    if (i != slists_.end()) {
+      curl_slist_free_all(i->second);
+      slists_.erase(i);
     }
   }
 }

@@ -104,12 +104,16 @@ namespace dromozoa {
 
     static CURLcode setopt_string_ref(easy_handle* self, lua_State* L, CURLoption option, CURLoption option_length) {
       if (lua_isnoneornil(L, 3)) {
-        return curl_easy_setopt(self->get(), option, 0);
+        CURLcode result = curl_easy_setopt(self->get(), option, 0);
+        if (result == CURLE_OK) {
+          self->delete_reference(option);
+        }
+        return result;
       } else {
-        self->new_reference(option, L, 3);
         size_t length = 0;
         CURLcode result = curl_easy_setopt(self->get(), option, luaL_checklstring(L, 3, &length));
         if (result == CURLE_OK) {
+          self->new_reference(option, L, 3);
           result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(length));
         }
         return result;
@@ -123,49 +127,62 @@ namespace dromozoa {
 
     template <class T>
     static CURLcode setopt_function_ref(easy_handle* self, lua_State* L, CURLoption option, CURLoption option_data, const T& callback, void* default_data) {
-      CURLcode result = CURLE_UNKNOWN_OPTION;
       if (lua_isnoneornil(L, 3)) {
-        result = curl_easy_setopt(self->get(), option, 0);
+        CURLcode result = curl_easy_setopt(self->get(), option, 0);
         if (result == CURLE_OK) {
+          self->delete_reference(option);
           result = curl_easy_setopt(self->get(), option_data, default_data);
         }
+        return result;
       } else {
-        luaX_reference<>* ref = self->new_reference(option, L, 3);
-        result = curl_easy_setopt(self->get(), option, callback);
+        CURLcode result = curl_easy_setopt(self->get(), option, callback);
         if (result == CURLE_OK) {
+          luaX_reference<>* ref = self->new_reference(option, L, 3);
           result = curl_easy_setopt(self->get(), option_data, ref);
         }
+        return result;
       }
-      return result;
     }
 
     static CURLcode setopt_slist(easy_handle* self, lua_State* L, CURLoption option) {
-      CURLcode result = CURLE_UNKNOWN_OPTION;
-      if (lua_isnoneornil(L, 3)) {
-        result = curl_easy_setopt(self->get(), option, 0);
-      } else {
+      if (!lua_isnoneornil(L, 3)) {
         luaL_checktype(L, 3, LUA_TTABLE);
         string_list list(L, 3);
         if (struct curl_slist* slist = list.get()) {
-          self->save_slist(option, slist);
-          result = curl_easy_setopt(self->get(), option, slist);
-          list.release();
-        } else {
-          result = curl_easy_setopt(self->get(), option, 0);
+          CURLcode result = curl_easy_setopt(self->get(), option, slist);
+          if (result == CURLE_OK) {
+            self->save_slist(option, slist);
+            list.release();
+          }
+          return result;
         }
+      }
+      CURLcode result = curl_easy_setopt(self->get(), option, 0);
+      if (result == CURLE_OK) {
+        self->free_slist(option);
       }
       return result;
     }
 
     static CURLcode setopt_httppost_ref(easy_handle* self, lua_State* L, CURLoption option) {
-      luaL_checkany(L, 3);
-      self->new_reference(option, L, 3);
-      httppost_handle* form = check_httppost_handle(L, 3);
-      CURLcode result = curl_easy_setopt(self->get(), option, form->get());
-      if (result == CURLE_OK && form->stream() > 0) {
-        result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
+      if (lua_isnoneornil(L, 3)) {
+        CURLcode result = curl_easy_setopt(self->get(), option, 0);
+        if (result == CURLE_OK) {
+          self->delete_reference(option);
+          result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, 0);
+        }
+        return result;
+      } else {
+        httppost_handle* form = check_httppost_handle(L, 3);
+        CURLcode result = curl_easy_setopt(self->get(), option, form->get());
+        if (result == CURLE_OK) {
+          self->new_reference(option, L, 3);
+          if (form->stream() > 0) {
+            result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
+          }
+        }
+        return result;
       }
-      return result;
     }
   };
 
