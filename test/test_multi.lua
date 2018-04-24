@@ -49,6 +49,21 @@ for i = 1, 10 do
   assert(multi:add_handle(easy))
 end
 
+if verbose then
+  io.stderr:write "collectgarbage1\n"
+  io.stderr:flush()
+end
+collectgarbage()
+if verbose then
+  io.stderr:write "collectgarbage2\n"
+  io.stderr:flush()
+end
+collectgarbage()
+if verbose then
+  io.stderr:write "collectgarbage3\n"
+  io.stderr:flush()
+end
+
 local socket_map = {}
 
 assert(multi:setopt(curl.CURLMOPT_SOCKETFUNCTION, function (easy, s, what)
