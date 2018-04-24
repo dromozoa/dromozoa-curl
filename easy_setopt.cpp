@@ -146,8 +146,13 @@ namespace dromozoa {
       } else {
         luaL_checktype(L, 3, LUA_TTABLE);
         string_list list(L, 3);
-        self->save_slist(option, list.get());
-        result = curl_easy_setopt(self->get(), option, list.release());
+        if (struct curl_slist* slist = list.get()) {
+          self->save_slist(option, slist);
+          result = curl_easy_setopt(self->get(), option, slist);
+          list.release();
+        } else {
+          result = curl_easy_setopt(self->get(), option, 0);
+        }
       }
       return result;
     }
