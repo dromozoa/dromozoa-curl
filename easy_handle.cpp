@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -27,19 +27,39 @@ namespace dromozoa {
   }
 
   void easy_handle::reset() {
-    clear();
     curl_easy_reset(handle_);
+    clear();
   }
 
   void easy_handle::cleanup() {
-    clear();
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
+    clear();
   }
 
   CURL* easy_handle::get() const {
     return handle_;
+  }
+
+  void easy_handle::clear() {
+    {
+      std::map<CURLoption, luaX_binder*>::iterator i = references_.begin();
+      std::map<CURLoption, luaX_binder*>::iterator end = references_.end();
+      for (; i != end; ++i) {
+        delete i->second;
+      }
+      references_.clear();
+    }
+
+    {
+      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
+      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
+      for (; i != end; ++i) {
+        curl_slist_free_all(i->second);
+      }
+      slists_.clear();
+    }
   }
 
   luaX_reference<>* easy_handle::new_reference(CURLoption option, lua_State* L, int index) {
@@ -67,26 +87,6 @@ namespace dromozoa {
     } else {
       curl_slist_free_all(i->second);
       i->second = slist;
-    }
-  }
-
-  void easy_handle::clear() {
-    {
-      std::map<CURLoption, luaX_binder*>::iterator i = references_.begin();
-      std::map<CURLoption, luaX_binder*>::iterator end = references_.end();
-      for (; i != end; ++i) {
-        delete i->second;
-      }
-      references_.clear();
-    }
-
-    {
-      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
-      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
-      for (; i != end; ++i) {
-        curl_slist_free_all(i->second);
-      }
-      slists_.clear();
     }
   }
 }
