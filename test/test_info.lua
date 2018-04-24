@@ -27,7 +27,6 @@ if verbose then
   assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
 end
 assert(easy:setopt(curl.CURLOPT_IPRESOLVE, curl.CURL_IPRESOLVE_V4))
-assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
 assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
   if verbose then
     io.stderr:write(data)
@@ -35,17 +34,35 @@ assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
 end))
 assert(easy:setopt(curl.CURLOPT_COOKIEFILE, ""))
 
+assert(easy:setopt(curl.CURLOPT_URL, "https://dromozoa.s3.amazonaws.com/pub/dromozoa-curl/test.txt"))
 assert(easy:perform())
 
-local data = assert(easy:getinfo(curl.CURLINFO_COOKIELIST))
+local info = assert(easy:getinfo(curl.CURLINFO_SIZE_DOWNLOAD))
 if verbose then
-  for i = 1, #data do
-    io.stderr:write(data[i], "\n")
+  io.stderr:write(info, "\n")
+end
+assert(info == 56)
+
+if curl.CURLINFO_SIZE_DOWNLOAD_T then
+  local info = assert(easy:getinfo(curl.CURLINFO_SIZE_DOWNLOAD))
+  if verbose then
+    io.stderr:write(info, "\n")
+  end
+  assert(info == 56)
+end
+
+assert(easy:setopt(curl.CURLOPT_URL, "https://kotori.dromozoa.com/cgi-bin/dromozoa-curl.cgi"))
+assert(easy:perform())
+
+local info = assert(easy:getinfo(curl.CURLINFO_COOKIELIST))
+if verbose then
+  for i = 1, #info do
+    io.stderr:write(info[i], "\n")
   end
 end
-assert(#data == 2)
-assert(data[1]:find "\tbar\tbaz$")
-assert(data[2]:find "\tbaz\tqux$")
+assert(#info == 2)
+assert(info[1]:find "\tbar\tbaz$")
+assert(info[2]:find "\tbaz\tqux$")
 
 if curl.CURLINFO_TLS_SESSION then
   local info = assert(easy:getinfo(curl.CURLINFO_TLS_SESSION))
