@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -58,6 +58,14 @@ namespace dromozoa {
     } catch (...) {
       delete reference;
       throw;
+    }
+  }
+
+  void multi_handle::delete_reference(CURLMoption option) {
+    std::map<CURLMoption, luaX_binder*>::iterator i = references_.find(option);
+    if (i != references_.end()) {
+      delete i->second;
+      references_.erase(i);
     }
   }
 }
