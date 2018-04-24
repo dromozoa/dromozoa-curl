@@ -33,7 +33,7 @@ assert(easy:setopt(curl.CURLOPT_WRITEFUNCTION, function (data)
     io.stderr:write(data)
   end
 end))
-assert(easy:setopt(curl.CURLOPT_COOKIELIST, "Set-Cookie: foo=bar; Secure; Path=/"))
+assert(easy:setopt(curl.CURLOPT_COOKIEFILE, ""))
 
 assert(easy:perform())
 
