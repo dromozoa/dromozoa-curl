@@ -111,9 +111,10 @@ namespace dromozoa {
         return result;
       } else {
         size_t length = 0;
-        CURLcode result = curl_easy_setopt(self->get(), option, luaL_checklstring(L, 3, &length));
+        const char* ptr = luaL_checklstring(L, 3, &length);
+        self->new_reference(option, L, 3);
+        CURLcode result = curl_easy_setopt(self->get(), option, ptr);
         if (result == CURLE_OK) {
-          self->new_reference(option, L, 3);
           result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(length));
         }
         return result;
@@ -130,8 +131,10 @@ namespace dromozoa {
       if (lua_isnoneornil(L, 3)) {
         CURLcode result = curl_easy_setopt(self->get(), option, 0);
         if (result == CURLE_OK) {
-          self->delete_reference(option);
           result = curl_easy_setopt(self->get(), option_data, default_data);
+          if (result == CURLE_OK) {
+            self->delete_reference(option);
+          }
         }
         return result;
       } else {
@@ -149,12 +152,9 @@ namespace dromozoa {
         luaL_checktype(L, 3, LUA_TTABLE);
         string_list list(L, 3);
         if (struct curl_slist* slist = list.get()) {
-          CURLcode result = curl_easy_setopt(self->get(), option, slist);
-          if (result == CURLE_OK) {
-            self->save_slist(option, slist);
-            list.release();
-          }
-          return result;
+          self->save_slist(option, slist);
+          list.release();
+          return curl_easy_setopt(self->get(), option, slist);
         }
       }
       CURLcode result = curl_easy_setopt(self->get(), option, 0);
@@ -174,12 +174,10 @@ namespace dromozoa {
         return result;
       } else {
         httppost_handle* form = check_httppost_handle(L, 3);
+        self->new_reference(option, L, 3);
         CURLcode result = curl_easy_setopt(self->get(), option, form->get());
-        if (result == CURLE_OK) {
-          self->new_reference(option, L, 3);
-          if (form->stream() > 0) {
-            result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
-          }
+        if (result == CURLE_OK && form->stream() > 0) {
+          result = curl_easy_setopt(self->get(), CURLOPT_READFUNCTION, read_callback);
         }
         return result;
       }
