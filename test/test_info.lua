@@ -21,6 +21,7 @@ local curl = require "dromozoa.curl"
 local verbose = os.getenv "VERBOSE" == "1"
 
 assert(dyld.dlopen_pthread())
+assert(curl.global_init())
 
 local easy = assert(curl.easy())
 if verbose then
