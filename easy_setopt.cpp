@@ -79,7 +79,7 @@ namespace dromozoa {
     }
   }
 
-  class easy_setopt_impl {
+  class easy_handle_impl {
   public:
     static CURLcode setopt_string(easy_handle* self, lua_State* L, CURLoption option) {
       if (lua_isnoneornil(L, 3)) {
@@ -193,33 +193,33 @@ namespace dromozoa {
         case easy_setopt_param_char_p:
           switch (option) {
             case CURLOPT_COPYPOSTFIELDS:
-              result = easy_setopt_impl::setopt_string(self, L, option, CURLOPT_POSTFIELDSIZE_LARGE);
+              result = easy_handle_impl::setopt_string(self, L, option, CURLOPT_POSTFIELDSIZE_LARGE);
               break;
             case CURLOPT_POSTFIELDS:
-              result = easy_setopt_impl::setopt_string_ref(self, L, option, CURLOPT_POSTFIELDSIZE_LARGE);
+              result = easy_handle_impl::setopt_string_ref(self, L, option, CURLOPT_POSTFIELDSIZE_LARGE);
               break;
             default:
-              result = easy_setopt_impl::setopt_string(self, L, option);
+              result = easy_handle_impl::setopt_string(self, L, option);
           }
           break;
 
         case easy_setopt_param_long:
-          result = easy_setopt_impl::setopt_integer<long>(self, L, option);
+          result = easy_handle_impl::setopt_integer<long>(self, L, option);
           break;
         case easy_setopt_param_curl_off_t:
-          result = easy_setopt_impl::setopt_integer<curl_off_t>(self, L, option);
+          result = easy_handle_impl::setopt_integer<curl_off_t>(self, L, option);
           break;
 
         case easy_setopt_param_callback:
           switch (option) {
             case CURLOPT_READFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_READDATA, read_callback, stdin);
+              result = easy_handle_impl::setopt_function_ref(self, L, option, CURLOPT_READDATA, read_callback, stdin);
               break;
             case CURLOPT_HEADERFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_HEADERDATA, write_callback, 0);
+              result = easy_handle_impl::setopt_function_ref(self, L, option, CURLOPT_HEADERDATA, write_callback, 0);
               break;
             case CURLOPT_WRITEFUNCTION:
-              result = easy_setopt_impl::setopt_function_ref(self, L, option, CURLOPT_WRITEDATA, write_callback, stdout);
+              result = easy_handle_impl::setopt_function_ref(self, L, option, CURLOPT_WRITEDATA, write_callback, stdout);
               break;
             default:
               result = CURLE_UNKNOWN_OPTION;
@@ -227,11 +227,11 @@ namespace dromozoa {
           break;
 
         case easy_setopt_param_struct_curl_slist_p:
-          result = easy_setopt_impl::setopt_slist(self, L, option);
+          result = easy_handle_impl::setopt_slist(self, L, option);
           break;
 
         case easy_setopt_param_struct_curl_httppost_p:
-          result = easy_setopt_impl::setopt_httppost_ref(self, L, option);
+          result = easy_handle_impl::setopt_httppost_ref(self, L, option);
           break;
 
         default:
