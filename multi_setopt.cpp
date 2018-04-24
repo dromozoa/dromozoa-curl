@@ -79,6 +79,9 @@ namespace dromozoa {
         CURLMcode result = curl_multi_setopt(self->get(), option, 0);
         if (result == CURLM_OK) {
           result = curl_multi_setopt(self->get(), option_data, 0);
+          if (result == CURLM_OK) {
+            self->delete_reference(option);
+          }
         }
         return result;
       } else {

@@ -116,6 +116,7 @@ namespace dromozoa {
     multi_handle(const multi_handle&);
     multi_handle& operator=(const multi_handle&);
     luaX_reference<>* new_reference(CURLMoption option, lua_State* L, int index);
+    void delete_reference(CURLMoption option);
   };
 
   multi_handle* check_multi_handle(lua_State* L, int arg);
