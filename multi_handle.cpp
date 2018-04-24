@@ -37,8 +37,8 @@ namespace dromozoa {
     }
 
     {
-      std::map<CURL*, luaX_binder*>::iterator i = handles_.begin();
-      std::map<CURL*, luaX_binder*>::iterator end = handles_.end();
+      std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.begin();
+      std::map<CURL*, luaX_binder*>::iterator end = easy_handles_.end();
       for (; i != end; ++i) {
         CURLMcode result = curl_multi_remove_handle(handle_, i->first);
         if (result != CURLM_OK) {
@@ -46,7 +46,7 @@ namespace dromozoa {
         }
         delete i->second;
       }
-      handles_.clear();
+      easy_handles_.clear();
     }
 
     CURLM* handle = handle_;
@@ -61,15 +61,15 @@ namespace dromozoa {
       return CURLM_ADDED_ALREADY;
     }
 
-    std::map<CURL*, luaX_binder*>::iterator i = handles_.find(easy_handle->get());
-    if (i != handles_.end()) {
+    std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.find(easy_handle->get());
+    if (i != easy_handles_.end()) {
       return CURLM_ADDED_ALREADY;
     }
 
     luaX_reference<>* reference = 0;
     try {
       reference = new luaX_reference<>(L, index);
-      handles_.insert(std::make_pair(easy_handle->get(), reference));
+      easy_handles_.insert(std::make_pair(easy_handle->get(), reference));
     } catch (...) {
       delete reference;
       throw;
@@ -83,15 +83,15 @@ namespace dromozoa {
   }
 
   CURLMcode multi_handle::remove_handle(CURL* easy) {
-    std::map<CURL*, luaX_binder*>::iterator i = handles_.find(easy);
-    if (i == handles_.end()) {
+    std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.find(easy);
+    if (i == easy_handles_.end()) {
       return CURLM_OK;
     }
 
     CURLMcode result = curl_multi_remove_handle(handle_, easy);
     if (result == CURLM_OK) {
       delete i->second;
-      handles_.erase(i);
+      easy_handles_.erase(i);
     }
     return result;
   }

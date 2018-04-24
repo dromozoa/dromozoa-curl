@@ -120,7 +120,7 @@ namespace dromozoa {
     friend class multi_handle_impl;
     CURLM* handle_;
     std::map<CURLMoption, luaX_binder*> references_;
-    std::map<CURL*, luaX_binder*> handles_;
+    std::map<CURL*, luaX_binder*> easy_handles_;
     multi_handle(const multi_handle&);
     multi_handle& operator=(const multi_handle&);
     luaX_reference<>* new_reference(CURLMoption option, lua_State* L, int index);
