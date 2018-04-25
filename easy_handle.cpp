@@ -32,7 +32,12 @@ namespace dromozoa {
   }
 
   void easy_handle::cleanup() {
-    remove();
+    if (multi_handle_) {
+      CURLMcode result = multi_handle_->remove_handle(this);
+      if (result != CURLM_OK) {
+        DROMOZOA_UNEXPECTED(curl_multi_strerror(result));
+      }
+    }
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
@@ -41,14 +46,6 @@ namespace dromozoa {
 
   CURL* easy_handle::get() const {
     return handle_;
-  }
-
-  void easy_handle::remove() {
-    multi_handle* multi_handle = multi_handle_;
-    multi_handle_ = 0;
-    if (multi_handle) {
-      multi_handle->remove_handle(handle_);
-    }
   }
 
   void easy_handle::clear() {

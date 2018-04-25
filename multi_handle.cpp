@@ -37,13 +37,15 @@ namespace dromozoa {
     }
 
     {
-      std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.begin();
-      std::map<CURL*, luaX_binder*>::iterator end = easy_handles_.end();
+      std::map<easy_handle*, luaX_binder*>::iterator i = easy_handles_.begin();
+      std::map<easy_handle*, luaX_binder*>::iterator end = easy_handles_.end();
       for (; i != end; ++i) {
-        CURLMcode result = curl_multi_remove_handle(handle_, i->first);
+        easy_handle* that = i->first;
+        CURLMcode result = curl_multi_remove_handle(handle_, that->get());
         if (result != CURLM_OK) {
           DROMOZOA_UNEXPECTED(curl_multi_strerror(result));
         }
+        that->multi_handle_ = 0;
         delete i->second;
       }
       easy_handles_.clear();
@@ -55,13 +57,12 @@ namespace dromozoa {
   }
 
   CURLMcode multi_handle::add_handle(lua_State* L, int index) {
-    easy_handle* easy_handle = check_easy_handle(L, index);
-
-    if (easy_handle->multi_handle_) {
+    easy_handle* that = check_easy_handle(L, index);
+    if (that->multi_handle_) {
       return CURLM_ADDED_ALREADY;
     }
 
-    std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.find(easy_handle->get());
+    std::map<easy_handle*, luaX_binder*>::iterator i = easy_handles_.find(that);
     if (i != easy_handles_.end()) {
       return CURLM_ADDED_ALREADY;
     }
@@ -69,30 +70,37 @@ namespace dromozoa {
     luaX_reference<>* reference = 0;
     try {
       reference = new luaX_reference<>(L, index);
-      easy_handles_.insert(std::make_pair(easy_handle->get(), reference));
+      easy_handles_.insert(std::make_pair(that, reference));
     } catch (...) {
       delete reference;
       throw;
     }
 
-    CURLMcode result = curl_multi_add_handle(handle_, easy_handle->get());
+    CURLMcode result = curl_multi_add_handle(handle_, that->get());
     if (result == CURLM_OK) {
-      easy_handle->multi_handle_ = this;
+      that->multi_handle_ = this;
     }
+
     return result;
   }
 
-  CURLMcode multi_handle::remove_handle(CURL* easy) {
-    std::map<CURL*, luaX_binder*>::iterator i = easy_handles_.find(easy);
+  CURLMcode multi_handle::remove_handle(easy_handle* that) {
+    if (!that->multi_handle_) {
+      return CURLM_OK;
+    }
+
+    std::map<easy_handle*, luaX_binder*>::iterator i = easy_handles_.find(that);
     if (i == easy_handles_.end()) {
       return CURLM_OK;
     }
 
-    CURLMcode result = curl_multi_remove_handle(handle_, easy);
+    CURLMcode result = curl_multi_remove_handle(handle_, that->get());
     if (result == CURLM_OK) {
+      that->multi_handle_ = 0;
       delete i->second;
       easy_handles_.erase(i);
     }
+
     return result;
   }
 

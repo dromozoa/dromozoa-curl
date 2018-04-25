@@ -96,7 +96,6 @@ namespace dromozoa {
     std::map<CURLoption, struct curl_slist*> slists_;
     easy_handle(const easy_handle&);
     easy_handle& operator=(const easy_handle&);
-    void remove();
     void clear();
     luaX_reference<>* new_reference(CURLoption option, lua_State* L, int index);
     void delete_reference(CURLoption option);
@@ -114,13 +113,13 @@ namespace dromozoa {
     ~multi_handle();
     CURLMcode cleanup();
     CURLMcode add_handle(lua_State* L, int index);
-    CURLMcode remove_handle(CURL* easy);
+    CURLMcode remove_handle(easy_handle* that);
     CURLM* get() const;
   private:
     friend class multi_handle_impl;
     CURLM* handle_;
     std::map<CURLMoption, luaX_binder*> references_;
-    std::map<CURL*, luaX_binder*> easy_handles_;
+    std::map<easy_handle*, luaX_binder*> easy_handles_;
     multi_handle(const multi_handle&);
     multi_handle& operator=(const multi_handle&);
     luaX_reference<>* new_reference(CURLMoption option, lua_State* L, int index);

@@ -51,7 +51,7 @@ namespace dromozoa {
     }
 
     void impl_remove_handle(lua_State* L) {
-      CURLMcode result = check_multi_handle(L, 1)->remove_handle(check_easy(L, 2));
+      CURLMcode result = check_multi_handle(L, 1)->remove_handle(check_easy_handle(L, 2));
       if (result == CURLM_OK) {
         luaX_push_success(L);
       } else {
