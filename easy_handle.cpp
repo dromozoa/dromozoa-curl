@@ -18,7 +18,7 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  easy_handle::easy_handle(CURL* handle) : handle_(handle) {}
+  easy_handle::easy_handle(CURL* handle) : handle_(handle), multi_handle_() {}
 
   easy_handle::~easy_handle() {
     if (handle_) {
@@ -32,6 +32,12 @@ namespace dromozoa {
   }
 
   void easy_handle::cleanup() {
+    if (multi_handle_) {
+      CURLMcode result = multi_handle_->remove_handle(this);
+      if (result != CURLM_OK) {
+        DROMOZOA_UNEXPECTED(curl_multi_strerror(result));
+      }
+    }
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
