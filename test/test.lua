@@ -15,8 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-curl.  If not, see <http://www.gnu.org/licenses/>.
 
-local dyld = require "dromozoa.dyld"
 local curl = require "dromozoa.curl"
+local dyld = require "dromozoa.dyld"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
