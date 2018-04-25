@@ -80,6 +80,9 @@ namespace dromozoa {
         luaX_set_field(L, -2, "easy_handle");
         if (msg->msg == CURLMSG_DONE) {
           luaX_set_field<lua_Integer>(L, -1, "result", msg->data.result);
+        } else {
+          lua_pushlightuserdata(L, msg->data.whatever);
+          luaX_set_field(L, -2, "whatever");
         }
         luaX_push(L, msgs_in_queue);
       } else {

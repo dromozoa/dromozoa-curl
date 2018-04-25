@@ -137,6 +137,9 @@ while true do
   else
     break
   end
+  if verbose then
+    io.stderr:write(n, "\n")
+  end
 end
 
 timer:stop()
