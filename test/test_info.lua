@@ -71,6 +71,5 @@ if curl.CURLINFO_TLS_SESSION then
     io.stderr:write(info.backend, "\n")
     io.stderr:write(tostring(info.internals), "\n")
   end
-  assert(info.backend > 0)
   assert(type(info.internals) == "userdata")
 end
