@@ -30,9 +30,10 @@ local timer = unix.timer()
 
 local multi = assert(curl.multi())
 local multi_timer
+local easy
 
 for i = 1, 10 do
-  local easy = assert(curl.easy())
+  easy = assert(curl.easy())
   local j = 0
   if verbose then
     assert(easy:setopt(curl.CURLOPT_VERBOSE, 1))
@@ -144,3 +145,15 @@ if verbose then
   io.stderr:write(timer:elapsed(), "\n")
 end
 assert(timer:elapsed() < 5)
+
+local result, message = multi:add_handle(easy)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+
+assert(multi:remove_handle(easy))
+easy = nil
+
+collectgarbage()
+collectgarbage()
