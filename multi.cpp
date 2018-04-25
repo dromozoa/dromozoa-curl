@@ -19,6 +19,10 @@
 
 namespace dromozoa {
   namespace {
+    CURLM* check_multi(lua_State* L, int arg) {
+      return check_multi_handle(L, arg)->get();
+    }
+
     void impl_gc(lua_State* L) {
       check_multi_handle(L, 1)->~multi_handle();
     }
@@ -97,10 +101,6 @@ namespace dromozoa {
 
   multi_handle* check_multi_handle(lua_State* L, int arg) {
     return luaX_check_udata<multi_handle>(L, arg, "dromozoa.curl.multi_ref", "dromozoa.curl.multi");
-  }
-
-  CURLM* check_multi(lua_State* L, int arg) {
-    return check_multi_handle(L, arg)->get();
   }
 
   void new_multi_ref(lua_State* L, CURLM* handle) {
