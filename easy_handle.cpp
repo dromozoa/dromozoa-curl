@@ -42,6 +42,7 @@ namespace dromozoa {
     CURL* handle = handle_;
     handle_ = 0;
     curl_easy_cleanup(handle);
+
     clear();
   }
 
@@ -51,21 +52,21 @@ namespace dromozoa {
 
   void easy_handle::clear() {
     {
-      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
-      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
-      for (; i != end; ++i) {
-        curl_slist_free_all(i->second);
-      }
-      slists_.clear();
-    }
-
-    {
       std::map<CURLoption, luaX_reference<>*>::iterator i = references_.begin();
       std::map<CURLoption, luaX_reference<>*>::iterator end = references_.end();
       for (; i != end; ++i) {
         scoped_ptr<luaX_reference<> > deleter(i->second);
       }
       references_.clear();
+    }
+
+    {
+      std::map<CURLoption, struct curl_slist*>::iterator i = slists_.begin();
+      std::map<CURLoption, struct curl_slist*>::iterator end = slists_.end();
+      for (; i != end; ++i) {
+        curl_slist_free_all(i->second);
+      }
+      slists_.clear();
     }
   }
 
