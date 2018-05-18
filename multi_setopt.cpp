@@ -24,7 +24,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int result = 0;
-      int top = lua_gettop(L);
+      luaX_top_saver save_top(L);
       {
         ref->get_field(L);
         new_easy_ref(L, easy);
@@ -39,7 +39,6 @@ namespace dromozoa {
           DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
         }
       }
-      lua_settop(L, top);
       return result;
     }
 
@@ -47,7 +46,7 @@ namespace dromozoa {
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
       int result = 0;
-      int top = lua_gettop(L);
+      luaX_top_saver save_top(L);
       {
         ref->get_field(L);
         new_multi_ref(L, multi);
@@ -61,7 +60,6 @@ namespace dromozoa {
           DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
         }
       }
-      lua_settop(L, top);
       return result;
     }
   }
