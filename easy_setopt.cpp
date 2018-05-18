@@ -33,13 +33,12 @@ namespace dromozoa {
       {
         ref->get_field(L);
         luaX_push(L, n);
-        int r = lua_pcall(L, 1, 1, 0);
-        if (r == 0) {
-          if (luaX_is_integer(L, -1)) {
-            result = lua_tointeger(L, -1);
-          } else if (const char* ptr = lua_tolstring(L, -1, &result)) {
-            if (result <= n) {
-              memcpy(buffer, ptr, result);
+        if (lua_pcall(L, 1, 1, 0) == 0) {
+          if (luaX_string_reference source = luaX_to_string(L, -1)) {
+            result = source.size();
+            if (source.size() <= n) {
+              memcpy(buffer, source.data(), source.size());
+              result = source.size();
             } else {
               result = CURL_READFUNC_ABORT;
             }
@@ -62,9 +61,8 @@ namespace dromozoa {
       int top = lua_gettop(L);
       {
         ref->get_field(L);
-        lua_pushlstring(L, ptr, n);
-        int r = lua_pcall(L, 1, 1, 0);
-        if (r == 0) {
+        luaX_push(L, luaX_string_reference(ptr, n));
+        if (lua_pcall(L, 1, 1, 0) == 0) {
           if (luaX_is_integer(L, -1)) {
             result = lua_tointeger(L, -1);
           } else {
@@ -93,10 +91,10 @@ namespace dromozoa {
       if (lua_isnoneornil(L, 3)) {
         return curl_easy_setopt(self->get(), option, 0);
       } else {
-        size_t length = 0;
-        CURLcode result = curl_easy_setopt(self->get(), option, luaL_checklstring(L, 3, &length));
+        luaX_string_reference source = luaX_check_string(L, 3);
+        CURLcode result = curl_easy_setopt(self->get(), option, source.data());
         if (result == CURLE_OK) {
-          result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(length));
+          result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(source.size()));
         }
         return result;
       }
@@ -110,12 +108,11 @@ namespace dromozoa {
         }
         return result;
       } else {
-        size_t length = 0;
-        const char* ptr = luaL_checklstring(L, 3, &length);
+        luaX_string_reference source = luaX_check_string(L, 3);
         self->new_reference(option, L, 3);
-        CURLcode result = curl_easy_setopt(self->get(), option, ptr);
+        CURLcode result = curl_easy_setopt(self->get(), option, source.data());
         if (result == CURLE_OK) {
-          result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(length));
+          result = curl_easy_setopt(self->get(), option_length, static_cast<curl_off_t>(source.size()));
         }
         return result;
       }
