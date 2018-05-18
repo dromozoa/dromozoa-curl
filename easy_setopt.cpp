@@ -28,50 +28,51 @@ namespace dromozoa {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
-      size_t result = CURL_READFUNC_ABORT;
       luaX_top_saver save_top(L);
       {
         ref->get_field(L);
         luaX_push(L, n);
         if (lua_pcall(L, 1, 1, 0) == 0) {
-          if (luaX_string_reference source = luaX_to_string(L, -1)) {
-            result = source.size();
+          if (luaX_is_integer(L, -1)) {
+            // CURL_READFUNC_ABORT, CURL_READFUNC_PAUSE or 0
+            return lua_tointeger(L, -1);
+          } else if (luaX_string_reference source = luaX_to_string(L, -1)) {
             if (source.size() <= n) {
               memcpy(buffer, source.data(), source.size());
-              result = source.size();
-            } else {
-              result = CURL_READFUNC_ABORT;
+              return source.size();
             }
           } else {
-            result = 0;
+            // stop the current transfer
+            return 0;
           }
         } else {
           DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
         }
       }
-      return result;
+      return CURL_READFUNC_ABORT;
     }
 
     size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
       size_t n = size * nmemb;
       luaX_reference<>* ref = static_cast<luaX_reference<>*>(userdata);
       lua_State* L = ref->state();
-      size_t result = 0;
       luaX_top_saver save_top(L);
       {
         ref->get_field(L);
         luaX_push(L, luaX_string_reference(ptr, n));
         if (lua_pcall(L, 1, 1, 0) == 0) {
           if (luaX_is_integer(L, -1)) {
-            result = lua_tointeger(L, -1);
+            // the number of bytes written or CURL_WRITEFUNC_PAUSE
+            return lua_tointeger(L, -1);
           } else {
-            result = n;
+            // assume that all bytes were written
+            return n;
           }
         } else {
           DROMOZOA_UNEXPECTED(lua_tostring(L, -1));
         }
       }
-      return result;
+      return 0;
     }
   }
 
