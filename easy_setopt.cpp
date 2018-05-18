@@ -87,7 +87,11 @@ namespace dromozoa {
 
     static CURLcode setopt_string(easy_handle* self, lua_State* L, CURLoption option, CURLoption option_length) {
       if (lua_isnoneornil(L, 3)) {
-        return curl_easy_setopt(self->get(), option, 0);
+        CURLcode result = curl_easy_setopt(self->get(), option, 0);
+        if (result == CURLE_OK) {
+          result = curl_easy_setopt(self->get(), option_length, 0);
+        }
+        return result;
       } else {
         luaX_string_reference source = luaX_check_string(L, 3);
         CURLcode result = curl_easy_setopt(self->get(), option, source.data());
@@ -102,7 +106,10 @@ namespace dromozoa {
       if (lua_isnoneornil(L, 3)) {
         CURLcode result = curl_easy_setopt(self->get(), option, 0);
         if (result == CURLE_OK) {
-          self->delete_reference(option);
+          result = curl_easy_setopt(self->get(), option_length, 0);
+          if (result == CURLE_OK) {
+            self->delete_reference(option);
+          }
         }
         return result;
       } else {
