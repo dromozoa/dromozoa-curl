@@ -1,4 +1,4 @@
-// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-curl.
 //
@@ -82,7 +82,8 @@ namespace dromozoa {
       if (lua_isnoneornil(L, 3)) {
         return curl_easy_setopt(self->get(), option, 0);
       } else {
-        return curl_easy_setopt(self->get(), option, luaL_checkstring(L, 3));
+        luaX_string_reference source = luaX_check_string(L, 3);
+        return curl_easy_setopt(self->get(), option, source.data());
       }
     }
 
