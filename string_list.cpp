@@ -24,8 +24,8 @@ namespace dromozoa {
     if (lua_istable(L, index)) {
       for (int i = 1; ; ++i) {
         luaX_get_field(L, index, i);
-        if (const char* p = lua_tostring(L, -1)) {
-          slist_ = curl_slist_append(slist_, p);
+        if (luaX_string_reference item = luaX_to_string(L, -1)) {
+          slist_ = curl_slist_append(slist_, item.data());
           lua_pop(L, 1);
         } else {
           lua_pop(L, 1);
