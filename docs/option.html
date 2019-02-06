@@ -184,6 +184,11 @@
     <td>file</td>
   </tr>
   <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_CURLU.html">CURLOPT_CURLU</a></td>
+    <td>void *</td>
+    <td>pointer</td>
+  </tr>
+  <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_CUSTOMREQUEST.html">CURLOPT_CUSTOMREQUEST</a></td>
     <td>char *</td>
     <td>request</td>
@@ -207,6 +212,11 @@
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_DIRLISTONLY.html">CURLOPT_DIRLISTONLY</a></td>
     <td>long</td>
     <td>listonly</td>
+  </tr>
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_DISALLOW_USERNAME_IN_URL.html">CURLOPT_DISALLOW_USERNAME_IN_URL</a></td>
+    <td>long</td>
+    <td>disallow</td>
   </tr>
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_DNS_CACHE_TIMEOUT.html">CURLOPT_DNS_CACHE_TIMEOUT</a></td>
@@ -237,6 +247,11 @@
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_DNS_SHUFFLE_ADDRESSES.html">CURLOPT_DNS_SHUFFLE_ADDRESSES</a></td>
     <td>long</td>
     <td>onoff</td>
+  </tr>
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_DOH_URL.html">CURLOPT_DOH_URL</a></td>
+    <td>char *</td>
+    <td>URL</td>
   </tr>
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_EGDSOCKET.html">CURLOPT_EGDSOCKET</a></td>
@@ -829,6 +844,11 @@
     <td>verify</td>
   </tr>
   <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_PROXY_TLS13_CIPHERS.html">CURLOPT_PROXY_TLS13_CIPHERS</a></td>
+    <td>char *</td>
+    <td>list</td>
+  </tr>
+  <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_PROXY_TLSAUTH_PASSWORD.html">CURLOPT_PROXY_TLSAUTH_PASSWORD</a></td>
     <td>char *</td>
     <td>pwd</td>
@@ -897,6 +917,16 @@
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESOLVE.html">CURLOPT_RESOLVE</a></td>
     <td>struct curl_slist *</td>
     <td>hosts</td>
+  </tr>
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESOLVER_START_DATA.html">CURLOPT_RESOLVER_START_DATA</a></td>
+    <td>void *</td>
+    <td>pointer</td>
+  </tr>
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESOLVER_START_FUNCTION.html">CURLOPT_RESOLVER_START_FUNCTION</a></td>
+    <td>resolver_start_cb</td>
+    <td></td>
   </tr>
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESUME_FROM.html">CURLOPT_RESUME_FROM</a></td>
@@ -1219,6 +1249,11 @@
     <td>val</td>
   </tr>
   <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_TLS13_CIPHERS.html">CURLOPT_TLS13_CIPHERS</a></td>
+    <td>char *</td>
+    <td>list</td>
+  </tr>
+  <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_TLSAUTH_PASSWORD.html">CURLOPT_TLSAUTH_PASSWORD</a></td>
     <td>char *</td>
     <td>pwd</td>
@@ -1244,16 +1279,6 @@
     <td>enable</td>
   </tr>
   <tr>
-    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESOLVER_START_FUNCTION.html">CURLOPT_RESOLVER_START_FUNCTION</a></td>
-    <td>resolver_start_cb</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_RESOLVER_START_DATA.html">CURLOPT_RESOLVER_START_DATA</a></td>
-    <td>void *</td>
-    <td>pointer</td>
-  </tr>
-  <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_UNIX_SOCKET_PATH.html">CURLOPT_UNIX_SOCKET_PATH</a></td>
     <td>char *</td>
     <td>path</td>
@@ -1264,9 +1289,19 @@
     <td>goahead</td>
   </tr>
   <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_UPKEEP_INTERVAL_MS.html">CURLOPT_UPKEEP_INTERVAL_MS</a></td>
+    <td>long</td>
+    <td>upkeep_interval_ms</td>
+  </tr>
+  <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_UPLOAD.html">CURLOPT_UPLOAD</a></td>
     <td>long</td>
     <td>upload</td>
+  </tr>
+  <tr>
+    <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_UPLOAD_BUFFERSIZE.html">CURLOPT_UPLOAD_BUFFERSIZE</a></td>
+    <td>long</td>
+    <td>size</td>
   </tr>
   <tr>
     <td><a href="https://curl.haxx.se/libcurl/c/CURLOPT_URL.html">CURLOPT_URL</a></td>
