@@ -1,14 +1,19 @@
-package = "dromozoa-bind"
-version = "1.48-1"
+rockspec_format = "3.0"
+package = "dromozoa-curl"
+version = "1.16-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-bind/archive/v1.48.tar.gz";
-  file = "dromozoa-bind-1.48.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-curl/archive/v1.16.tar.gz";
+  file = "dromozoa-curl-1.16.tar.gz";
 }
 description = {
-  summary = "Helper library for creating bindings between C++ and Lua";
+  summary = "Lua bindings for libcurl";
   license = "GPL-3";
-  homepage = "https://github.com/dromozoa/dromozoa-bind/";
+  homepage = "https://github.com/dromozoa/dromozoa-curl/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
+}
+test = {
+  type = "command";
+  command = "./test.sh";
 }
 build = {
   type = "make";

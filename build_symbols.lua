@@ -1,4 +1,4 @@
--- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-curl.
 --
@@ -294,10 +294,10 @@ end
 out:write [[
   };
 
-  void initialize_symbols(lua_State* L);
-  easy_setopt_param_enum easy_setopt_param(CURLoption option);
-  multi_setopt_param_enum multi_setopt_param(CURLMoption option);
-  const char* error_to_string(CURLFORMcode code);
+  void initialize_symbols(lua_State*);
+  easy_setopt_param_enum easy_setopt_param(CURLoption);
+  multi_setopt_param_enum multi_setopt_param(CURLMoption);
+  const char* error_to_string(CURLFORMcode);
 }
 
 #endif
