@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "dromozoa-curl"
-version = "1.17-1"
+version = "1.18-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-curl/archive/v1.17.tar.gz";
-  file = "dromozoa-curl-1.17.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-curl/archive/v1.18.tar.gz";
+  file = "dromozoa-curl-1.18.tar.gz";
 }
 description = {
   summary = "Lua bindings for libcurl";
@@ -21,7 +21,6 @@ build = {
     CFLAGS = "$(CFLAGS)";
     LIBFLAG = "$(LIBFLAG)";
     LUA_INCDIR = "$(LUA_INCDIR)";
-    LUA_LIBDIR = "$(LUA_LIBDIR)";
   };
   install_variables = {
     LIBDIR = "$(LIBDIR)";
